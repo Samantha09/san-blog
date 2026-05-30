@@ -2,7 +2,7 @@
 title: "Hello World"
 date: 2025-05-30T12:00:00+08:00
 draft: false
-tags: ["hugo", "blog"]
+tags: ["博客搭建", "Hugo", "PaperMod", "GitHub Pages"]
 categories: ["随笔"]
 ---
 

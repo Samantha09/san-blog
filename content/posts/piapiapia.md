@@ -2,7 +2,7 @@
 title: "[0CTF 2016]piapiapia"
 date: 2025-05-30T15:00:00+08:00
 draft: false
-tags: ["ctf", "php", "反序列化", "web安全"]
+tags: ["CTF", "Web安全", "PHP", "反序列化", "文件读取"]
 categories: ["Writeup"]
 ---
 

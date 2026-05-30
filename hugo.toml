@@ -1,11 +1,11 @@
 baseURL = 'https://Samantha09.github.io/san-blog'
 languageCode = 'zh-cn'
-title = 'Samantha09的博客'
+title = '东阳的安全笔记'
 theme = 'PaperMod'
 
 [params]
-  author = 'Samantha09'
-  description = '记录学习与生活'
+  author = '东阳'
+  description = '数据安全与网络安全技术分享'
   defaultTheme = 'auto'
   ShowReadingTime = true
   ShowShareButtons = false
@@ -25,7 +25,7 @@ theme = 'PaperMod'
 
   [params.homeInfoParams]
     Title = "Hi there 👋"
-    Content = "欢迎来到 Samantha09 的博客，记录技术学习与生活点滴。"
+    Content = "欢迎来到东阳的安全笔记，专注数据安全与网络安全技术分享。"
 
   [[params.socialIcons]]
     name = "github"
