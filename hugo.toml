@@ -48,6 +48,11 @@ theme = 'PaperMod'
     url = '/tags/'
     weight = 30
   [[menu.main]]
+    identifier = 'categories'
+    name = '分类'
+    url = '/categories/'
+    weight = 35
+  [[menu.main]]
     identifier = 'archives'
     name = '归档'
     url = '/archives/'
