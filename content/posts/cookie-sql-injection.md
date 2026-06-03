@@ -54,6 +54,57 @@ $result = mysqli_query($conn, $sql);
 
 这些场景下，服务端往往会直接读取 Cookie 值并用于数据库查询。
 
+### 2.4 常见应用场景
+
+Cookie 注入通常出现在以下具体场景中：
+
+**用户偏好持久化**
+
+网站常将用户的主题、语言、时区等偏好存入 Cookie，下次访问时读取并应用：
+
+```php
+$theme = $_COOKIE['theme'];
+$sql = "SELECT css_path FROM themes WHERE name = '$theme'";
+```
+
+攻击者修改 `theme` Cookie 即可注入。
+
+**分页与筛选状态**
+
+某些系统将列表页的分页参数、筛选条件存入 Cookie，避免 URL 过长：
+
+```php
+$filter = json_decode($_COOKIE['search_filter']);
+$sql = "SELECT * FROM products WHERE category = '{$filter->category}'";
+```
+
+如果 Cookie 值未经解码和过滤直接拼接，JSON 中的引号可以闭合 SQL 语句。
+
+**框架自动序列化**
+
+部分 PHP 框架或 CMS 会将路由参数自动序列化到 Cookie 中：
+
+```
+Cookie: route_params=a:1:{s:2:"id";s:1:"1";}
+```
+
+框架反序列化后直接提取 `id` 用于查询，这个过程如果缺乏过滤，就会产生注入点。
+
+**身份验证与权限控制**
+
+一些老旧系统将会员等级、用户角色等身份信息直接存储在 Cookie 中：
+
+```php
+$role = $_COOKIE['user_role'];
+$sql = "SELECT * FROM admin_panel WHERE required_role = '$role'";
+```
+
+攻击者可以通过修改 Cookie 中的角色值实现越权，甚至注入 SQL。
+
+**绕过前端过滤**
+
+当 URL 参数和 POST 数据经过严格的前端/WAF 过滤时，Cookie 可能成为绕过的通道。同样的 payload 在 URL 中被拦截，在 Cookie 中可能畅通无阻。
+
 ---
 
 ## 三、Cookie 注入 vs GET/POST 注入
