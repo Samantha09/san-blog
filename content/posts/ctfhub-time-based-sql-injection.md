@@ -1,5 +1,5 @@
 ---
-title: "CTFHub 踩坑记：当"布尔注入"遇上 Time-based Blind SQL 注入"
+title: "CTFHub 踩坑记：当「布尔注入」遇上 Time-based Blind SQL 注入"
 date: 2026-06-03T21:30:00+08:00
 draft: false
 tags: ["CTF", "Web安全", "SQL注入", "sqlmap", "Time-based Blind"]
