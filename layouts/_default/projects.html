@@ -1,0 +1,236 @@
+{{ define "main" }}
+
+<div class="projects-container">
+    <header class="projects-header">
+        <h1>{{ .Title }}</h1>
+        {{ with .Content }}
+        <div class="projects-description">{{ . }}</div>
+        {{ end }}
+    </header>
+
+    <div class="projects-grid">
+        {{ range $.Site.Data.projects }}
+        <article class="project-card {{ if .featured }}project-featured{{ end }}">
+            <div class="project-image-wrapper">
+                {{ if .image }}
+                <img src="{{ .image }}" alt="{{ .name }}" loading="lazy" class="project-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="project-image-placeholder" style="display:none;">{{ substr .name 0 1 }}</div>
+                {{ else }}
+                <div class="project-image-placeholder">{{ substr .name 0 1 }}</div>
+                {{ end }}
+                {{ if .featured }}
+                <span class="project-badge">精选</span>
+                {{ end }}
+            </div>
+
+            <div class="project-content">
+                <h3 class="project-title">{{ .name }}</h3>
+                <p class="project-desc">{{ .description }}</p>
+
+                <div class="project-tech">
+                    {{ range .tech }}
+                    <span class="tech-tag">{{ . }}</span>
+                    {{ end }}
+                </div>
+
+                <div class="project-links">
+                    {{ if .github }}
+                    <a href="{{ .github }}" target="_blank" rel="noopener" class="project-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                        GitHub
+                    </a>
+                    {{ end }}
+                    {{ if .demo }}
+                    <a href="{{ .demo }}" target="_blank" rel="noopener" class="project-link project-link-demo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        在线演示
+                    </a>
+                    {{ end }}
+                </div>
+            </div>
+        </article>
+        {{ end }}
+    </div>
+</div>
+
+<style>
+.projects-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.projects-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.projects-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.projects-description {
+    color: var(--secondary);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.project-card {
+    background: var(--entry);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.project-featured {
+    border-color: var(--primary);
+}
+
+.project-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: var(--theme);
+}
+
+.project-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.project-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    font-weight: bold;
+    color: var(--secondary);
+    background: linear-gradient(135deg, var(--theme) 0%, var(--entry) 100%);
+}
+
+.project-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--primary);
+    color: var(--theme);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.project-content {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+}
+
+.project-desc {
+    color: var(--secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    flex: 1;
+}
+
+.project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+}
+
+.tech-tag {
+    background: var(--code-bg);
+    color: var(--primary);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.project-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+}
+
+.project-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    color: var(--primary);
+    transition: all 0.2s ease;
+}
+
+.project-link:hover {
+    background: var(--primary);
+    color: var(--theme);
+    border-color: var(--primary);
+}
+
+.project-link svg {
+    transition: transform 0.2s ease;
+}
+
+.project-link:hover svg {
+    transform: scale(1.1);
+}
+
+.project-link-demo {
+    background: var(--primary);
+    color: var(--theme);
+    border-color: var(--primary);
+}
+
+.project-link-demo:hover {
+    background: transparent;
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .projects-header h1 {
+        font-size: 2rem;
+    }
+}
+</style>
+
+{{ end }}

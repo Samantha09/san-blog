@@ -1,0 +1,15 @@
+- name: "Piapiapia CTF Writeup"
+  description: "[0CTF 2016] PHP 反序列化字符串逃逸漏洞分析与利用"
+  image: "https://github-readme-stats.vercel.app/api/pin/?username=Samantha09&repo=san-blog&theme=transparent"
+  tech: ["PHP", "CTF", "Web安全", "反序列化"]
+  github: "https://github.com/Samantha09/san-blog"
+  demo: "https://samantha09.github.io/san-blog/posts/piapiapia/"
+  featured: true
+
+- name: "示例项目"
+  description: "这是一个示例项目，用来展示作品页的布局效果"
+  image: ""
+  tech: ["Go", "Hugo", "PaperMod"]
+  github: "https://github.com/Samantha09/san-blog"
+  demo: "https://samantha09.github.io/san-blog/"
+  featured: false
