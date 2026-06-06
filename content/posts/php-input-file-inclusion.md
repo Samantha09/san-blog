@@ -98,7 +98,7 @@ HTTP/1.1 200 OK
 ctfhub{xxxxxxxxxxxxxxxxxxxxxxxx}
 ```
 
-![Burp Suite Repeater 利用截图](/images/php-input-burp-repeater.png)
+![Burp Suite Repeater 利用截图](../../images/php-input-burp-repeater.png)
 
 ### 3.3 关键点解析
 

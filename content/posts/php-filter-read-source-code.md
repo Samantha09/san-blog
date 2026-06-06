@@ -98,7 +98,7 @@ GET /?file=php://filter/resource=/flag HTTP/1.1
 Host: <TARGET_IP>:<PORT>
 ```
 
-![Burp Suite 利用截图](/images/php-filter-read-flag.png)
+![Burp Suite 利用截图](../../images/php-filter-read-flag.png)
 
 **Response：**
 ```
