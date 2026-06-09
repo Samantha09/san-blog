@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>前端绕过 on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/%E5%89%8D%E7%AB%AF%E7%BB%95%E8%BF%87/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/%E5%89%8D%E7%AB%AF%E7%BB%95%E8%BF%87/</link>
     <description>Recent content in 前端绕过 on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Mon, 01 Jun 2026 21:00:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/%E5%89%8D%E7%AB%AF%E7%BB%95%E8%BF%87/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/%E5%89%8D%E7%AB%AF%E7%BB%95%E8%BF%87/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>[DASCTF] Upload-Labs-Linux Pass-01</title>
-      <link>http://localhost:1313/san-blog/posts/upload-labs-linux-pass01/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/upload-labs-linux-pass01/</link>
       <pubDate>Mon, 01 Jun 2026 21:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/upload-labs-linux-pass01/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/upload-labs-linux-pass01/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 文件上传漏洞&lt;/li&gt;

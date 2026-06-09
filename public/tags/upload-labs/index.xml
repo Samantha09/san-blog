@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Upload-Labs on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/upload-labs/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/upload-labs/</link>
     <description>Recent content in Upload-Labs on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Fri, 05 Jun 2026 00:00:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/upload-labs/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/upload-labs/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>文件上传绕过技法全解：从无验证到双写后缀的七种攻击面</title>
-      <link>http://localhost:1313/san-blog/posts/file-upload-bypass-techniques/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/file-upload-bypass-techniques/</link>
       <pubDate>Fri, 05 Jun 2026 00:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/file-upload-bypass-techniques/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/file-upload-bypass-techniques/</guid>
       <description>&lt;h2 id=&#34;一前言&#34;&gt;一、前言&lt;/h2&gt;
 &lt;p&gt;文件上传漏洞是 Web 安全中最常见的高危漏洞之一。实际环境中，服务端往往不会「完全不设防」，而是部署了多层校验。本题图梳理了文件上传从「无验证」到「双写后缀」的完整攻击链路，本文将逐一拆解图中高亮的 &lt;strong&gt;七种绕过技法&lt;/strong&gt;，配合真实代码和 Payload，形成可落地的利用手册。&lt;/p&gt;
 &lt;hr&gt;
@@ -52,9 +52,9 @@
     </item>
     <item>
       <title>[DASCTF] Upload-Labs-Linux Pass-01</title>
-      <link>http://localhost:1313/san-blog/posts/upload-labs-linux-pass01/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/upload-labs-linux-pass01/</link>
       <pubDate>Mon, 01 Jun 2026 21:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/upload-labs-linux-pass01/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/upload-labs-linux-pass01/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 文件上传漏洞&lt;/li&gt;

@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>SVN on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/svn/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/svn/</link>
     <description>Recent content in SVN on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 02 Jun 2026 21:52:22 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/svn/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/svn/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>SVN 信息泄露漏洞原理、利用与防护</title>
-      <link>http://localhost:1313/san-blog/posts/svn-info-leak-vulnerability/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/svn-info-leak-vulnerability/</link>
       <pubDate>Tue, 02 Jun 2026 21:52:22 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/svn-info-leak-vulnerability/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/svn-info-leak-vulnerability/</guid>
       <description>&lt;h1 id=&#34;svn-信息泄露漏洞原理利用与防护&#34;&gt;SVN 信息泄露漏洞原理、利用与防护&lt;/h1&gt;
 &lt;h2 id=&#34;一什么是-svn-信息泄露漏洞&#34;&gt;一、什么是 SVN 信息泄露漏洞&lt;/h2&gt;
 &lt;p&gt;SVN（Subversion）是一种集中式版本控制系统，广泛用于代码管理。在 Web 开发中，开发者常常直接将包含 &lt;code&gt;.svn&lt;/code&gt; 目录的项目部署到 Web 服务器的根目录下。如果服务器没有正确配置访问控制，攻击者就可以通过浏览器直接访问 &lt;code&gt;.svn&lt;/code&gt; 目录下的文件，从而获取网站的源代码、历史版本、敏感配置甚至数据库密码，这种安全问题被称为 &lt;strong&gt;SVN 信息泄露漏洞&lt;/strong&gt;。&lt;/p&gt;

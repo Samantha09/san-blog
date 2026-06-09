@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>User-Agent注入 on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/user-agent%E6%B3%A8%E5%85%A5/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/user-agent%E6%B3%A8%E5%85%A5/</link>
     <description>Recent content in User-Agent注入 on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Wed, 03 Jun 2026 22:30:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/user-agent%E6%B3%A8%E5%85%A5/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/user-agent%E6%B3%A8%E5%85%A5/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御</title>
-      <link>http://localhost:1313/san-blog/posts/http-header-sql-injection/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/http-header-sql-injection/</link>
       <pubDate>Wed, 03 Jun 2026 22:30:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/http-header-sql-injection/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/http-header-sql-injection/</guid>
       <description>&lt;h2 id=&#34;一什么是-http-header-sql-注入&#34;&gt;一、什么是 HTTP Header SQL 注入&lt;/h2&gt;
 &lt;p&gt;HTTP Header SQL 注入是指攻击者将 SQL 注入 payload 植入 HTTP 请求头部的各类字段中（如 Cookie、User-Agent、Referer 等），当服务端&lt;strong&gt;直接将这些头部值拼接到 SQL 语句&lt;/strong&gt;时触发的注入漏洞。&lt;/p&gt;
 &lt;p&gt;与 GET/POST 注入不同，Header 注入的触发逻辑往往不在主业务流程中，而是隐藏在&lt;strong&gt;日志记录、统计分析、会话管理、来源追踪&lt;/strong&gt;等周边功能里。它们共享同一个核心特征：&lt;strong&gt;开发者通常不会怀疑这些「元信息」头部会成为攻击入口&lt;/strong&gt;。&lt;/p&gt;

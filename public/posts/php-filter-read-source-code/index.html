@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto" data-theme="auto">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>php://filter 伪协议：在文件包含中读取源代码 | 东阳的安全笔记</title>
 <meta name="keywords" content="CTF, Web安全, 文件包含, PHP, 伪协议, CTFHub">
 <meta name="description" content="一、php://filter 是什么
@@ -90,16 +90,16 @@ php://filter/&lt;action&gt;=&lt;filter_list&gt;/resource=&lt;target_file&gt;
 URL: http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/
 页面提示：">
 <meta name="author" content="东阳">
-<link rel="canonical" href="http://localhost:1313/san-blog/posts/php-filter-read-source-code/">
+<link rel="canonical" href="https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/">
 <link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<link rel="icon" href="https://Samantha09.github.io/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Samantha09.github.io/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Samantha09.github.io/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Samantha09.github.io/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Samantha09.github.io/san-blog/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/php-filter-read-source-code/">
+<link rel="alternate" hreflang="en" href="https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/">
 <noscript>
     <style>
         #theme-toggle,
@@ -145,13 +145,102 @@ URL: http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/
         document.querySelector("html").dataset.theme = 'light';
     }
 
+</script><meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/">
+  <meta property="og:site_name" content="东阳的安全笔记">
+  <meta property="og:title" content="php://filter 伪协议：在文件包含中读取源代码">
+  <meta property="og:description" content="一、php://filter 是什么 php://filter 是 PHP 提供的一种元封装协议（meta wrapper），用于在访问数据流时对数据进行过滤和转换。
+与 php://input 不同，php://filter 的核心价值不在于执行代码，而在于以安全的方式读取文件内容——尤其是当目标文件是 PHP 源码时。
+二、为什么需要 php://filter 读取源码 假设存在如下漏洞代码：
+&lt;?php $file = $_GET[&#39;file&#39;]; include($file); // 用户可控！ ?&gt; 如果我们直接传入 ?file=index.php，会发生什么？
+GET /?file=index.php HTTP/1.1 include(&#39;index.php&#39;) 会执行 index.php 中的 PHP 代码，而不是显示它的源码。页面上看到的仍然是渲染后的 HTML 输出。
+那如何看到源码呢？
+答案就是 php://filter。利用它的编码过滤器，可以在 PHP 代码被执行前，先将文件内容进行 Base64 编码：
+?file=php://filter/read=convert.base64-encode/resource=index.php 这样返回的就是 Base64 编码后的源码字符串，而不是执行结果。
+三、基本语法结构 php://filter/&lt;action&gt;=&lt;filter_list&gt;/resource=&lt;target_file&gt; 组成部分 说明 read= / write= 对读取/写入的数据应用过滤器 filter_list 过滤器名称，支持链式调用（用 ` resource= 指定目标文件路径 3.1 常用过滤器 过滤器 功能 convert.base64-encode Base64 编码 convert.base64-decode Base64 解码 string.rot13 ROT13 编码 string.toupper 转大写 string.tolower 转小写 convert.iconv.* 字符集转换 四、实战案例：CTFHub 文件包含读源码 4.1 题目环境 URL: http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/ 页面提示：">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-05T23:30:00+08:00">
+    <meta property="article:modified_time" content="2026-06-05T23:30:00+08:00">
+    <meta property="article:tag" content="CTF">
+    <meta property="article:tag" content="Web安全">
+    <meta property="article:tag" content="文件包含">
+    <meta property="article:tag" content="PHP">
+    <meta property="article:tag" content="伪协议">
+    <meta property="article:tag" content="CTFHub">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="php://filter 伪协议：在文件包含中读取源代码">
+  <meta name="twitter:description" content="一、php://filter 是什么 php://filter 是 PHP 提供的一种元封装协议（meta wrapper），用于在访问数据流时对数据进行过滤和转换。
+与 php://input 不同，php://filter 的核心价值不在于执行代码，而在于以安全的方式读取文件内容——尤其是当目标文件是 PHP 源码时。
+二、为什么需要 php://filter 读取源码 假设存在如下漏洞代码：
+&lt;?php $file = $_GET[&#39;file&#39;]; include($file); // 用户可控！ ?&gt; 如果我们直接传入 ?file=index.php，会发生什么？
+GET /?file=index.php HTTP/1.1 include(&#39;index.php&#39;) 会执行 index.php 中的 PHP 代码，而不是显示它的源码。页面上看到的仍然是渲染后的 HTML 输出。
+那如何看到源码呢？
+答案就是 php://filter。利用它的编码过滤器，可以在 PHP 代码被执行前，先将文件内容进行 Base64 编码：
+?file=php://filter/read=convert.base64-encode/resource=index.php 这样返回的就是 Base64 编码后的源码字符串，而不是执行结果。
+三、基本语法结构 php://filter/&lt;action&gt;=&lt;filter_list&gt;/resource=&lt;target_file&gt; 组成部分 说明 read= / write= 对读取/写入的数据应用过滤器 filter_list 过滤器名称，支持链式调用（用 ` resource= 指定目标文件路径 3.1 常用过滤器 过滤器 功能 convert.base64-encode Base64 编码 convert.base64-decode Base64 解码 string.rot13 ROT13 编码 string.toupper 转大写 string.tolower 转小写 convert.iconv.* 字符集转换 四、实战案例：CTFHub 文件包含读源码 4.1 题目环境 URL: http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/ 页面提示：">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Samantha09.github.io/san-blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "php://filter 伪协议：在文件包含中读取源代码",
+      "item": "https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "php://filter 伪协议：在文件包含中读取源代码",
+  "name": "php:\/\/filter 伪协议：在文件包含中读取源代码",
+  "description": "一、php://filter 是什么 php://filter 是 PHP 提供的一种元封装协议（meta wrapper），用于在访问数据流时对数据进行过滤和转换。\n与 php://input 不同，php://filter 的核心价值不在于执行代码，而在于以安全的方式读取文件内容——尤其是当目标文件是 PHP 源码时。\n二、为什么需要 php://filter 读取源码 假设存在如下漏洞代码：\n\u0026lt;?php $file = $_GET[\u0026#39;file\u0026#39;]; include($file); // 用户可控！ ?\u0026gt; 如果我们直接传入 ?file=index.php，会发生什么？\nGET /?file=index.php HTTP/1.1 include('index.php') 会执行 index.php 中的 PHP 代码，而不是显示它的源码。页面上看到的仍然是渲染后的 HTML 输出。\n那如何看到源码呢？\n答案就是 php://filter。利用它的编码过滤器，可以在 PHP 代码被执行前，先将文件内容进行 Base64 编码：\n?file=php://filter/read=convert.base64-encode/resource=index.php 这样返回的就是 Base64 编码后的源码字符串，而不是执行结果。\n三、基本语法结构 php://filter/\u0026lt;action\u0026gt;=\u0026lt;filter_list\u0026gt;/resource=\u0026lt;target_file\u0026gt; 组成部分 说明 read= / write= 对读取/写入的数据应用过滤器 filter_list 过滤器名称，支持链式调用（用 ` resource= 指定目标文件路径 3.1 常用过滤器 过滤器 功能 convert.base64-encode Base64 编码 convert.base64-decode Base64 解码 string.rot13 ROT13 编码 string.toupper 转大写 string.tolower 转小写 convert.iconv.* 字符集转换 四、实战案例：CTFHub 文件包含读源码 4.1 题目环境 URL: http://\u0026lt;TARGET_IP\u0026gt;:\u0026lt;PORT\u0026gt;/ 页面提示：\n",
+  "keywords": [
+    "CTF", "Web安全", "文件包含", "PHP", "伪协议", "CTFHub"
+  ],
+  "articleBody": "一、php://filter 是什么 php://filter 是 PHP 提供的一种元封装协议（meta wrapper），用于在访问数据流时对数据进行过滤和转换。\n与 php://input 不同，php://filter 的核心价值不在于执行代码，而在于以安全的方式读取文件内容——尤其是当目标文件是 PHP 源码时。\n二、为什么需要 php://filter 读取源码 假设存在如下漏洞代码：\n\u003c?php $file = $_GET['file']; include($file); // 用户可控！ ?\u003e 如果我们直接传入 ?file=index.php，会发生什么？\nGET /?file=index.php HTTP/1.1 include('index.php') 会执行 index.php 中的 PHP 代码，而不是显示它的源码。页面上看到的仍然是渲染后的 HTML 输出。\n那如何看到源码呢？\n答案就是 php://filter。利用它的编码过滤器，可以在 PHP 代码被执行前，先将文件内容进行 Base64 编码：\n?file=php://filter/read=convert.base64-encode/resource=index.php 这样返回的就是 Base64 编码后的源码字符串，而不是执行结果。\n三、基本语法结构 php://filter/=/resource= 组成部分 说明 read= / write= 对读取/写入的数据应用过滤器 filter_list 过滤器名称，支持链式调用（用 ` resource= 指定目标文件路径 3.1 常用过滤器 过滤器 功能 convert.base64-encode Base64 编码 convert.base64-decode Base64 解码 string.rot13 ROT13 编码 string.toupper 转大写 string.tolower 转小写 convert.iconv.* 字符集转换 四、实战案例：CTFHub 文件包含读源码 4.1 题目环境 URL: http://:/ 页面提示：\ni don't have shell, how to get flag? flag in \u003ccode\u003e/flag\u003c/code\u003e 说明 flag 位于服务器的 /flag 文件中。\n4.2 直接读取 flag 由于 /flag 是纯文本文件（不含 PHP 标签），include('/flag') 会将其内容原样输出到页面。\n构造 Payload：\nGET /?file=php://filter/resource=/flag HTTP/1.1 Host: : Response：\nctfhub{xxxxxxxxxxxxxxxxxxxxxxxx} 4.3 关键点解析 关键点 说明 php://filter/resource=/flag resource= 指定要读取的目标文件 无过滤器时 直接读取文件原始内容，等同于 include('/flag') 为什么能读到 flag /flag 是纯文本，include() 不会执行任何 PHP 代码，直接输出内容 五、进阶用法：读取 PHP 源码 如果题目要求读取 index.php 的源码，就需要用到编码过滤器防止 PHP 被执行。\n5.1 Base64 编码读取 GET /?file=php://filter/read=convert.base64-encode/resource=index.php 返回的是 Base64 字符串，解码后即可看到原始 PHP 源码。\n5.2 链式过滤器 先编码再解码（某些场景下用于绕过 WAF）：\n?file=php://filter/read=convert.base64-encode|convert.base64-decode/resource=index.php 5.3 用 iconv 绕过某些限制 ?file=php://filter/convert.iconv.UTF-8.UTF-16/resource=index.php 六、curl 复现流程 步骤 1：读取 flag（纯文本） curl \"http:///?file=php://filter/resource=/flag\" 步骤 2：读取 PHP 源码（Base64 编码） curl \"http:///?file=php://filter/read=convert.base64-encode/resource=index.php\" 步骤 3：解码源码 # 将返回的 Base64 字符串解码 echo \"PD9waHAg...\" | base64 -d 七、php://filter vs php://input 特性 php://filter php://input 主要用途 读取文件（源码、配置等） 执行任意 PHP 代码 是否执行 PHP 可选（不加过滤器会执行） 会执行 是否需要请求体 否 是 读取源码能力 ✅ 强（通过编码绕过执行） ❌ 无法直接读源码 RCE 能力 ❌ 不能直接 RCE ✅ 可直接 RCE 组合使用思路：\n先用 php://filter 读取源码，分析漏洞点 再用 php://input 注入代码，实现 RCE 八、防御方法 关闭 allow_url_include\nallow_url_include = Off 白名单校验\n$allowed = ['home.php', 'about.php']; if (!in_array($_GET['file'], $allowed)) { die('Invalid file'); } include($_GET['file']); 过滤伪协议关键字\nif (strpos($_GET['file'], 'php://') !== false) { die('Forbidden'); } 使用 open_basedir 限制 PHP 只能访问指定目录，防止跨目录读取 /flag 等敏感文件。\n九、总结 php://filter 是文件包含漏洞中信息收集的利器：\n通过编码过滤器（如 Base64），可以安全地读取 PHP 源码而不被解析执行 对于纯文本文件（如 /flag），可以直接用 resource= 读取内容 与 php://input 配合使用，形成完整的「信息收集 → 代码执行」攻击链 在 CTF 中，当你遇到文件包含但无法直接 RCE 时，先尝试 php://filter 读源码 往往是打开局面的第一步。\n相关题目：CTFHub Skill / Web / RCE / 文件包含\n",
+  "wordCount" : "298",
+  "inLanguage": "en",
+  "datePublished": "2026-06-05T23:30:00+08:00",
+  "dateModified": "2026-06-05T23:30:00+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "东阳"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "东阳的安全笔记",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Samantha09.github.io/san-blog/favicon.ico"
+    }
+  }
+}
 </script>
 </head>
 <body id="top">
     <header class="header">
     <nav class="header-nav">
         <div class="logo">
-            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <a href="https://Samantha09.github.io/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
@@ -177,27 +266,27 @@ URL: http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/san-blog/" title="首页">
+                <a href="https://Samantha09.github.io/san-blog/" title="首页">
                     <span>首页</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                <a href="https://Samantha09.github.io/san-blog/posts/" title="文章">
                     <span>文章</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                <a href="https://Samantha09.github.io/san-blog/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                <a href="https://Samantha09.github.io/san-blog/categories/" title="分类">
                     <span>分类</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                <a href="https://Samantha09.github.io/san-blog/archives/" title="归档">
                     <span>归档</span>
                 </a>
             </li>
@@ -453,19 +542,19 @@ Host: &lt;TARGET_IP&gt;:&lt;PORT&gt;
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="http://localhost:1313/san-blog/tags/ctf/">CTF</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">文件包含</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/php/">PHP</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E4%BC%AA%E5%8D%8F%E8%AE%AE/">伪协议</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/ctfhub/">CTFHub</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/ctf/">CTF</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">文件包含</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/php/">PHP</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E4%BC%AA%E5%8D%8F%E8%AE%AE/">伪协议</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/ctfhub/">CTFHub</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/">
+  <a class="prev" href="https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/">
     <span class="title">« Prev</span>
     <span>CTFHub RFI 远程文件包含漏洞利用详解</span>
   </a>
-  <a class="next" href="http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/">
+  <a class="next" href="https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/">
     <span class="title">Next »</span>
     <span>CTFHub 文件包含实战：利用一句话木马 getshell</span>
   </a>
@@ -476,7 +565,7 @@ Host: &lt;TARGET_IP&gt;:&lt;PORT&gt;
     </main>
     
 <footer class="footer">
-        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+        <span>&copy; 2026 <a href="https://Samantha09.github.io/san-blog/">东阳的安全笔记</a></span> · 
 
     
     

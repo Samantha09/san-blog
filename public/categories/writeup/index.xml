@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>WriteUp on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/categories/writeup/</link>
-    <description>Recent content in WriteUp on 东阳的安全笔记</description>
+    <title>Writeup on 东阳的安全笔记</title>
+    <link>https://Samantha09.github.io/san-blog/categories/writeup/</link>
+    <description>Recent content in Writeup on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 09 Jun 2026 22:55:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/categories/writeup/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/categories/writeup/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用</title>
-      <link>http://localhost:1313/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</link>
       <pubDate>Tue, 09 Jun 2026 22:55:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</guid>
       <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
@@ -68,9 +68,9 @@
     </item>
     <item>
       <title>CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制</title>
-      <link>http://localhost:1313/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/</link>
       <pubDate>Tue, 09 Jun 2026 21:43:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/</guid>
       <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
@@ -115,9 +115,9 @@
     </item>
     <item>
       <title>命令注入综合过滤绕过实战：从空格到管道的一条龙</title>
-      <link>http://localhost:1313/san-blog/posts/command-injection-filter-bypass/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/</link>
       <pubDate>Tue, 09 Jun 2026 01:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/command-injection-filter-bypass/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 命令注入（Command Injection）&lt;/li&gt;
@@ -151,9 +151,9 @@
     </item>
     <item>
       <title>CTFHub RFI 远程文件包含漏洞利用详解</title>
-      <link>http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/</link>
       <pubDate>Sat, 06 Jun 2026 10:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 文件包含漏洞&lt;/li&gt;
@@ -188,9 +188,9 @@
     </item>
     <item>
       <title>CTFHub 文件包含实战：利用一句话木马 getshell</title>
-      <link>http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/</link>
       <pubDate>Fri, 05 Jun 2026 23:10:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/</guid>
       <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
@@ -249,9 +249,9 @@
     </item>
     <item>
       <title>[BUUOJ] SQL COURSE 1</title>
-      <link>http://localhost:1313/san-blog/posts/buu-sql-course-1/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/</link>
       <pubDate>Mon, 01 Jun 2026 22:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/buu-sql-course-1/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / SQL 注入&lt;/li&gt;
@@ -286,9 +286,9 @@
     </item>
     <item>
       <title>[DASCTF] Upload-Labs-Linux Pass-01</title>
-      <link>http://localhost:1313/san-blog/posts/upload-labs-linux-pass01/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/upload-labs-linux-pass01/</link>
       <pubDate>Mon, 01 Jun 2026 21:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/upload-labs-linux-pass01/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/upload-labs-linux-pass01/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 文件上传漏洞&lt;/li&gt;
@@ -330,9 +330,9 @@
     </item>
     <item>
       <title>[0CTF 2016]piapiapia</title>
-      <link>http://localhost:1313/san-blog/posts/piapiapia/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/piapiapia/</link>
       <pubDate>Fri, 30 May 2025 15:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/piapiapia/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/piapiapia/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / PHP 反序列化&lt;/li&gt;

@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>BUUOJ on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/buuoj/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/buuoj/</link>
     <description>Recent content in BUUOJ on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Mon, 01 Jun 2026 22:00:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/buuoj/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/buuoj/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>[BUUOJ] SQL COURSE 1</title>
-      <link>http://localhost:1313/san-blog/posts/buu-sql-course-1/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/</link>
       <pubDate>Mon, 01 Jun 2026 22:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/buu-sql-course-1/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / SQL 注入&lt;/li&gt;

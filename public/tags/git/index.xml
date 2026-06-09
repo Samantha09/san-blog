@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Git on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/git/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/git/</link>
     <description>Recent content in Git on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 02 Jun 2026 21:00:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/git/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/git/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitHack 工具使用与 .git 泄露利用详解</title>
-      <link>http://localhost:1313/san-blog/posts/githack-git-leak-exploit/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/githack-git-leak-exploit/</link>
       <pubDate>Tue, 02 Jun 2026 21:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/githack-git-leak-exploit/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/githack-git-leak-exploit/</guid>
       <description>&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;
 &lt;p&gt;在 Web 安全中，&lt;code&gt;.git&lt;/code&gt; 目录泄露是一种常见的信息泄露漏洞。当开发人员将代码直接部署到 Web 目录时，如果未正确配置，访问者可能直接下载到 &lt;code&gt;.git&lt;/code&gt; 文件夹，从而获取完整的源代码、提交历史、甚至敏感信息（如密码、API Key、Flag 等）。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;GitHack&lt;/strong&gt; 是一款专门用于利用 &lt;code&gt;.git&lt;/code&gt; 泄露的工具，支持三种恢复模式，能够还原历史版本、提取 stash 内容、从 index 文件恢复代码。&lt;/p&gt;

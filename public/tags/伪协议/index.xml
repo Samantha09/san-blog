@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>伪协议 on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/%E4%BC%AA%E5%8D%8F%E8%AE%AE/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/%E4%BC%AA%E5%8D%8F%E8%AE%AE/</link>
     <description>Recent content in 伪协议 on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Fri, 05 Jun 2026 23:30:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/%E4%BC%AA%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/%E4%BC%AA%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>php://filter 伪协议：在文件包含中读取源代码</title>
-      <link>http://localhost:1313/san-blog/posts/php-filter-read-source-code/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/</link>
       <pubDate>Fri, 05 Jun 2026 23:30:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/php-filter-read-source-code/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/</guid>
       <description>&lt;h2 id=&#34;一phpfilter-是什么&#34;&gt;一、php://filter 是什么&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;php://filter&lt;/code&gt; 是 PHP 提供的一种&lt;strong&gt;元封装协议（meta wrapper）&lt;/strong&gt;，用于在访问数据流时&lt;strong&gt;对数据进行过滤和转换&lt;/strong&gt;。&lt;/p&gt;
 &lt;p&gt;与 &lt;code&gt;php://input&lt;/code&gt; 不同，&lt;code&gt;php://filter&lt;/code&gt; 的核心价值不在于执行代码，而在于&lt;strong&gt;以安全的方式读取文件内容&lt;/strong&gt;——尤其是当目标文件是 PHP 源码时。&lt;/p&gt;

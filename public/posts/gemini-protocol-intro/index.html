@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto" data-theme="auto">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能 | 东阳的安全笔记</title>
 <meta name="keywords" content="协议, Web, Gemini, Gopher, 极简主义, 隐私">
 <meta name="description" content="一、Gemini 是什么
@@ -71,16 +71,16 @@ Gemini 的设计哲学是有意识地做减法：
 &#43;------------&#43;
 Gemini 强制 TLS，没有明文传输的选项。这避免了 HTTP 历史上 &ldquo;HTTP 默认、HTTPS 可选&rdquo; 的安全债。">
 <meta name="author" content="东阳">
-<link rel="canonical" href="http://localhost:1313/san-blog/posts/gemini-protocol-intro/">
+<link rel="canonical" href="https://Samantha09.github.io/san-blog/posts/gemini-protocol-intro/">
 <link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<link rel="icon" href="https://Samantha09.github.io/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Samantha09.github.io/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Samantha09.github.io/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Samantha09.github.io/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Samantha09.github.io/san-blog/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/gemini-protocol-intro/">
+<link rel="alternate" hreflang="en" href="https://Samantha09.github.io/san-blog/posts/gemini-protocol-intro/">
 <noscript>
     <style>
         #theme-toggle,
@@ -126,13 +126,100 @@ Gemini 强制 TLS，没有明文传输的选项。这避免了 HTTP 历史上 &l
         document.querySelector("html").dataset.theme = 'light';
     }
 
+</script><meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/gemini-protocol-intro/">
+  <meta property="og:site_name" content="东阳的安全笔记">
+  <meta property="og:title" content="Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能">
+  <meta property="og:description" content="一、Gemini 是什么 Gemini 是一种新兴的互联网应用层协议，诞生于 2019 年，由 Solderpunk 发起设计。它的定位非常明确：
+介于 Gopher 和 HTTP 之间，比 Gopher 更现代，比 HTTP 更简单。
+如果你厌倦了现代 Web 的臃肿——动辄几 MB 的 JavaScript、无穷无尽的 Cookie 弹窗、追踪脚本和广告框架——Gemini 提供了一条回归信息本质的逃生通道。
+二、为什么需要 Gemini 2.1 Gopher 太古老 Gopher（1991）的设计理念很棒（极简、层级、纯文本），但它有硬伤：
+无加密：明文传输，在现代互联网不可接受 无错误码：成功失败靠约定，调试困难 无类型系统：资源类型靠单个字符标识，扩展性差 无输入机制：除了搜索框，几乎无法与用户交互 2.2 HTTP 太复杂 HTTP/1.1 → HTTP/2 → HTTP/3，每一次迭代都在增加复杂度：
+特性 HTTP 现状 Header 数十个标准头，无限自定义头 方法 GET/POST/PUT/PATCH/DELETE/OPTIONS… 状态码 40&#43; 个，还要细分 扩展 Cookie、CORS、HSTS、CSP、SRI… 渲染引擎 HTML &#43; CSS &#43; JS，永恒的安全噩梦 Gemini 的设计哲学是有意识地做减法：
+“不是 HTTP 做不了的我们不加，而是 Gopher 没做好的我们才补。”
+三、Gemini 的核心设计 3.1 协议栈极简 &#43;------------&#43; | Gemini | ← 应用层协议（类似 HTTP） &#43;------------&#43; | TLS 1.2&#43; | ← 强制加密（类似 HTTPS） &#43;------------&#43; | TCP | ← 传输层 &#43;------------&#43; Gemini 强制 TLS，没有明文传输的选项。这避免了 HTTP 历史上 “HTTP 默认、HTTPS 可选” 的安全债。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-09T21:50:00+08:00">
+    <meta property="article:modified_time" content="2026-06-09T21:50:00+08:00">
+    <meta property="article:tag" content="协议">
+    <meta property="article:tag" content="Web">
+    <meta property="article:tag" content="Gemini">
+    <meta property="article:tag" content="Gopher">
+    <meta property="article:tag" content="极简主义">
+    <meta property="article:tag" content="隐私">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能">
+  <meta name="twitter:description" content="一、Gemini 是什么 Gemini 是一种新兴的互联网应用层协议，诞生于 2019 年，由 Solderpunk 发起设计。它的定位非常明确：
+介于 Gopher 和 HTTP 之间，比 Gopher 更现代，比 HTTP 更简单。
+如果你厌倦了现代 Web 的臃肿——动辄几 MB 的 JavaScript、无穷无尽的 Cookie 弹窗、追踪脚本和广告框架——Gemini 提供了一条回归信息本质的逃生通道。
+二、为什么需要 Gemini 2.1 Gopher 太古老 Gopher（1991）的设计理念很棒（极简、层级、纯文本），但它有硬伤：
+无加密：明文传输，在现代互联网不可接受 无错误码：成功失败靠约定，调试困难 无类型系统：资源类型靠单个字符标识，扩展性差 无输入机制：除了搜索框，几乎无法与用户交互 2.2 HTTP 太复杂 HTTP/1.1 → HTTP/2 → HTTP/3，每一次迭代都在增加复杂度：
+特性 HTTP 现状 Header 数十个标准头，无限自定义头 方法 GET/POST/PUT/PATCH/DELETE/OPTIONS… 状态码 40&#43; 个，还要细分 扩展 Cookie、CORS、HSTS、CSP、SRI… 渲染引擎 HTML &#43; CSS &#43; JS，永恒的安全噩梦 Gemini 的设计哲学是有意识地做减法：
+“不是 HTTP 做不了的我们不加，而是 Gopher 没做好的我们才补。”
+三、Gemini 的核心设计 3.1 协议栈极简 &#43;------------&#43; | Gemini | ← 应用层协议（类似 HTTP） &#43;------------&#43; | TLS 1.2&#43; | ← 强制加密（类似 HTTPS） &#43;------------&#43; | TCP | ← 传输层 &#43;------------&#43; Gemini 强制 TLS，没有明文传输的选项。这避免了 HTTP 历史上 “HTTP 默认、HTTPS 可选” 的安全债。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Samantha09.github.io/san-blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能",
+      "item": "https://Samantha09.github.io/san-blog/posts/gemini-protocol-intro/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能",
+  "name": "Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能",
+  "description": "一、Gemini 是什么 Gemini 是一种新兴的互联网应用层协议，诞生于 2019 年，由 Solderpunk 发起设计。它的定位非常明确：\n介于 Gopher 和 HTTP 之间，比 Gopher 更现代，比 HTTP 更简单。\n如果你厌倦了现代 Web 的臃肿——动辄几 MB 的 JavaScript、无穷无尽的 Cookie 弹窗、追踪脚本和广告框架——Gemini 提供了一条回归信息本质的逃生通道。\n二、为什么需要 Gemini 2.1 Gopher 太古老 Gopher（1991）的设计理念很棒（极简、层级、纯文本），但它有硬伤：\n无加密：明文传输，在现代互联网不可接受 无错误码：成功失败靠约定，调试困难 无类型系统：资源类型靠单个字符标识，扩展性差 无输入机制：除了搜索框，几乎无法与用户交互 2.2 HTTP 太复杂 HTTP/1.1 → HTTP/2 → HTTP/3，每一次迭代都在增加复杂度：\n特性 HTTP 现状 Header 数十个标准头，无限自定义头 方法 GET/POST/PUT/PATCH/DELETE/OPTIONS\u0026hellip; 状态码 40+ 个，还要细分 扩展 Cookie、CORS、HSTS、CSP、SRI\u0026hellip; 渲染引擎 HTML + CSS + JS，永恒的安全噩梦 Gemini 的设计哲学是有意识地做减法：\n\u0026ldquo;不是 HTTP 做不了的我们不加，而是 Gopher 没做好的我们才补。\u0026rdquo;\n三、Gemini 的核心设计 3.1 协议栈极简 +------------+ | Gemini | ← 应用层协议（类似 HTTP） +------------+ | TLS 1.2+ | ← 强制加密（类似 HTTPS） +------------+ | TCP | ← 传输层 +------------+ Gemini 强制 TLS，没有明文传输的选项。这避免了 HTTP 历史上 \u0026ldquo;HTTP 默认、HTTPS 可选\u0026rdquo; 的安全债。\n",
+  "keywords": [
+    "协议", "Web", "Gemini", "Gopher", "极简主义", "隐私"
+  ],
+  "articleBody": "一、Gemini 是什么 Gemini 是一种新兴的互联网应用层协议，诞生于 2019 年，由 Solderpunk 发起设计。它的定位非常明确：\n介于 Gopher 和 HTTP 之间，比 Gopher 更现代，比 HTTP 更简单。\n如果你厌倦了现代 Web 的臃肿——动辄几 MB 的 JavaScript、无穷无尽的 Cookie 弹窗、追踪脚本和广告框架——Gemini 提供了一条回归信息本质的逃生通道。\n二、为什么需要 Gemini 2.1 Gopher 太古老 Gopher（1991）的设计理念很棒（极简、层级、纯文本），但它有硬伤：\n无加密：明文传输，在现代互联网不可接受 无错误码：成功失败靠约定，调试困难 无类型系统：资源类型靠单个字符标识，扩展性差 无输入机制：除了搜索框，几乎无法与用户交互 2.2 HTTP 太复杂 HTTP/1.1 → HTTP/2 → HTTP/3，每一次迭代都在增加复杂度：\n特性 HTTP 现状 Header 数十个标准头，无限自定义头 方法 GET/POST/PUT/PATCH/DELETE/OPTIONS… 状态码 40+ 个，还要细分 扩展 Cookie、CORS、HSTS、CSP、SRI… 渲染引擎 HTML + CSS + JS，永恒的安全噩梦 Gemini 的设计哲学是有意识地做减法：\n“不是 HTTP 做不了的我们不加，而是 Gopher 没做好的我们才补。”\n三、Gemini 的核心设计 3.1 协议栈极简 +------------+ | Gemini | ← 应用层协议（类似 HTTP） +------------+ | TLS 1.2+ | ← 强制加密（类似 HTTPS） +------------+ | TCP | ← 传输层 +------------+ Gemini 强制 TLS，没有明文传输的选项。这避免了 HTTP 历史上 “HTTP 默认、HTTPS 可选” 的安全债。\n3.2 请求格式 一个 Gemini 请求就是一个 URI + CRLF：\ngemini://example.com/document.gmi\\r\\n 没有 Header。没有方法。没有 Cookie。\n对比 HTTP：\nGET /document HTTP/1.1 Host: example.com User-Agent: Mozilla/5.0 Accept: text/html Accept-Language: zh-CN Accept-Encoding: gzip Connection: keep-alive Cookie: session=abc123 Gemini 的请求永远只有一行。\n3.3 响应格式 \\r\\n STATUS：两位数字状态码（比 HTTP 少得多） META：人类可读的状态说明或 MIME 类型 BODY：二进制内容，直接跟随 例子：\n20 text/gemini\\r\\n# Hello, Gemini!\\r\\nThis is a simple document. 3.4 状态码极简 状态码 含义 对比 HTTP 20 成功 200 30 重定向 301/302 40 临时失败 404/500 50 永久失败 410 60 需要客户端证书 无直接对应 没有 201、204、206、301、302、304、400、401、403、404、405、500、502、503… 的细分。Gemini 认为：客户端不需要知道这么多细节。\n3.5 输入机制：原生支持 Gopher 几乎没有输入能力。Gemini 引入了 INPUT 状态码 (10)：\n10 What is your name?\\r\\n 客户端收到 10 后，弹出一个输入框，用户提交后客户端再发送一次请求：\ngemini://example.com/search?name=Alice\\r\\n 没有 POST body，没有表单编码。输入通过 Query String 传递，极简但够用。\n四、Gemini 文本格式（text/gemini） Gemini 不传输 HTML。它有自己的标记语言，比 Markdown 更严格，比 HTML 更简单。\n4.1 语法一览 # 一级标题 ## 二级标题 ### 三级标题 普通文本段落，自动换行。 * 列表项 1 * 列表项 2 * 列表项 3 \u003e 引用文本 ```代码块 自动识别，无需指定语言 =\u003e https://example.com 链接文本 =\u003e gemini://other.capsule 另一个 Gemini 胶囊\n**注意**： - 没有内联样式（粗体、斜体、下划线） - 没有图片内嵌（图片作为独立链接） - 没有表格 - 没有超链接文本混排（链接独占一行） ### 4.2 设计理念 \u003e \"内容创作者应该专注于**写什么**，而不是**怎么渲染**。**\" Gemini 客户端决定如何渲染 `text/gemini`，作者无法干预。这彻底消除了： - CSS 漏洞和注入 - 视觉欺骗钓鱼（\"这个按钮看起来安全\"） - 跟踪像素和字体指纹 --- ## 五、Gemini vs Gopher vs HTTP | 特性 | Gopher | Gemini | HTTP | |------|--------|--------|------| | 诞生时间 | 1991 | 2019 | 1991 | | 传输加密 | ❌ 无 | ✅ 强制 TLS | ⚠️ 可选 (HTTP/3 强制) | | 请求复杂度 | 极简 | 极简 | 复杂 | | 响应头 | 无 | 极简一行 | 复杂多行 | | 内容格式 | 文本/二进制 | text/gemini + 任意 | HTML/CSS/JS/任意 | | 交互能力 | 搜索框 | 输入框 (10) | 表单/JS/AJAX/WebSocket | | 状态码 | 无 | 5 个 | 40+ 个 | | 扩展性 | 差 | 故意限制 | 极强 | | 客户端实现 | 容易 | 非常容易 | 极其困难 | | 现代生态 | 复古社区 | 活跃增长 | 统治互联网 | --- ## 六、现代生态与工具 ### 6.1 服务端 | 项目 | 语言 | 特点 | |------|------|------| | **Agate** | Rust | 轻量、安全、高性能 | | **Gmnisrv** | C | 简洁，依赖少 | | **Jetforce** | Python | 功能丰富，易扩展 | | **Molly Brown** | Go | 成熟稳定 | ### 6.2 客户端 | 项目 | 平台 | 特点 | |------|------|------| | **Lagrange** | 跨平台 GUI | 功能最完善的图形客户端 | | **Amfora** | 终端 | 优美的 TUI 体验 | | **Browsh** | 终端 | 支持 Gemini 的文本浏览器 | | **Kristall** | 跨平台 | 支持 Gopher/Gemini/Finger | ### 6.3 搜索引擎与聚合 - **Gemini Search (gus.guru)**：Gemini 空间的搜索引擎 - **Antenna**：Gemini 博客聚合器 - **CAPCOM**：内容聚合与推荐 --- ## 七、Gemini 的局限性与批评 ### 7.1 功能过于受限 - 无法上传文件（无 POST body） - 无法构建复杂应用（无脚本、无状态管理） - 内联链接缺失影响某些文档类型（学术论文、百科） ### 7.2 生态隔离 Gemini 空间（称为 \"Smol Web\" 或 \"Capsule\"）与主流互联网几乎不互通。你不可能在 Gemini 上阅读一篇包含交互式图表的数据新闻。 ### 7.3 客户端证书的设计争议 状态码 `60` 要求客户端 TLS 证书用于身份认证，但证书管理对普通用户来说门槛过高，实际使用率低。 --- ## 八、适用场景总结 | 场景 | 是否适合 Gemini | 原因 | |------|----------------|------| | 个人博客/日记 | ✅ 完美 | 纯文本，无广告，隐私优先 | | 技术文档/手册 | ✅ 适合 | 结构化内容，无需交互 | | 新闻/资讯站点 | ⚠️ 可以 | 缺乏图片内嵌和富媒体 | | 电商/支付 | ❌ 不适合 | 无状态管理、无安全输入机制 | | 社交网络 | ❌ 不适合 | 无实时推送、无评论系统 | | 内部知识库 | ✅ 适合 | 低维护成本、无安全风险 | | 嵌入式/IoT | ✅ 适合 | 协议极简、TLS 内置 | --- ## 九、总结 Gemini 不是来取代 HTTP 的。它是一个**有意的替代方案**，为那些： - 厌恶 Web 复杂化的开发者 - 关心隐私和去跟踪的普通用户 - 资源受限环境下的系统设计者 提供了一条退路。 如果你也对极简协议感兴趣，可以从安装 **Lagrange** 或 **Amfora** 开始，访问 `gemini.circumlunar.space`（Gemini 项目主页），体验一下这个\"轻 100 倍的 Web\"。 --- ## 参考 - [Gemini Project Homepage](gemini.circumlunar.space) - [Gemini Specification](https://gemini.circumlunar.space/docs/specification.html) - [Lagrange Browser](https://gmi.skyjake.fi/lagrange/) - [GUS - Gemini Search](https://gus.guru) ",
+  "wordCount" : "634",
+  "inLanguage": "en",
+  "datePublished": "2026-06-09T21:50:00+08:00",
+  "dateModified": "2026-06-09T21:50:00+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "东阳"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Samantha09.github.io/san-blog/posts/gemini-protocol-intro/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "东阳的安全笔记",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Samantha09.github.io/san-blog/favicon.ico"
+    }
+  }
+}
 </script>
 </head>
 <body id="top">
     <header class="header">
     <nav class="header-nav">
         <div class="logo">
-            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <a href="https://Samantha09.github.io/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
@@ -158,27 +245,27 @@ Gemini 强制 TLS，没有明文传输的选项。这避免了 HTTP 历史上 &l
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/san-blog/" title="首页">
+                <a href="https://Samantha09.github.io/san-blog/" title="首页">
                     <span>首页</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                <a href="https://Samantha09.github.io/san-blog/posts/" title="文章">
                     <span>文章</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                <a href="https://Samantha09.github.io/san-blog/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                <a href="https://Samantha09.github.io/san-blog/categories/" title="分类">
                     <span>分类</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                <a href="https://Samantha09.github.io/san-blog/archives/" title="归档">
                     <span>归档</span>
                 </a>
             </li>
@@ -481,19 +568,19 @@ Gemini 不是来取代 HTTP 的。它是一个**有意的替代方案**，为那
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="http://localhost:1313/san-blog/tags/%E5%8D%8F%E8%AE%AE/">协议</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/web/">Web</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/gemini/">Gemini</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/gopher/">Gopher</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E6%9E%81%E7%AE%80%E4%B8%BB%E4%B9%89/">极简主义</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E9%9A%90%E7%A7%81/">隐私</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E5%8D%8F%E8%AE%AE/">协议</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/web/">Web</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/gemini/">Gemini</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/gopher/">Gopher</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E6%9E%81%E7%AE%80%E4%B8%BB%E4%B9%89/">极简主义</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E9%9A%90%E7%A7%81/">隐私</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/">
+  <a class="prev" href="https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/">
     <span class="title">« Prev</span>
     <span>CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用</span>
   </a>
-  <a class="next" href="http://localhost:1313/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/">
+  <a class="next" href="https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/">
     <span class="title">Next »</span>
     <span>CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制</span>
   </a>
@@ -504,7 +591,7 @@ Gemini 不是来取代 HTTP 的。它是一个**有意的替代方案**，为那
     </main>
     
 <footer class="footer">
-        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+        <span>&copy; 2026 <a href="https://Samantha09.github.io/san-blog/">东阳的安全笔记</a></span> · 
 
     
     

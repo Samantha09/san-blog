@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>工具使用 on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/</link>
     <description>Recent content in 工具使用 on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 02 Jun 2026 22:47:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>sqlmap 使用指南：从入门到 CTF 夺旗</title>
-      <link>http://localhost:1313/san-blog/posts/sqlmap-usage-guide/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/sqlmap-usage-guide/</link>
       <pubDate>Tue, 02 Jun 2026 22:47:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/sqlmap-usage-guide/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/sqlmap-usage-guide/</guid>
       <description>&lt;h2 id=&#34;什么是-sqlmap&#34;&gt;什么是 sqlmap&lt;/h2&gt;
 &lt;p&gt;sqlmap 是一款开源的自动化 SQL 注入工具，支持检测和利用多种类型的 SQL 注入漏洞，能够自动识别后端数据库类型、枚举数据库结构、提取数据，甚至获取操作系统 shell。在 CTF 比赛和渗透测试中，它是处理 SQL 注入效率最高的工具之一。&lt;/p&gt;
 &lt;hr&gt;
@@ -116,9 +116,9 @@
     </item>
     <item>
       <title>dvcs-ripper 与 Mercurial (.hg) 信息泄露漏洞详解</title>
-      <link>http://localhost:1313/san-blog/posts/dvcs-ripper-hg-leak-exploit/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/dvcs-ripper-hg-leak-exploit/</link>
       <pubDate>Tue, 02 Jun 2026 22:05:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/dvcs-ripper-hg-leak-exploit/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/dvcs-ripper-hg-leak-exploit/</guid>
       <description>&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;
 &lt;p&gt;Mercurial（简称 &lt;strong&gt;hg&lt;/strong&gt;，化学元素汞的符号）是一种分布式版本控制系统，与 Git 类似，广泛应用于代码管理。和 &lt;code&gt;.git&lt;/code&gt;、&lt;code&gt;.svn&lt;/code&gt; 一样，当开发人员将包含 &lt;code&gt;.hg&lt;/code&gt; 目录的项目直接部署到 Web 服务器根目录，且未做访问限制时，攻击者就可能通过下载 &lt;code&gt;.hg&lt;/code&gt; 目录中的元数据，恢复源代码、历史版本，甚至获取敏感信息。&lt;/p&gt;
 &lt;p&gt;本文将介绍 &lt;strong&gt;.hg 信息泄露漏洞的原理&lt;/strong&gt;、&lt;strong&gt;使用 dvcs-ripper 自动化挖掘漏洞的过程&lt;/strong&gt;，以及对应的 &lt;strong&gt;防护措施&lt;/strong&gt;。&lt;/p&gt;
@@ -152,9 +152,9 @@
     </item>
     <item>
       <title>GitHack 工具使用与 .git 泄露利用详解</title>
-      <link>http://localhost:1313/san-blog/posts/githack-git-leak-exploit/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/githack-git-leak-exploit/</link>
       <pubDate>Tue, 02 Jun 2026 21:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/githack-git-leak-exploit/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/githack-git-leak-exploit/</guid>
       <description>&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;
 &lt;p&gt;在 Web 安全中，&lt;code&gt;.git&lt;/code&gt; 目录泄露是一种常见的信息泄露漏洞。当开发人员将代码直接部署到 Web 目录时，如果未正确配置，访问者可能直接下载到 &lt;code&gt;.git&lt;/code&gt; 文件夹，从而获取完整的源代码、提交历史、甚至敏感信息（如密码、API Key、Flag 等）。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;GitHack&lt;/strong&gt; 是一款专门用于利用 &lt;code&gt;.git&lt;/code&gt; 泄露的工具，支持三种恢复模式，能够还原历史版本、提取 stash 内容、从 index 文件恢复代码。&lt;/p&gt;

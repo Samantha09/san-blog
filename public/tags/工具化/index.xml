@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>工具化 on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/%E5%B7%A5%E5%85%B7%E5%8C%96/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/%E5%B7%A5%E5%85%B7%E5%8C%96/</link>
     <description>Recent content in 工具化 on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 09 Jun 2026 22:55:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/%E5%B7%A5%E5%85%B7%E5%8C%96/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/%E5%B7%A5%E5%85%B7%E5%8C%96/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用</title>
-      <link>http://localhost:1313/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</link>
       <pubDate>Tue, 09 Jun 2026 22:55:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</guid>
       <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;

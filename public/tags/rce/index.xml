@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>RCE on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/rce/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/rce/</link>
     <description>Recent content in RCE on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 09 Jun 2026 01:00:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/rce/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/rce/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>命令注入综合过滤绕过实战：从空格到管道的一条龙</title>
-      <link>http://localhost:1313/san-blog/posts/command-injection-filter-bypass/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/</link>
       <pubDate>Tue, 09 Jun 2026 01:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/command-injection-filter-bypass/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 命令注入（Command Injection）&lt;/li&gt;
@@ -46,9 +46,9 @@
     </item>
     <item>
       <title>php://input 文件包含漏洞利用：从原理到实战</title>
-      <link>http://localhost:1313/san-blog/posts/php-input-file-inclusion/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/php-input-file-inclusion/</link>
       <pubDate>Fri, 05 Jun 2026 22:50:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/php-input-file-inclusion/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/php-input-file-inclusion/</guid>
       <description>&lt;h2 id=&#34;一phpinput-是什么&#34;&gt;一、php://input 是什么&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;php://input&lt;/code&gt; 是 PHP 提供的&lt;strong&gt;只读数据流包装器（wrapper）&lt;/strong&gt;，它允许开发者直接访问 &lt;strong&gt;HTTP 请求的原始请求体（raw POST data）&lt;/strong&gt;。&lt;/p&gt;
 &lt;p&gt;在文件包含漏洞的利用场景中，&lt;code&gt;php://input&lt;/code&gt; 是一把利器：当我们能够控制 &lt;code&gt;include()&lt;/code&gt; / &lt;code&gt;require()&lt;/code&gt; 等函数的文件参数时，传入 &lt;code&gt;php://input&lt;/code&gt;，PHP 就会把&lt;strong&gt;请求体中的内容当作 PHP 代码&lt;/strong&gt;来解析执行。&lt;/p&gt;

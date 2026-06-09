@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>文件包含 on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/</link>
     <description>Recent content in 文件包含 on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Sat, 06 Jun 2026 10:00:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>CTFHub RFI 远程文件包含漏洞利用详解</title>
-      <link>http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/</link>
       <pubDate>Sat, 06 Jun 2026 10:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 文件包含漏洞&lt;/li&gt;
@@ -47,9 +47,9 @@
     </item>
     <item>
       <title>php://filter 伪协议：在文件包含中读取源代码</title>
-      <link>http://localhost:1313/san-blog/posts/php-filter-read-source-code/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/</link>
       <pubDate>Fri, 05 Jun 2026 23:30:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/php-filter-read-source-code/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/php-filter-read-source-code/</guid>
       <description>&lt;h2 id=&#34;一phpfilter-是什么&#34;&gt;一、php://filter 是什么&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;php://filter&lt;/code&gt; 是 PHP 提供的一种&lt;strong&gt;元封装协议（meta wrapper）&lt;/strong&gt;，用于在访问数据流时&lt;strong&gt;对数据进行过滤和转换&lt;/strong&gt;。&lt;/p&gt;
 &lt;p&gt;与 &lt;code&gt;php://input&lt;/code&gt; 不同，&lt;code&gt;php://filter&lt;/code&gt; 的核心价值不在于执行代码，而在于&lt;strong&gt;以安全的方式读取文件内容&lt;/strong&gt;——尤其是当目标文件是 PHP 源码时。&lt;/p&gt;
@@ -135,9 +135,9 @@
     </item>
     <item>
       <title>CTFHub 文件包含实战：利用一句话木马 getshell</title>
-      <link>http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/</link>
       <pubDate>Fri, 05 Jun 2026 23:10:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/</guid>
       <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
@@ -196,9 +196,9 @@
     </item>
     <item>
       <title>php://input 文件包含漏洞利用：从原理到实战</title>
-      <link>http://localhost:1313/san-blog/posts/php-input-file-inclusion/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/php-input-file-inclusion/</link>
       <pubDate>Fri, 05 Jun 2026 22:50:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/php-input-file-inclusion/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/php-input-file-inclusion/</guid>
       <description>&lt;h2 id=&#34;一phpinput-是什么&#34;&gt;一、php://input 是什么&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;php://input&lt;/code&gt; 是 PHP 提供的&lt;strong&gt;只读数据流包装器（wrapper）&lt;/strong&gt;，它允许开发者直接访问 &lt;strong&gt;HTTP 请求的原始请求体（raw POST data）&lt;/strong&gt;。&lt;/p&gt;
 &lt;p&gt;在文件包含漏洞的利用场景中，&lt;code&gt;php://input&lt;/code&gt; 是一把利器：当我们能够控制 &lt;code&gt;include()&lt;/code&gt; / &lt;code&gt;require()&lt;/code&gt; 等函数的文件参数时，传入 &lt;code&gt;php://input&lt;/code&gt;，PHP 就会把&lt;strong&gt;请求体中的内容当作 PHP 代码&lt;/strong&gt;来解析执行。&lt;/p&gt;

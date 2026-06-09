@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>隐私 on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/%E9%9A%90%E7%A7%81/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/%E9%9A%90%E7%A7%81/</link>
     <description>Recent content in 隐私 on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 09 Jun 2026 21:50:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/%E9%9A%90%E7%A7%81/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/%E9%9A%90%E7%A7%81/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能</title>
-      <link>http://localhost:1313/san-blog/posts/gemini-protocol-intro/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/gemini-protocol-intro/</link>
       <pubDate>Tue, 09 Jun 2026 21:50:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/gemini-protocol-intro/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/gemini-protocol-intro/</guid>
       <description>&lt;h2 id=&#34;一gemini-是什么&#34;&gt;一、Gemini 是什么&lt;/h2&gt;
 &lt;p&gt;&lt;strong&gt;Gemini&lt;/strong&gt; 是一种新兴的互联网应用层协议，诞生于 &lt;strong&gt;2019 年&lt;/strong&gt;，由 Solderpunk 发起设计。它的定位非常明确：&lt;/p&gt;
 &lt;blockquote&gt;

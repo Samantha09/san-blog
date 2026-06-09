@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>命令注入 on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/</link>
     <description>Recent content in 命令注入 on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 09 Jun 2026 01:00:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>命令注入综合过滤绕过实战：从空格到管道的一条龙</title>
-      <link>http://localhost:1313/san-blog/posts/command-injection-filter-bypass/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/</link>
       <pubDate>Tue, 09 Jun 2026 01:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/command-injection-filter-bypass/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 命令注入（Command Injection）&lt;/li&gt;

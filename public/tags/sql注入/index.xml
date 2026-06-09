@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>SQL注入 on 东阳的安全笔记</title>
-    <link>http://localhost:1313/san-blog/tags/sql%E6%B3%A8%E5%85%A5/</link>
+    <link>https://Samantha09.github.io/san-blog/tags/sql%E6%B3%A8%E5%85%A5/</link>
     <description>Recent content in SQL注入 on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <lastBuildDate>Wed, 03 Jun 2026 23:00:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/san-blog/tags/sql%E6%B3%A8%E5%85%A5/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://Samantha09.github.io/san-blog/tags/sql%E6%B3%A8%E5%85%A5/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>SQL 注入空格过滤绕过：原理、手法与 sqlmap 实战</title>
-      <link>http://localhost:1313/san-blog/posts/sql-injection-space-filter-bypass/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/sql-injection-space-filter-bypass/</link>
       <pubDate>Wed, 03 Jun 2026 23:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/sql-injection-space-filter-bypass/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/sql-injection-space-filter-bypass/</guid>
       <description>&lt;h2 id=&#34;一什么是空格过滤&#34;&gt;一、什么是空格过滤&lt;/h2&gt;
 &lt;p&gt;空格过滤是指目标系统（WAF、Web 应用代码或中间件）对 HTTP 请求中的空格字符进行&lt;strong&gt;检测、替换或删除&lt;/strong&gt;，以阻止 SQL 注入攻击的一种防御手段。&lt;/p&gt;
 &lt;h3 id=&#34;11-过滤的实现方式&#34;&gt;1.1 过滤的实现方式&lt;/h3&gt;
@@ -45,9 +45,9 @@
     </item>
     <item>
       <title>HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御</title>
-      <link>http://localhost:1313/san-blog/posts/http-header-sql-injection/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/http-header-sql-injection/</link>
       <pubDate>Wed, 03 Jun 2026 22:30:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/http-header-sql-injection/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/http-header-sql-injection/</guid>
       <description>&lt;h2 id=&#34;一什么是-http-header-sql-注入&#34;&gt;一、什么是 HTTP Header SQL 注入&lt;/h2&gt;
 &lt;p&gt;HTTP Header SQL 注入是指攻击者将 SQL 注入 payload 植入 HTTP 请求头部的各类字段中（如 Cookie、User-Agent、Referer 等），当服务端&lt;strong&gt;直接将这些头部值拼接到 SQL 语句&lt;/strong&gt;时触发的注入漏洞。&lt;/p&gt;
 &lt;p&gt;与 GET/POST 注入不同，Header 注入的触发逻辑往往不在主业务流程中，而是隐藏在&lt;strong&gt;日志记录、统计分析、会话管理、来源追踪&lt;/strong&gt;等周边功能里。它们共享同一个核心特征：&lt;strong&gt;开发者通常不会怀疑这些「元信息」头部会成为攻击入口&lt;/strong&gt;。&lt;/p&gt;
@@ -74,9 +74,9 @@
     </item>
     <item>
       <title>深入理解 Time-based Blind SQL 注入：原理、利用与 sqlmap 实操</title>
-      <link>http://localhost:1313/san-blog/posts/ctfhub-time-based-sql-injection/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-time-based-sql-injection/</link>
       <pubDate>Wed, 03 Jun 2026 21:30:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/ctfhub-time-based-sql-injection/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-time-based-sql-injection/</guid>
       <description>&lt;h2 id=&#34;一什么是-blind-sql-注入&#34;&gt;一、什么是 Blind SQL 注入&lt;/h2&gt;
 &lt;p&gt;当应用程序存在 SQL 注入漏洞，但&lt;strong&gt;不会在前端直接回显查询结果或错误信息&lt;/strong&gt;时，传统的 UNION 注入和报错注入便无法直接使用。此时攻击者只能依赖 &lt;strong&gt;Blind SQL Injection（盲注）&lt;/strong&gt; —— 通过观察应用程序的&lt;strong&gt;间接反应&lt;/strong&gt;来逐位推断数据库中的数据。&lt;/p&gt;
 &lt;p&gt;盲注分为两大类：&lt;/p&gt;
@@ -122,9 +122,9 @@
     </item>
     <item>
       <title>sqlmap 使用指南：从入门到 CTF 夺旗</title>
-      <link>http://localhost:1313/san-blog/posts/sqlmap-usage-guide/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/sqlmap-usage-guide/</link>
       <pubDate>Tue, 02 Jun 2026 22:47:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/sqlmap-usage-guide/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/sqlmap-usage-guide/</guid>
       <description>&lt;h2 id=&#34;什么是-sqlmap&#34;&gt;什么是 sqlmap&lt;/h2&gt;
 &lt;p&gt;sqlmap 是一款开源的自动化 SQL 注入工具，支持检测和利用多种类型的 SQL 注入漏洞，能够自动识别后端数据库类型、枚举数据库结构、提取数据，甚至获取操作系统 shell。在 CTF 比赛和渗透测试中，它是处理 SQL 注入效率最高的工具之一。&lt;/p&gt;
 &lt;hr&gt;
@@ -228,9 +228,9 @@
     </item>
     <item>
       <title>[BUUOJ] SQL COURSE 1</title>
-      <link>http://localhost:1313/san-blog/posts/buu-sql-course-1/</link>
+      <link>https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/</link>
       <pubDate>Mon, 01 Jun 2026 22:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/san-blog/posts/buu-sql-course-1/</guid>
+      <guid>https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/</guid>
       <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / SQL 注入&lt;/li&gt;
