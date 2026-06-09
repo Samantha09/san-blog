@@ -6,66 +6,8 @@
     <description>Recent content in Writeup on 东阳的安全笔记</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 09 Jun 2026 22:55:00 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 09 Jun 2026 21:43:00 +0800</lastBuildDate>
     <atom:link href="https://Samantha09.github.io/san-blog/categories/writeup/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用</title>
-      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</link>
-      <pubDate>Tue, 09 Jun 2026 22:55:00 +0800</pubDate>
-      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</guid>
-      <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / SSRF / 文件上传&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;考点&lt;/strong&gt;：SSRF（服务器端请求伪造）、Gopher 协议、&lt;code&gt;multipart/form-data&lt;/code&gt; 报文构造、文件上传&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;题目场景：存在一个 &lt;code&gt;?url=&lt;/code&gt; 参数，服务器会代为请求用户指定的地址。目标 &lt;code&gt;flag.php&lt;/code&gt; 限制仅本地访问，且需要 POST 上传一个非空文件。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id=&#34;二源码分析&#34;&gt;二、源码分析&lt;/h2&gt;
-&lt;p&gt;通过 Gopher GET 请求访问 &lt;code&gt;flag.php&lt;/code&gt;，拿到源码：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;error_reporting&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;($_SERVER[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;REMOTE_ADDR&amp;#34;&lt;/span&gt;] &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;127.0.0.1&amp;#34;&lt;/span&gt;){
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Just View From 127.0.0.1&amp;#34;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;isset&lt;/span&gt;($_FILES[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt;]) &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; $_FILES[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt;][&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;size&amp;#34;&lt;/span&gt;] &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;){
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;getenv&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;CTFHUB&amp;#34;&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;exit&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;关键限制&#34;&gt;关键限制&lt;/h3&gt;
-&lt;table&gt;
-	&lt;thead&gt;
-			&lt;tr&gt;
-					&lt;th&gt;条件&lt;/th&gt;
-					&lt;th&gt;说明&lt;/th&gt;
-			&lt;/tr&gt;
-	&lt;/thead&gt;
-	&lt;tbody&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;REMOTE_ADDR != 127.0.0.1&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;外部直接访问被拒绝，必须是本机请求&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;isset($_FILES[&amp;quot;file&amp;quot;])&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;必须是文件上传请求（&lt;code&gt;multipart/form-data&lt;/code&gt;）&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;$_FILES[&amp;quot;file&amp;quot;][&amp;quot;size&amp;quot;] &amp;gt; 0&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;上传的文件不能为空&lt;/td&gt;
-			&lt;/tr&gt;
-	&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h2 id=&#34;三攻击思路&#34;&gt;三、攻击思路&lt;/h2&gt;
-&lt;h3 id=&#34;31-绕过本地访问限制&#34;&gt;3.1 绕过本地访问限制&lt;/h3&gt;
-&lt;p&gt;和之前的 POST key 题型一样，利用 &lt;strong&gt;SSRF&lt;/strong&gt; 让服务器自己请求自己：&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;攻击者 -&amp;gt; ?url=gopher://127.0.0.1:80/_... -&amp;gt; 服务器代为请求 -&amp;gt; flag.php
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;此时 &lt;code&gt;$_SERVER[&amp;quot;REMOTE_ADDR&amp;quot;]&lt;/code&gt; 就是 &lt;code&gt;127.0.0.1&lt;/code&gt;，通过第一重验证。&lt;/p&gt;</description>
-    </item>
     <item>
       <title>CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制</title>
       <link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/</link>

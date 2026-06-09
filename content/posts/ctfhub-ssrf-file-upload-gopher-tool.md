@@ -3,7 +3,7 @@ title: "CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用"
 date: 2026-06-09T22:55:00+08:00
 draft: false
 tags: ["CTF", "Web安全", "SSRF", "Gopher", "文件上传", "工具化", "CTFHub"]
-categories: ["WriteUp"]
+categories: ["工具"]
 ---
 
 ## 一、题目信息

@@ -167,24 +167,6 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF / 文件上传 考点：SSRF（服务器端请求伪造）、Gopher 协议、multipart/form-data 报文构造、文件上传 题目场景：存在一个 ?url= 参数，服务器会代为请求用户指定的地址。目标 flag.php 限制仅本地访问，且需要 POST 上传一个非空文件。
-二、源码分析 通过 Gopher GET 请求访问 flag.php，拿到源码：
-&lt;?php error_reporting(0); if($_SERVER[&#34;REMOTE_ADDR&#34;] != &#34;127.0.0.1&#34;){ echo &#34;Just View From 127.0.0.1&#34;; return; } if(isset($_FILES[&#34;file&#34;]) &amp;&amp; $_FILES[&#34;file&#34;][&#34;size&#34;] &gt; 0){ echo getenv(&#34;CTFHUB&#34;); exit; } ?&gt; 关键限制 条件 说明 REMOTE_ADDR != 127.0.0.1 外部直接访问被拒绝，必须是本机请求 isset($_FILES[&#34;file&#34;]) 必须是文件上传请求（multipart/form-data） $_FILES[&#34;file&#34;][&#34;size&#34;] &gt; 0 上传的文件不能为空 三、攻击思路 3.1 绕过本地访问限制 和之前的 POST key 题型一样，利用 SSRF 让服务器自己请求自己：
-攻击者 -&gt; ?url=gopher://127.0.0.1:80/_... -&gt; 服务器代为请求 -&gt; flag.php 此时 $_SERVER[&#34;REMOTE_ADDR&#34;] 就是 127.0.0.1，通过第一重验证。
-...</p>
-  </div>
-  <footer class="entry-footer">
-
-<span title='2026-06-09 22:55:00 +0800 CST'>June 9, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>431 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
-  <a class="entry-link" aria-label="post link to CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用" href="https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/"></a>
-</article>
-
-<article class="post-entry tag-entry"> 
-  <header class="entry-header">
     <h2 class="entry-hint-parent">CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制
     </h2>
   </header>
