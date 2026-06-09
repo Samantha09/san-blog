@@ -43,6 +43,11 @@ theme = 'PaperMod'
     url = '/posts/'
     weight = 20
   [[menu.main]]
+    identifier = 'tools'
+    name = '工具'
+    url = '/projects/'
+    weight = 25
+  [[menu.main]]
     identifier = 'tags'
     name = '标签'
     url = '/tags/'
