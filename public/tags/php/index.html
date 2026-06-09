@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>PHP | 东阳的安全笔记</title>
+<meta name="keywords" content="">
+<meta name="description" content="数据安全与网络安全技术分享">
+<meta name="author" content="东阳">
+<link rel="canonical" href="http://localhost:1313/san-blog/tags/php/">
+<link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/san-blog/tags/php/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/tags/php/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/san-blog/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/san-blog/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/san-blog/tags/">Tags</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+  <h1>
+    PHP
+    <a href="/san-blog/tags/php/index.xml" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" height="23">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    </a>
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">php://filter 伪协议：在文件包含中读取源代码
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、php://filter 是什么 php://filter 是 PHP 提供的一种元封装协议（meta wrapper），用于在访问数据流时对数据进行过滤和转换。
+与 php://input 不同，php://filter 的核心价值不在于执行代码，而在于以安全的方式读取文件内容——尤其是当目标文件是 PHP 源码时。
+二、为什么需要 php://filter 读取源码 假设存在如下漏洞代码：
+&lt;?php $file = $_GET[&#39;file&#39;]; include($file); // 用户可控！ ?&gt; 如果我们直接传入 ?file=index.php，会发生什么？
+GET /?file=index.php HTTP/1.1 include(&#39;index.php&#39;) 会执行 index.php 中的 PHP 代码，而不是显示它的源码。页面上看到的仍然是渲染后的 HTML 输出。
+那如何看到源码呢？
+答案就是 php://filter。利用它的编码过滤器，可以在 PHP 代码被执行前，先将文件内容进行 Base64 编码：
+?file=php://filter/read=convert.base64-encode/resource=index.php 这样返回的就是 Base64 编码后的源码字符串，而不是执行结果。
+三、基本语法结构 php://filter/&lt;action&gt;=&lt;filter_list&gt;/resource=&lt;target_file&gt; 组成部分 说明 read= / write= 对读取/写入的数据应用过滤器 filter_list 过滤器名称，支持链式调用（用 ` resource= 指定目标文件路径 3.1 常用过滤器 过滤器 功能 convert.base64-encode Base64 编码 convert.base64-decode Base64 解码 string.rot13 ROT13 编码 string.toupper 转大写 string.tolower 转小写 convert.iconv.* 字符集转换 四、实战案例：CTFHub 文件包含读源码 4.1 题目环境 URL: http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/ 页面提示：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-05 23:30:00 +0800 CST'>June 5, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>298 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to php://filter 伪协议：在文件包含中读取源代码" href="http://localhost:1313/san-blog/posts/php-filter-read-source-code/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub 文件包含实战：利用一句话木马 getshell
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / RCE / 文件包含 考点：PHP include 函数、一句话木马、WebShell 连接 题目链接：https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html
+二、源码分析 进入题目后，直接给出了 PHP 源码：
+&lt;?php error_reporting(0); // 关闭报错显示 if (isset($_GET[&#39;file&#39;])) { // 接收 file 参数 if (strpos($_GET[&#39;file&#39;], &#34;flag&#34;) !== false) { // 如果包含 &#34;flag&#34; 字符串 echo &#34;hack&#34;; // 输出 hack，阻止访问 } else { include($_GET[&#39;file&#39;]); // 否则包含指定文件 } } ?&gt; 逻辑梳理 条件 结果 file 参数包含 &#34;flag&#34; 输出 hack，包含失败 file 参数不含 &#34;flag&#34; 执行 include($file) 核心考点：include() 函数的特性——不检查后缀，直接执行文件中的 PHP 代码。
+三、发现突破口 题目下方有一个提示链接，访问后得到 shell.txt：
+http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt 内容是一句话木马：
+&lt;?php eval($_REQUEST[&#39;ctfhub&#39;]);?&gt; 连接密码：ctfhub 原理：eval() 函数将 $_REQUEST[&#39;ctfhub&#39;] 接收到的内容作为 PHP 代码执行 四、解题思路 4.1 include 函数的关键特性 假设 index.php 中执行了：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-05 23:10:00 +0800 CST'>June 5, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>265 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub 文件包含实战：利用一句话木马 getshell" href="http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">php://input 文件包含漏洞利用：从原理到实战
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、php://input 是什么 php://input 是 PHP 提供的只读数据流包装器（wrapper），它允许开发者直接访问 HTTP 请求的原始请求体（raw POST data）。
+在文件包含漏洞的利用场景中，php://input 是一把利器：当我们能够控制 include() / require() 等函数的文件参数时，传入 php://input，PHP 就会把请求体中的内容当作 PHP 代码来解析执行。
+💡 关键前提：allow_url_include = On（PHP 5.x 部分默认开启，PHP 7&#43; 默认关闭）
+二、利用原理 假设存在如下存在漏洞的代码：
+&lt;?php $file = $_GET[&#39;file&#39;]; include($file); // 用户可控！ ?&gt; 当我们发送如下请求时：
+GET /?file=php://input HTTP/1.1 Host: target.com Content-Length: 29 &lt;?php system(&#34;whoami&#34;); ?&gt; 执行流程如下：
+$_GET[&#39;file&#39;] 获取到字符串 &#34;php://input&#34; include(&#34;php://input&#34;) 打开 php://input 数据流 PHP 从 HTTP 请求体中读取内容：&lt;?php system(&#34;whoami&#34;); ?&gt; 读取到的内容被当作 PHP 代码包含并执行 system(&#34;whoami&#34;) 被执行，返回当前系统用户 三、实战案例：CTFHub 文件包含 下面结合一道 CTFHub 真题，完整走一遍利用流程。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-05 22:50:00 +0800 CST'>June 5, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>299 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to php://input 文件包含漏洞利用：从原理到实战" href="http://localhost:1313/san-blog/posts/php-input-file-inclusion/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">[0CTF 2016]piapiapia
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>题目信息 类型：Web / PHP 反序列化 核心漏洞：反序列化字符串逃逸 &#43; 任意文件读取 源码泄露：www.zip 源码结构 下载源码后得到以下关键文件：
+文件 作用 index.php 登录页面 register.php 注册页面 update.php 更新个人信息（文件上传 &#43; 数据入库） profile.php 展示个人信息（触发文件读取） class.php 核心类（user &#43; mysql） config.php 配置文件（含 flag） 漏洞分析 1. 任意文件读取（核心利用点） profile.php 第 16 行：
+$profile = unserialize($profile); $photo = base64_encode(file_get_contents($profile[&#39;photo&#39;])); $profile 是从数据库读取的序列化字符串，经过 unserialize() 后得到数组。$profile[&#39;photo&#39;] 作为文件路径传入 file_get_contents()，结果被 base64 编码输出到页面。
+如果能控制 $profile[&#39;photo&#39;] 的值，就能读取服务器上的任意文件。
+2. 反序列化字符串逃逸 2.1 filter() 函数 class.php 中的 filter()：
+public function filter($string) { $escape = array(&#39;\&#39;&#39;, &#39;\\\\&#39;); $escape = &#39;/&#39; . implode(&#39;|&#39;, $escape) . &#39;/&#39;; $string = preg_replace($escape, &#39;_&#39;, $string); $safe = array(&#39;select&#39;, &#39;insert&#39;, &#39;update&#39;, &#39;delete&#39;, &#39;where&#39;); $safe = &#39;/&#39; . implode(&#39;|&#39;, $safe) . &#39;/i&#39;; return preg_replace($safe, &#39;hacker&#39;, $string); } 关键点：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2025-05-30 15:00:00 +0800 CST'>May 30, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>592 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to [0CTF 2016]piapiapia" href="http://localhost:1313/san-blog/posts/piapiapia/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

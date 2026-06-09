@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Sqlmap | 东阳的安全笔记</title>
+<meta name="keywords" content="">
+<meta name="description" content="数据安全与网络安全技术分享">
+<meta name="author" content="东阳">
+<link rel="canonical" href="http://localhost:1313/san-blog/tags/sqlmap/">
+<link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/san-blog/tags/sqlmap/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/tags/sqlmap/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/san-blog/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/san-blog/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/san-blog/tags/">Tags</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+  <h1>
+    Sqlmap
+    <a href="/san-blog/tags/sqlmap/index.xml" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" height="23">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    </a>
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">SQL 注入空格过滤绕过：原理、手法与 sqlmap 实战
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、什么是空格过滤 空格过滤是指目标系统（WAF、Web 应用代码或中间件）对 HTTP 请求中的空格字符进行检测、替换或删除，以阻止 SQL 注入攻击的一种防御手段。
+1.1 过滤的实现方式 代码层面
+// 直接删除所有空格 $input = str_replace(&#34; &#34;, &#34;&#34;, $_GET[&#39;id&#39;]); // 替换为空 $input = str_replace(&#34; &#34;, &#34;&#34;, $_GET[&#39;id&#39;]); // 正则匹配删除所有空白字符 $input = preg_replace(&#39;/\s&#43;/&#39;, &#39;&#39;, $_GET[&#39;id&#39;]); WAF 层面
+WAF 规则检测到 SQL 关键字（如 UNION、SELECT、AND）前后存在空格时，直接拦截请求。例如：
+规则：IF (request_body CONTAINS &#34;UNION SELECT&#34;) THEN BLOCK 此时攻击者如果不使用空格，而是写成 UNION/**/SELECT，规则可能无法匹配。
+1.2 为什么空格是关键 SQL 语句的语法结构依赖空格作为分隔符：
+SELECT id, name FROM users WHERE id = 1 AND status = &#39;active&#39; ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ 空格分隔关键字、标识符、运算符 当空格被删除后：
+SELECTid,nameFROMusersWHEREid=1ANDstatus=&#39;active&#39; 整条语句变成一团，MySQL 解析器无法识别各个 token，SQL 注入 payload 失效。
+二、空格过滤的绕过手法 空格过滤并非不可突破。SQL 解析器认可的「空白等价物」远不止空格一种。
+2.1 注释符 /**/ MySQL 支持 C 风格的多行注释 /**/，注释内容可以为空，效果等同于一个空格：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-03 23:00:00 +0800 CST'>June 3, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>630 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to SQL 注入空格过滤绕过：原理、手法与 sqlmap 实战" href="http://localhost:1313/san-blog/posts/sql-injection-space-filter-bypass/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、什么是 HTTP Header SQL 注入 HTTP Header SQL 注入是指攻击者将 SQL 注入 payload 植入 HTTP 请求头部的各类字段中（如 Cookie、User-Agent、Referer 等），当服务端直接将这些头部值拼接到 SQL 语句时触发的注入漏洞。
+与 GET/POST 注入不同，Header 注入的触发逻辑往往不在主业务流程中，而是隐藏在日志记录、统计分析、会话管理、来源追踪等周边功能里。它们共享同一个核心特征：开发者通常不会怀疑这些「元信息」头部会成为攻击入口。
+二、为什么 Header 注入容易被忽视 2.1 认知盲区 安全测试的注意力通常集中在：
+URL 的 GET 参数 (?id=1) 表单提交的 POST 数据 JSON/XML API 请求体 而 HTTP Header 被视为「请求元数据」，很少被怀疑会携带恶意数据。
+2.2 WAF 绕过优势 许多 WAF 重点监控 URL 查询字符串和 POST Body，但对 Cookie、User-Agent、Referer 等头部的检测往往较弱。同样的 payload，放在 URL 里会被拦截，放在 Header 里可能畅通无阻。
+2.3 业务场景驱动 有些架构天然依赖 Header 传参：
+Cookie 存储用户偏好、分页状态 User-Agent 用于设备识别与内容适配 Referer 用于来源统计与反盗链 这些场景下，服务端往往会直接读取 Header 值并用于数据库查询。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-03 22:30:00 +0800 CST'>June 3, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>815 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御" href="http://localhost:1313/san-blog/posts/http-header-sql-injection/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">深入理解 Time-based Blind SQL 注入：原理、利用与 sqlmap 实操
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、什么是 Blind SQL 注入 当应用程序存在 SQL 注入漏洞，但不会在前端直接回显查询结果或错误信息时，传统的 UNION 注入和报错注入便无法直接使用。此时攻击者只能依赖 Blind SQL Injection（盲注） —— 通过观察应用程序的间接反应来逐位推断数据库中的数据。
+盲注分为两大类：
+类型 判断依据 速度 Boolean-based Blind（布尔盲注） 页面返回内容/长度是否有差异 较快 Time-based Blind（时间盲注） 响应时间是否有延迟 很慢 当页面无论查询成功还是失败都返回完全相同的响应时，布尔盲注失效，时间盲注成为唯一选择。
+二、Time-based Blind 注入原理 2.1 核心思想 时间盲注不依赖页面内容的变化，而是利用数据库的时间延迟函数（如 MySQL 的 SLEEP()、PostgreSQL 的 pg_sleep()、SQL Server 的 WAITFOR DELAY）来构造条件：
+条件为真 → 执行 SLEEP(n) → 响应延迟 n 秒 条件为假 → 不执行延迟 → 响应正常 通过测量响应时间，攻击者就能判断条件的真假，从而逐位提取数据。
+2.2 手工 Payload 示例 以 MySQL 为例，假设注入点为 ?id=1，目标是获取 flag 表中的 flag 字段：
+-- 判断数据库名第一个字符是否为 &#39;s&#39; ?id=1 AND IF(ASCII(SUBSTRING(DATABASE(),1,1))=115, SLEEP(5), 0) -- 判断 flag 表第一条记录的第一个字符是否为 &#39;c&#39; ?id=1 AND IF(ASCII(SUBSTRING((SELECT flag FROM flag LIMIT 0,1),1,1))=99, SLEEP(5), 0) 执行逻辑：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-03 21:30:00 +0800 CST'>June 3, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>600 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to 深入理解 Time-based Blind SQL 注入：原理、利用与 sqlmap 实操" href="http://localhost:1313/san-blog/posts/ctfhub-time-based-sql-injection/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">sqlmap 使用指南：从入门到 CTF 夺旗
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>什么是 sqlmap sqlmap 是一款开源的自动化 SQL 注入工具，支持检测和利用多种类型的 SQL 注入漏洞，能够自动识别后端数据库类型、枚举数据库结构、提取数据，甚至获取操作系统 shell。在 CTF 比赛和渗透测试中，它是处理 SQL 注入效率最高的工具之一。
+安装 方式一：直接克隆源码（推荐） git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git cd sqlmap python sqlmap.py --version 方式二：包管理器安装 # Debian/Ubuntu sudo apt install sqlmap # macOS brew install sqlmap # Python pip pip install sqlmap 核心参数速查 参数 说明 -u URL 指定目标 URL --data &#34;data&#34; POST 数据包 -p &#34;param&#34; 指定测试参数 --tables 枚举所有表名 --columns -T table 枚举指定表的列名 --dump -T table 导出指定表的数据 --dump -C col -T table 导出指定列的数据 -D dbname 指定数据库名 --dbs 枚举所有数据库 --batch 自动选择默认选项，无需交互 --threads 10 设置线程数，加快检测速度 --level 1-5 检测等级，默认 1，越高测试越全面 --risk 1-3 风险等级，默认 1，越高越激进 --technique 指定注入技术（如 B,E,U,T,Q） --os-shell 获取操作系统 shell（需要权限） --file-read /path 读取服务器文件 --tamper 使用 tamper 脚本绕过 WAF 实战：CTF 中的标准操作流程 以下以一次真实的 CTF 题目为例，展示完整的 sqlmap 利用链。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-02 22:47:00 +0800 CST'>June 2, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>528 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to sqlmap 使用指南：从入门到 CTF 夺旗" href="http://localhost:1313/san-blog/posts/sqlmap-usage-guide/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

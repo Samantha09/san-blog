@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>安全技术 | 东阳的安全笔记</title>
+<meta name="keywords" content="">
+<meta name="description" content="数据安全与网络安全技术分享">
+<meta name="author" content="东阳">
+<link rel="canonical" href="http://localhost:1313/san-blog/categories/%E5%AE%89%E5%85%A8%E6%8A%80%E6%9C%AF/">
+<link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/san-blog/categories/%E5%AE%89%E5%85%A8%E6%8A%80%E6%9C%AF/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/categories/%E5%AE%89%E5%85%A8%E6%8A%80%E6%9C%AF/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/san-blog/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/san-blog/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/san-blog/categories/">Categories</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+  <h1>
+    安全技术
+    <a href="/san-blog/categories/%E5%AE%89%E5%85%A8%E6%8A%80%E6%9C%AF/index.xml" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" height="23">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    </a>
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">dvcs-ripper 与 Mercurial (.hg) 信息泄露漏洞详解
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>前言 Mercurial（简称 hg，化学元素汞的符号）是一种分布式版本控制系统，与 Git 类似，广泛应用于代码管理。和 .git、.svn 一样，当开发人员将包含 .hg 目录的项目直接部署到 Web 服务器根目录，且未做访问限制时，攻击者就可能通过下载 .hg 目录中的元数据，恢复源代码、历史版本，甚至获取敏感信息。
+本文将介绍 .hg 信息泄露漏洞的原理、使用 dvcs-ripper 自动化挖掘漏洞的过程，以及对应的 防护措施。
+一、漏洞原理 1.1 .hg 目录结构 Mercurial 在每个仓库的根目录下维护一个 .hg 目录，用于存储版本控制所需的全部元数据。其核心结构如下：
+.hg/ 00changelog.i # 变更日志索引，记录所有提交历史 dirstate # 工作目录状态（哪些文件被跟踪、修改、删除） requires # 仓库格式版本要求 branch # 当前分支名 last-message.txt # 上次提交信息 undo.branch # 撤销操作相关 undo.desc undo.dirstate store/ # 核心数据存储区 00changelog.i # 提交历史的 revlog（索引） 00changelog.d # 提交历史的 revlog（数据，大文件时存在） 00manifest.i # 清单文件的 revlog（记录每个版本中包含的文件列表） 00manifest.d # 清单文件的数据部分 fncache # 文件名缓存，记录所有被跟踪文件对应的 revlog 路径 undo # 撤销数据 data/ # 各文件的历史版本 revlog index.html.i # index.html 的 revlog 索引 index.html.d # index.html 的 revlog 数据（大文件时存在） flag_xxxx.txt.i # 其他文件的 revlog 索引 flag_xxxx.txt.d # 其他文件的 revlog 数据 1.2 Revlog 存储机制 Mercurial 使用 revlog（revision log）格式来存储所有版本数据。每个被跟踪的文件都有一个对应的 revlog，由一对文件组成：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-02 22:05:00 +0800 CST'>June 2, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>684 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to dvcs-ripper 与 Mercurial (.hg) 信息泄露漏洞详解" href="http://localhost:1313/san-blog/posts/dvcs-ripper-hg-leak-exploit/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">SVN 信息泄露漏洞原理、利用与防护
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>SVN 信息泄露漏洞原理、利用与防护 一、什么是 SVN 信息泄露漏洞 SVN（Subversion）是一种集中式版本控制系统，广泛用于代码管理。在 Web 开发中，开发者常常直接将包含 .svn 目录的项目部署到 Web 服务器的根目录下。如果服务器没有正确配置访问控制，攻击者就可以通过浏览器直接访问 .svn 目录下的文件，从而获取网站的源代码、历史版本、敏感配置甚至数据库密码，这种安全问题被称为 SVN 信息泄露漏洞。
+二、漏洞原理 2.1 .svn 目录的作用 SVN 在每个工作副本（Working Copy）的根目录下维护一个隐藏的 .svn 目录，用于存储版本控制所需的元数据。这些元数据包括：
+仓库地址（Repository URL） 文件版本信息 完整的文件历史内容（pristine 副本） 本地修改状态 作者、提交时间等日志信息 2.2 旧格式（SVN 1.6 及更早） 在旧版本中，.svn 目录分散在每个子目录中，结构如下：
+.svn/ entries # 文件/目录列表及版本信息 format # 工作副本格式版本号 text-base/ # 当前版本文件的原始副本 prop-base/ # 属性文件 props/ # 本地修改的属性 tmp/ # 临时文件 关键风险点：entries 文件以明文形式记录目录结构和版本号，text-base/ 下存储着当前版本所有文件的完整原始内容。即使服务器禁止了目录遍历，攻击者仍可以直接猜测并下载这些文件。
+2.3 新格式（SVN 1.7&#43;） 从 SVN 1.7 开始，工作副本改为单 .svn 模式，所有元数据集中在根目录的 .svn 中：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-02 21:52:22 +0800 CST'>June 2, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>464 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to SVN 信息泄露漏洞原理、利用与防护" href="http://localhost:1313/san-blog/posts/svn-info-leak-vulnerability/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">GitHack 工具使用与 .git 泄露利用详解
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>前言 在 Web 安全中，.git 目录泄露是一种常见的信息泄露漏洞。当开发人员将代码直接部署到 Web 目录时，如果未正确配置，访问者可能直接下载到 .git 文件夹，从而获取完整的源代码、提交历史、甚至敏感信息（如密码、API Key、Flag 等）。
+GitHack 是一款专门用于利用 .git 泄露的工具，支持三种恢复模式，能够还原历史版本、提取 stash 内容、从 index 文件恢复代码。
+依赖安装 GitHack 本身不需要额外的 Python 库，但依赖系统中已安装 git 命令。
+# Ubuntu/Debian sudo apt-get install git # macOS brew install git # Windows 下载 Git for Windows 基本使用 python GitHack.py http://目标网站/.git/ 恢复后的文件默认存放在 dist/目标域名/ 目录下。
+工作流程 GitHack 会依次尝试三种恢复方式：
+直接 Clone：尝试用 git clone 直接克隆仓库 目录遍历：检测是否支持目录遍历，逐个文件下载 缓存恢复：从 .git/index、commit 记录、objects 缓存中恢复文件 三大核心利用方式 一、Log —— 历史提交中找回删除的内容 git log 会记录仓库的所有提交历史。即使敏感文件在最新版本中被删除，通过查看历史提交仍可找回。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-02 21:00:00 +0800 CST'>June 2, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>390 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to GitHack 工具使用与 .git 泄露利用详解" href="http://localhost:1313/san-blog/posts/githack-git-leak-exploit/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

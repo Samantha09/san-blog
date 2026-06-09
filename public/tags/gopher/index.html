@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Gopher | 东阳的安全笔记</title>
+<meta name="keywords" content="">
+<meta name="description" content="数据安全与网络安全技术分享">
+<meta name="author" content="东阳">
+<link rel="canonical" href="http://localhost:1313/san-blog/tags/gopher/">
+<link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/san-blog/tags/gopher/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/tags/gopher/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/san-blog/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/san-blog/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/san-blog/tags/">Tags</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+  <h1>
+    Gopher
+    <a href="/san-blog/tags/gopher/index.xml" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" height="23">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    </a>
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF / 文件上传 考点：SSRF（服务器端请求伪造）、Gopher 协议、multipart/form-data 报文构造、文件上传 题目场景：存在一个 ?url= 参数，服务器会代为请求用户指定的地址。目标 flag.php 限制仅本地访问，且需要 POST 上传一个非空文件。
+二、源码分析 通过 Gopher GET 请求访问 flag.php，拿到源码：
+&lt;?php error_reporting(0); if($_SERVER[&#34;REMOTE_ADDR&#34;] != &#34;127.0.0.1&#34;){ echo &#34;Just View From 127.0.0.1&#34;; return; } if(isset($_FILES[&#34;file&#34;]) &amp;&amp; $_FILES[&#34;file&#34;][&#34;size&#34;] &gt; 0){ echo getenv(&#34;CTFHUB&#34;); exit; } ?&gt; 关键限制 条件 说明 REMOTE_ADDR != 127.0.0.1 外部直接访问被拒绝，必须是本机请求 isset($_FILES[&#34;file&#34;]) 必须是文件上传请求（multipart/form-data） $_FILES[&#34;file&#34;][&#34;size&#34;] &gt; 0 上传的文件不能为空 三、攻击思路 3.1 绕过本地访问限制 和之前的 POST key 题型一样，利用 SSRF 让服务器自己请求自己：
+攻击者 -&gt; ?url=gopher://127.0.0.1:80/_... -&gt; 服务器代为请求 -&gt; flag.php 此时 $_SERVER[&#34;REMOTE_ADDR&#34;] 就是 127.0.0.1，通过第一重验证。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-09 22:55:00 +0800 CST'>June 9, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>431 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用" href="http://localhost:1313/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、Gemini 是什么 Gemini 是一种新兴的互联网应用层协议，诞生于 2019 年，由 Solderpunk 发起设计。它的定位非常明确：
+介于 Gopher 和 HTTP 之间，比 Gopher 更现代，比 HTTP 更简单。
+如果你厌倦了现代 Web 的臃肿——动辄几 MB 的 JavaScript、无穷无尽的 Cookie 弹窗、追踪脚本和广告框架——Gemini 提供了一条回归信息本质的逃生通道。
+二、为什么需要 Gemini 2.1 Gopher 太古老 Gopher（1991）的设计理念很棒（极简、层级、纯文本），但它有硬伤：
+无加密：明文传输，在现代互联网不可接受 无错误码：成功失败靠约定，调试困难 无类型系统：资源类型靠单个字符标识，扩展性差 无输入机制：除了搜索框，几乎无法与用户交互 2.2 HTTP 太复杂 HTTP/1.1 → HTTP/2 → HTTP/3，每一次迭代都在增加复杂度：
+特性 HTTP 现状 Header 数十个标准头，无限自定义头 方法 GET/POST/PUT/PATCH/DELETE/OPTIONS… 状态码 40&#43; 个，还要细分 扩展 Cookie、CORS、HSTS、CSP、SRI… 渲染引擎 HTML &#43; CSS &#43; JS，永恒的安全噩梦 Gemini 的设计哲学是有意识地做减法：
+“不是 HTTP 做不了的我们不加，而是 Gopher 没做好的我们才补。”
+三、Gemini 的核心设计 3.1 协议栈极简 &#43;------------&#43; | Gemini | ← 应用层协议（类似 HTTP） &#43;------------&#43; | TLS 1.2&#43; | ← 强制加密（类似 HTTPS） &#43;------------&#43; | TCP | ← 传输层 &#43;------------&#43; Gemini 强制 TLS，没有明文传输的选项。这避免了 HTTP 历史上 “HTTP 默认、HTTPS 可选” 的安全债。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-09 21:50:00 +0800 CST'>June 9, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>634 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能" href="http://localhost:1313/san-blog/posts/gemini-protocol-intro/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、Gopher 协议、双重 URL 编码、HTTP 报文构造 题目场景：存在一个 ?url= 参数，服务器会代为请求用户指定的地址。目标 flag.php 限制仅本地访问，且需要 POST 提交正确的 key。
+二、SSRF 原理 2.1 什么是 SSRF？ SSRF（Server-Side Request Forgery，服务器端请求伪造）是指攻击者通过服务端应用，向服务端所在网络或本地发起请求的攻击方式。
+在本题中，?url= 参数就是 SSRF 的注入点。服务器接收到用户传入的 URL 后，使用自身的 HTTP Client（如 PHP 的 file_get_contents() 或 curl）去请求该地址，并将结果返回给用户。
+2.2 为什么能访问 127.0.0.1？ 访问控制通常发生在多个层级：
+层级 控制方式 本题情况 网络层 (L3) iptables / 防火墙 未限制回环接口 传输层 (L4) TCP 监听绑定 Apache 绑定 0.0.0.0:80，本地可连 应用层 (L7) PHP 代码逻辑 flag.php 仅检查 $_SERVER[&#39;REMOTE_ADDR&#39;] === &#39;127.0.0.1&#39; 当服务端代码发起请求时，它的身份是服务器进程，出站连接的源地址是 127.0.0.1，因此满足 flag.php 的本地访问控制策略。
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-09 21:43:00 +0800 CST'>June 9, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>585 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制" href="http://localhost:1313/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

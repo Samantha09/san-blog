@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>一句话木马 | 东阳的安全笔记</title>
+<meta name="keywords" content="">
+<meta name="description" content="数据安全与网络安全技术分享">
+<meta name="author" content="东阳">
+<link rel="canonical" href="http://localhost:1313/san-blog/tags/%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/">
+<link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/san-blog/tags/%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/tags/%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/san-blog/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/san-blog/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/san-blog/tags/">Tags</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+  <h1>
+    一句话木马
+    <a href="/san-blog/tags/%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/index.xml" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" height="23">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    </a>
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CTFHub 文件包含实战：利用一句话木马 getshell
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、题目信息 平台：CTFHub 分类：Skill / Web / RCE / 文件包含 考点：PHP include 函数、一句话木马、WebShell 连接 题目链接：https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html
+二、源码分析 进入题目后，直接给出了 PHP 源码：
+&lt;?php error_reporting(0); // 关闭报错显示 if (isset($_GET[&#39;file&#39;])) { // 接收 file 参数 if (strpos($_GET[&#39;file&#39;], &#34;flag&#34;) !== false) { // 如果包含 &#34;flag&#34; 字符串 echo &#34;hack&#34;; // 输出 hack，阻止访问 } else { include($_GET[&#39;file&#39;]); // 否则包含指定文件 } } ?&gt; 逻辑梳理 条件 结果 file 参数包含 &#34;flag&#34; 输出 hack，包含失败 file 参数不含 &#34;flag&#34; 执行 include($file) 核心考点：include() 函数的特性——不检查后缀，直接执行文件中的 PHP 代码。
+三、发现突破口 题目下方有一个提示链接，访问后得到 shell.txt：
+http://&lt;TARGET_IP&gt;:&lt;PORT&gt;/shell.txt 内容是一句话木马：
+&lt;?php eval($_REQUEST[&#39;ctfhub&#39;]);?&gt; 连接密码：ctfhub 原理：eval() 函数将 $_REQUEST[&#39;ctfhub&#39;] 接收到的内容作为 PHP 代码执行 四、解题思路 4.1 include 函数的关键特性 假设 index.php 中执行了：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-05 23:10:00 +0800 CST'>June 5, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>265 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to CTFHub 文件包含实战：利用一句话木马 getshell" href="http://localhost:1313/san-blog/posts/ctfhub-file-inclusion-shell/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">文件上传漏洞实战：从无验证到 Getshell 的完整流程
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一、什么是文件上传漏洞 文件上传漏洞是指 Web 应用程序允许用户上传文件，但没有对上传文件的类型、内容、后缀等进行充分校验，导致攻击者可以上传恶意文件（如 Web Shell），进而控制服务器的安全漏洞。
+1.1 漏洞的本质 正常业务场景中，用户上传头像、文档、图片等文件，服务端将其保存到服务器目录。如果服务端信任了用户上传的所有文件，攻击者就可以上传一个伪装成图片的 PHP 脚本，然后直接访问该脚本执行任意代码。
+1.2 典型的漏洞代码 // 无验证的文件上传 $target = &#34;upload/&#34; . basename($_FILES[&#34;file&#34;][&#34;name&#34;]); move_uploaded_file($_FILES[&#34;file&#34;][&#34;tmp_name&#34;], $target); 这段代码直接将用户上传的文件保存到 upload/ 目录，不做任何类型检查。上传 shell.php 后，访问 http://target.com/upload/shell.php 即可执行恶意代码。
+二、常见应用场景 文件上传漏洞通常出现在以下业务场景中：
+2.1 用户头像/资料上传 社交平台、论坛、博客系统允许用户上传头像、背景图。如果仅检查文件扩展名或 MIME 类型，攻击者可以通过修改后缀、伪造 MIME 等方式绕过。
+2.2 附件与文档管理 企业 OA 系统、邮件系统、网盘允许上传文档、压缩包。如果服务端对压缩包内的文件不做二次检查，攻击者可以上传包含 Web Shell 的 ZIP 文件。
+2.3 编辑器与富文本组件 富文本编辑器（如 UEditor、KindEditor）的图片上传功能，如果没有严格限制上传类型，可能成为 getshell 的入口。
+2.4 API 文件接口 前后端分离架构中，前端通过 API 上传文件到 OSS 或服务器。如果 API 没有校验文件类型，攻击者可以直接调用接口上传任意文件。
+三、环境判断：确定用什么木马 上传木马前，必须先判断目标环境的语言和中间件，否则上传的木马无法执行。
+3.1 判断方法 方法 操作 示例 URL 后缀 观察页面 URL index.php → PHP Wappalyzer 插件 浏览器插件自动检测 显示 PHP、Apache、Nginx 响应头 查看 X-Powered-By X-Powered-By: PHP/7.3.14 报错页面 触发 404 或报错 Fatal error: Uncaught Error → PHP 3.2 常见木马类型 环境 木马后缀 示例 PHP .php &lt;?php eval(@$_POST[&#39;a&#39;]); ?&gt; JSP .jsp &lt;% Runtime.getRuntime().exec(request.getParameter(&#34;cmd&#34;)); %&gt; ASP .asp &lt;% eval request(&#34;cmd&#34;) %&gt; ASPX .aspx &lt;%@ Page Language=&#34;Jscript&#34; %&gt; 四、一句话木马原理 4.1 PHP 一句话木马 &lt;?php eval(@$_POST[&#39;a&#39;]); ?&gt; 执行逻辑：
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-06-04 00:00:00 +0800 CST'>June 4, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>450 words</span>&nbsp;·&nbsp;<span>东阳</span></footer>
+  <a class="entry-link" aria-label="post link to 文件上传漏洞实战：从无验证到 Getshell 的完整流程" href="http://localhost:1313/san-blog/posts/file-upload-vulnerability/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

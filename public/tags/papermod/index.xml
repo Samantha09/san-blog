@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>PaperMod on 东阳的安全笔记</title>
+    <link>http://localhost:1313/san-blog/tags/papermod/</link>
+    <description>Recent content in PaperMod on 东阳的安全笔记</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 30 May 2025 12:00:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/san-blog/tags/papermod/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hello World</title>
+      <link>http://localhost:1313/san-blog/posts/hello-world/</link>
+      <pubDate>Fri, 30 May 2025 12:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/san-blog/posts/hello-world/</guid>
+      <description>&lt;p&gt;这是我的第一篇博客文章！&lt;/p&gt;
+&lt;h2 id=&#34;为什么选择-hugo&#34;&gt;为什么选择 Hugo&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;构建速度快&lt;/strong&gt;：Go 语言编写，毫秒级构建&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;主题丰富&lt;/strong&gt;：PaperMod 主题简洁美观&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;部署简单&lt;/strong&gt;：配合 GitHub Actions 自动部署&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;后续计划&#34;&gt;后续计划&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;分享更多技术文章&lt;/li&gt;
+&lt;li&gt;记录学习笔记&lt;/li&gt;
+&lt;li&gt;探索更多有趣的技术&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;感谢阅读！&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

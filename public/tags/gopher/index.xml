@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Gopher on 东阳的安全笔记</title>
+    <link>http://localhost:1313/san-blog/tags/gopher/</link>
+    <description>Recent content in Gopher on 东阳的安全笔记</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Tue, 09 Jun 2026 22:55:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/san-blog/tags/gopher/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用</title>
+      <link>http://localhost:1313/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</link>
+      <pubDate>Tue, 09 Jun 2026 22:55:00 +0800</pubDate>
+      <guid>http://localhost:1313/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</guid>
+      <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / SSRF / 文件上传&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;考点&lt;/strong&gt;：SSRF（服务器端请求伪造）、Gopher 协议、&lt;code&gt;multipart/form-data&lt;/code&gt; 报文构造、文件上传&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;题目场景：存在一个 &lt;code&gt;?url=&lt;/code&gt; 参数，服务器会代为请求用户指定的地址。目标 &lt;code&gt;flag.php&lt;/code&gt; 限制仅本地访问，且需要 POST 上传一个非空文件。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;二源码分析&#34;&gt;二、源码分析&lt;/h2&gt;
+&lt;p&gt;通过 Gopher GET 请求访问 &lt;code&gt;flag.php&lt;/code&gt;，拿到源码：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;error_reporting&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;($_SERVER[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;REMOTE_ADDR&amp;#34;&lt;/span&gt;] &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;127.0.0.1&amp;#34;&lt;/span&gt;){
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Just View From 127.0.0.1&amp;#34;&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;isset&lt;/span&gt;($_FILES[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt;]) &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; $_FILES[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt;][&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;size&amp;#34;&lt;/span&gt;] &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;){
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;getenv&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;CTFHUB&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;exit&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;关键限制&#34;&gt;关键限制&lt;/h3&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;条件&lt;/th&gt;
+					&lt;th&gt;说明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;REMOTE_ADDR != 127.0.0.1&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;外部直接访问被拒绝，必须是本机请求&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;isset($_FILES[&amp;quot;file&amp;quot;])&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;必须是文件上传请求（&lt;code&gt;multipart/form-data&lt;/code&gt;）&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;$_FILES[&amp;quot;file&amp;quot;][&amp;quot;size&amp;quot;] &amp;gt; 0&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;上传的文件不能为空&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;三攻击思路&#34;&gt;三、攻击思路&lt;/h2&gt;
+&lt;h3 id=&#34;31-绕过本地访问限制&#34;&gt;3.1 绕过本地访问限制&lt;/h3&gt;
+&lt;p&gt;和之前的 POST key 题型一样，利用 &lt;strong&gt;SSRF&lt;/strong&gt; 让服务器自己请求自己：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;攻击者 -&amp;gt; ?url=gopher://127.0.0.1:80/_... -&amp;gt; 服务器代为请求 -&amp;gt; flag.php
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;此时 &lt;code&gt;$_SERVER[&amp;quot;REMOTE_ADDR&amp;quot;]&lt;/code&gt; 就是 &lt;code&gt;127.0.0.1&lt;/code&gt;，通过第一重验证。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能</title>
+      <link>http://localhost:1313/san-blog/posts/gemini-protocol-intro/</link>
+      <pubDate>Tue, 09 Jun 2026 21:50:00 +0800</pubDate>
+      <guid>http://localhost:1313/san-blog/posts/gemini-protocol-intro/</guid>
+      <description>&lt;h2 id=&#34;一gemini-是什么&#34;&gt;一、Gemini 是什么&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Gemini&lt;/strong&gt; 是一种新兴的互联网应用层协议，诞生于 &lt;strong&gt;2019 年&lt;/strong&gt;，由 Solderpunk 发起设计。它的定位非常明确：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;介于 Gopher 和 HTTP 之间，比 Gopher 更现代，比 HTTP 更简单。&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;如果你厌倦了现代 Web 的臃肿——动辄几 MB 的 JavaScript、无穷无尽的 Cookie 弹窗、追踪脚本和广告框架——Gemini 提供了一条回归信息本质的逃生通道。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;二为什么需要-gemini&#34;&gt;二、为什么需要 Gemini&lt;/h2&gt;
+&lt;h3 id=&#34;21-gopher-太古老&#34;&gt;2.1 Gopher 太古老&lt;/h3&gt;
+&lt;p&gt;Gopher（1991）的设计理念很棒（极简、层级、纯文本），但它有硬伤：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;无加密&lt;/strong&gt;：明文传输，在现代互联网不可接受&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无错误码&lt;/strong&gt;：成功失败靠约定，调试困难&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无类型系统&lt;/strong&gt;：资源类型靠单个字符标识，扩展性差&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无输入机制&lt;/strong&gt;：除了搜索框，几乎无法与用户交互&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;22-http-太复杂&#34;&gt;2.2 HTTP 太复杂&lt;/h3&gt;
+&lt;p&gt;HTTP/1.1 → HTTP/2 → HTTP/3，每一次迭代都在增加复杂度：&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;特性&lt;/th&gt;
+					&lt;th&gt;HTTP 现状&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Header&lt;/td&gt;
+					&lt;td&gt;数十个标准头，无限自定义头&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;方法&lt;/td&gt;
+					&lt;td&gt;GET/POST/PUT/PATCH/DELETE/OPTIONS&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;状态码&lt;/td&gt;
+					&lt;td&gt;40+ 个，还要细分&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;扩展&lt;/td&gt;
+					&lt;td&gt;Cookie、CORS、HSTS、CSP、SRI&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;渲染引擎&lt;/td&gt;
+					&lt;td&gt;HTML + CSS + JS，永恒的安全噩梦&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Gemini 的设计哲学是&lt;strong&gt;有意识地做减法&lt;/strong&gt;：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;不是 HTTP 做不了的我们不加，而是 Gopher 没做好的我们才补。&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;三gemini-的核心设计&#34;&gt;三、Gemini 的核心设计&lt;/h2&gt;
+&lt;h3 id=&#34;31-协议栈极简&#34;&gt;3.1 协议栈极简&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;+------------+
+| Gemini     |  ← 应用层协议（类似 HTTP）
++------------+
+| TLS 1.2+   |  ← 强制加密（类似 HTTPS）
++------------+
+| TCP        |  ← 传输层
++------------+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Gemini &lt;strong&gt;强制 TLS&lt;/strong&gt;，没有明文传输的选项。这避免了 HTTP 历史上 &amp;ldquo;HTTP 默认、HTTPS 可选&amp;rdquo; 的安全债。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制</title>
+      <link>http://localhost:1313/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/</link>
+      <pubDate>Tue, 09 Jun 2026 21:43:00 +0800</pubDate>
+      <guid>http://localhost:1313/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/</guid>
+      <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / SSRF&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;考点&lt;/strong&gt;：SSRF（服务器端请求伪造）、Gopher 协议、双重 URL 编码、HTTP 报文构造&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;题目场景：存在一个 &lt;code&gt;?url=&lt;/code&gt; 参数，服务器会代为请求用户指定的地址。目标 &lt;code&gt;flag.php&lt;/code&gt; 限制仅本地访问，且需要 POST 提交正确的 key。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;二ssrf-原理&#34;&gt;二、SSRF 原理&lt;/h2&gt;
+&lt;h3 id=&#34;21-什么是-ssrf&#34;&gt;2.1 什么是 SSRF？&lt;/h3&gt;
+&lt;p&gt;SSRF（Server-Side Request Forgery，服务器端请求伪造）是指攻击者通过服务端应用，向服务端所在网络或本地发起请求的攻击方式。&lt;/p&gt;
+&lt;p&gt;在本题中，&lt;code&gt;?url=&lt;/code&gt; 参数就是 SSRF 的注入点。服务器接收到用户传入的 URL 后，使用自身的 HTTP Client（如 PHP 的 &lt;code&gt;file_get_contents()&lt;/code&gt; 或 curl）去请求该地址，并将结果返回给用户。&lt;/p&gt;
+&lt;h3 id=&#34;22-为什么能访问-127001&#34;&gt;2.2 为什么能访问 127.0.0.1？&lt;/h3&gt;
+&lt;p&gt;访问控制通常发生在多个层级：&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;层级&lt;/th&gt;
+					&lt;th&gt;控制方式&lt;/th&gt;
+					&lt;th&gt;本题情况&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;网络层 (L3)&lt;/td&gt;
+					&lt;td&gt;iptables / 防火墙&lt;/td&gt;
+					&lt;td&gt;未限制回环接口&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;传输层 (L4)&lt;/td&gt;
+					&lt;td&gt;TCP 监听绑定&lt;/td&gt;
+					&lt;td&gt;Apache 绑定 &lt;code&gt;0.0.0.0:80&lt;/code&gt;，本地可连&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;应用层 (L7)&lt;/td&gt;
+					&lt;td&gt;PHP 代码逻辑&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;flag.php&lt;/code&gt; 仅检查 &lt;code&gt;$_SERVER[&#39;REMOTE_ADDR&#39;] === &#39;127.0.0.1&#39;&lt;/code&gt;&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;当服务端代码发起请求时，它的身份是&lt;strong&gt;服务器进程&lt;/strong&gt;，出站连接的源地址是 &lt;code&gt;127.0.0.1&lt;/code&gt;，因此满足 &lt;code&gt;flag.php&lt;/code&gt; 的本地访问控制策略。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
