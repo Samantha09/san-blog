@@ -130,7 +130,7 @@ params:
     items:
       - title: ratel
         content: 命令行斗地主 C++ 实现，提供 WebSocket + JSON 网关与 React 网页前端，支持多人在线实时对战。
-        image: images/projects/ratel.svg
+        image: images/projects/ratel-lobby.png
         featured:
           name: GitHub
           link: https://github.com/Samantha09/ratel
@@ -160,7 +160,7 @@ params:
 
       - title: nl2sql-platform
         content: AI 数据库自然语言问答平台。非技术人员通过中文提问，系统自动生成 SQL、执行并返回可视化结果。
-        image: images/projects/nl2sql.svg
+        image: images/projects/nl2sql-overview.png
         featured:
           name: GitHub
           link: https://github.com/Samantha09/nl2sql-platform
@@ -175,7 +175,7 @@ params:
 
       - title: deepin-ai-island
         content: 专为 Linux（Deepin/DDE）打造的 AI Agent 监控工具，以屏幕顶部中央浮动胶囊作为核心 UI，实时监 Claude Code 会话进度与审批请求。
-        image: images/projects/deepin-ai-island.svg
+        image: images/projects/deepin-compact.png
         featured:
           name: GitHub
           link: https://github.com/Samantha09/deepin-ai-island
@@ -205,7 +205,7 @@ params:
 
       - title: mcpguard
         content: MCP 安全护栏，双向拦截 MCP JSON-RPC 请求与响应，检测并拦截不安全的 Agent 工具调用。
-        image: images/projects/mcpguard.svg
+        image: images/projects/mcpguard-dashboard.png
         featured:
           name: GitHub
           link: https://github.com/Samantha09/mcpguard
