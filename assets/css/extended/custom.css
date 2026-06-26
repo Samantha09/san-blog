@@ -1,0 +1,31 @@
+/* 头像统一圆形 */
+#hero img.img-thumbnail,
+#about img.img-thumbnail,
+footer .text-center.pt-2 img {
+    border-radius: 50%;
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
+}
+
+/* Hero 区域头像大小 */
+#hero img.img-thumbnail {
+    max-width: 220px;
+}
+
+/* About 区域头像大小 */
+#about img.img-thumbnail {
+    max-width: 250px;
+}
+
+/* 项目卡片截图统一圆角 */
+#projects .card-img-top {
+    border-radius: 12px 12px 0 0;
+    object-fit: cover;
+    aspect-ratio: 16 / 10;
+}
+
+/* 项目卡片整体圆角更柔和 */
+#projects .card {
+    border-radius: 12px;
+    overflow: hidden;
+}

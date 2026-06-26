@@ -98,7 +98,7 @@ params:
   about:
     enable: true
     title: "关于我"
-    image: "images/avatar.svg"
+    image: "images/avatar.jpg"
     content: |-
       我是东阳，一名热衷于技术探索的开发者。
 
