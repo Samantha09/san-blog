@@ -1,64 +1,24 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>反序列化 on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</link><description>Recent content in 反序列化 on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Fri, 30 May 2025 15:00:00 +0800</lastBuildDate><atom:link href="https://Samantha09.github.io/san-blog/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/index.xml" rel="self" type="application/rss+xml"/><item><title>[0CTF 2016]piapiapia</title><link>https://Samantha09.github.io/san-blog/posts/0ctf-2016piapiapia/</link><pubDate>Fri, 30 May 2025 15:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/0ctf-2016piapiapia/</guid><description>&lt;h2 id="题目信息"&gt;题目信息&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / PHP 反序列化&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;核心漏洞&lt;/strong&gt;：反序列化字符串逃逸 + 任意文件读取&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;源码泄露&lt;/strong&gt;：&lt;code&gt;www.zip&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;h2 id="源码结构"&gt;源码结构&lt;/h2&gt;
-&lt;p&gt;下载源码后得到以下关键文件：&lt;/p&gt;
-&lt;table&gt;
-	&lt;thead&gt;
-			&lt;tr&gt;
-					&lt;th&gt;文件&lt;/th&gt;
-					&lt;th&gt;作用&lt;/th&gt;
-			&lt;/tr&gt;
-	&lt;/thead&gt;
-	&lt;tbody&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;index.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;登录页面&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;register.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;注册页面&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;update.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;更新个人信息（文件上传 + 数据入库）&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;profile.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;展示个人信息（触发文件读取）&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;class.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;核心类（user + mysql）&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;config.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;配置文件（含 flag）&lt;/td&gt;
-			&lt;/tr&gt;
-	&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h2 id="漏洞分析"&gt;漏洞分析&lt;/h2&gt;
-&lt;h3 id="1-任意文件读取核心利用点"&gt;1. 任意文件读取（核心利用点）&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;profile.php&lt;/code&gt; 第 16 行：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;$profile &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;unserialize&lt;/span&gt;($profile);
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;$photo &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;base64_encode&lt;/span&gt;(&lt;span style="color:#a6e22e"&gt;file_get_contents&lt;/span&gt;($profile[&lt;span style="color:#e6db74"&gt;&amp;#39;photo&amp;#39;&lt;/span&gt;]));
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;$profile&lt;/code&gt; 是从数据库读取的序列化字符串，经过 &lt;code&gt;unserialize()&lt;/code&gt; 后得到数组。&lt;code&gt;$profile['photo']&lt;/code&gt; 作为文件路径传入 &lt;code&gt;file_get_contents()&lt;/code&gt;，结果被 base64 编码输出到页面。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;如果能控制 &lt;code&gt;$profile['photo']&lt;/code&gt; 的值，就能读取服务器上的任意文件。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id="2-反序列化字符串逃逸"&gt;2. 反序列化字符串逃逸&lt;/h3&gt;
-&lt;h4 id="21-filter-函数"&gt;2.1 filter() 函数&lt;/h4&gt;
-&lt;p&gt;&lt;code&gt;class.php&lt;/code&gt; 中的 &lt;code&gt;filter()&lt;/code&gt;：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;function&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;filter&lt;/span&gt;($string) {
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $escape &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;array&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;\&amp;#39;&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;\\\\&amp;#39;&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $escape &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;implode&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $escape) &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $string &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;preg_replace&lt;/span&gt;($escape, &lt;span style="color:#e6db74"&gt;&amp;#39;_&amp;#39;&lt;/span&gt;, $string);
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $safe &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;array&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;select&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;insert&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;update&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;delete&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;where&amp;#39;&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $safe &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;implode&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $safe) &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/i&amp;#39;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;preg_replace&lt;/span&gt;($safe, &lt;span style="color:#e6db74"&gt;&amp;#39;hacker&amp;#39;&lt;/span&gt;, $string);
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关键点：&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>反序列化 on 东阳的个人站点</title>
+		<link>http://127.0.0.1:1313/san-blog/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</link>
+		<description>Recent content in 反序列化 on 东阳的个人站点</description>
+		<generator>Hugo</generator>
+		<language>zh-cn</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 30 May 2025 15:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="http://127.0.0.1:1313/san-blog/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>[0CTF 2016]piapiapia</title>
+				<link>http://127.0.0.1:1313/san-blog/posts/0ctf-2016piapiapia/</link>
+				<pubDate>Fri, 30 May 2025 15:00:00 +0800</pubDate>
+				<guid>http://127.0.0.1:1313/san-blog/posts/0ctf-2016piapiapia/</guid>
+				<description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / PHP 反序列化&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;核心漏洞&lt;/strong&gt;：反序列化字符串逃逸 + 任意文件读取&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;源码泄露&lt;/strong&gt;：&lt;code&gt;www.zip&lt;/code&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;源码结构&#34;&gt;源码结构&lt;/h2&gt;&#xA;&lt;p&gt;下载源码后得到以下关键文件：&lt;/p&gt;&#xA;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;文件&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;作用&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;index.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;登录页面&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;register.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;注册页面&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;update.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;更新个人信息（文件上传 + 数据入库）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;profile.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;展示个人信息（触发文件读取）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;class.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;核心类（user + mysql）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;config.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;配置文件（含 flag）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;漏洞分析&#34;&gt;漏洞分析&lt;/h2&gt;&#xA;&lt;h3 id=&#34;1-任意文件读取核心利用点&#34;&gt;1. 任意文件读取（核心利用点）&lt;/h3&gt;&#xA;&lt;p&gt;&lt;code&gt;profile.php&lt;/code&gt; 第 16 行：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$profile &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;unserialize&lt;/span&gt;($profile);&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$photo &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;base64_encode&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;file_get_contents&lt;/span&gt;($profile[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;photo&amp;#39;&lt;/span&gt;]));&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;$profile&lt;/code&gt; 是从数据库读取的序列化字符串，经过 &lt;code&gt;unserialize()&lt;/code&gt; 后得到数组。&lt;code&gt;$profile[&#39;photo&#39;]&lt;/code&gt; 作为文件路径传入 &lt;code&gt;file_get_contents()&lt;/code&gt;，结果被 base64 编码输出到页面。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;如果能控制 &lt;code&gt;$profile[&#39;photo&#39;]&lt;/code&gt; 的值，就能读取服务器上的任意文件。&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;2-反序列化字符串逃逸&#34;&gt;2. 反序列化字符串逃逸&lt;/h3&gt;&#xA;&lt;h4 id=&#34;21-filter-函数&#34;&gt;2.1 filter() 函数&lt;/h4&gt;&#xA;&lt;p&gt;&lt;code&gt;class.php&lt;/code&gt; 中的 &lt;code&gt;filter()&lt;/code&gt;：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;filter&lt;/span&gt;($string) {&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $escape &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;array&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;\&amp;#39;&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;\\\\&amp;#39;&lt;/span&gt;);&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $escape &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;implode&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $escape) &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt;;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $string &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;preg_replace&lt;/span&gt;($escape, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;_&amp;#39;&lt;/span&gt;, $string);&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $safe &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;array&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;select&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;insert&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;update&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;delete&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;where&amp;#39;&lt;/span&gt;);&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $safe &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;implode&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $safe) &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/i&amp;#39;&lt;/span&gt;;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;preg_replace&lt;/span&gt;($safe, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hacker&amp;#39;&lt;/span&gt;, $string);&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关键点：&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

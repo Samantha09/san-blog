@@ -81,7 +81,7 @@ params:
     title: "东阳。"
     subtitle: "一名热爱构建与安全的开发者"
     content: "专注于 AI 应用、全栈开发和网络安全。这里展示我的开源项目与技术博客，记录从想法到实现的探索过程。"
-    image: /images/hero.svg
+    image: images/hero.svg
     bottomImage:
       enable: true
     button:
@@ -130,7 +130,7 @@ params:
     items:
       - title: ratel
         content: 命令行斗地主 C++ 实现，提供 WebSocket + JSON 网关与 React 网页前端，支持多人在线实时对战。
-        image: /images/projects/ratel.svg
+        image: images/projects/ratel.svg
         featured:
           name: GitHub
           link: https://github.com/Samantha09/ratel
@@ -145,7 +145,7 @@ params:
 
       - title: finbot-public
         content: 基于 OpenClaw 二次开发的个人金融投资 Agent，支持 A股/港股/美股/加密货币行情查询、舆情分析与投资组合风险管理。
-        image: /images/projects/finbot.svg
+        image: images/projects/finbot.svg
         featured:
           name: GitHub
           link: https://github.com/Samantha09/finbot-public
@@ -160,7 +160,7 @@ params:
 
       - title: nl2sql-platform
         content: AI 数据库自然语言问答平台。非技术人员通过中文提问，系统自动生成 SQL、执行并返回可视化结果。
-        image: /images/projects/nl2sql.svg
+        image: images/projects/nl2sql.svg
         featured:
           name: GitHub
           link: https://github.com/Samantha09/nl2sql-platform
@@ -175,7 +175,7 @@ params:
 
       - title: deepin-ai-island
         content: 专为 Linux（Deepin/DDE）打造的 AI Agent 监控工具，以屏幕顶部中央浮动胶囊作为核心 UI，实时监 Claude Code 会话进度与审批请求。
-        image: /images/projects/deepin-ai-island.svg
+        image: images/projects/deepin-ai-island.svg
         featured:
           name: GitHub
           link: https://github.com/Samantha09/deepin-ai-island
@@ -190,7 +190,7 @@ params:
 
       - title: llm-safety-papers
         content: 大模型安全论文阅读笔记，系统整理 LLM 安全领域的核心论文，涵盖越狱攻击、提示注入、对抗样本、安全对齐与评估基准等方向。
-        image: /images/projects/llm-safety.svg
+        image: images/projects/llm-safety.svg
         featured:
           name: GitHub
           link: https://github.com/Samantha09/llm-safety-papers
@@ -205,7 +205,7 @@ params:
 
       - title: mcpguard
         content: MCP 安全护栏，双向拦截 MCP JSON-RPC 请求与响应，检测并拦截不安全的 Agent 工具调用。
-        image: /images/projects/mcpguard.svg
+        image: images/projects/mcpguard.svg
         featured:
           name: GitHub
           link: https://github.com/Samantha09/mcpguard
