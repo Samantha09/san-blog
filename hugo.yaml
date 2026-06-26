@@ -44,7 +44,7 @@ markup:
 params:
   title: "东阳的个人站点"
   description: "全栈开发者 · AI 应用构建者 · 安全研究者"
-  favicon: "images/avatar.svg"
+  favicon: "images/avatar.jpg"
 
   useBootstrapCDN: false
   mathjax: false
@@ -81,7 +81,7 @@ params:
     title: "东阳。"
     subtitle: "一名热爱构建与安全的开发者"
     content: "专注于 AI 应用、全栈开发和网络安全。这里展示我的开源项目与技术博客，记录从想法到实现的探索过程。"
-    image: images/avatar.svg
+    image: images/avatar.jpg
     bottomImage:
       enable: true
     button:
@@ -176,7 +176,7 @@ params:
 
       - title: deepin-ai-island
         content: 专为 Linux（Deepin/DDE）打造的 AI Agent 监控工具，以屏幕顶部中央浮动胶囊作为核心 UI，实时监 Claude Code 会话进度与审批请求。
-        image: images/projects/deepin-compact.png
+        image: images/projects/deepin-expanded.png
         featured:
           name: GitHub
           link: https://github.com/Samantha09/deepin-ai-island
