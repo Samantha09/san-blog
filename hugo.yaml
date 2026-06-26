@@ -97,7 +97,7 @@ params:
     enable: true
     intro: "你好，我是"
     title: "东阳。"
-    subtitle: "一名热爱构建与安全的开发者"
+    subtitle: "一名热爱 AI 与安全的开发者"
     content: "专注于 AI 应用、全栈开发和网络安全。这里展示我的开源项目与技术博客，记录从想法到实现的探索过程。"
     image: images/avatar.jpg
     bottomImage:
