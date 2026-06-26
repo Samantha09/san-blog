@@ -81,7 +81,7 @@ params:
     title: "东阳。"
     subtitle: "一名热爱构建与安全的开发者"
     content: "专注于 AI 应用、全栈开发和网络安全。这里展示我的开源项目与技术博客，记录从想法到实现的探索过程。"
-    image: images/hero.svg
+    image: images/avatar.svg
     bottomImage:
       enable: true
     button:
@@ -98,6 +98,7 @@ params:
   about:
     enable: true
     title: "关于我"
+    image: "images/avatar.svg"
     content: |-
       我是东阳，一名热衷于技术探索的开发者。
 
