@@ -44,7 +44,7 @@ markup:
 params:
   title: "东阳的个人站点"
   description: "全栈开发者 · AI 应用构建者 · 安全研究者"
-  favicon: "/fav.png"
+  favicon: "images/avatar.svg"
 
   useBootstrapCDN: false
   mathjax: false
