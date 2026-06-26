@@ -1,0 +1,260 @@
+baseURL: "https://Samantha09.github.io/san-blog"
+locale: "zh-cn"
+title: "东阳的个人站点"
+theme: hugo-profile
+
+defaultContentLanguage: "zh-cn"
+defaultContentLanguageInSubdir: false
+
+languages:
+  zh-cn:
+    label: "简体中文"
+    weight: 1
+    contentDir: "content"
+    menu:
+      main:
+        - identifier: blog
+          name: "博客"
+          title: "技术博客"
+          url: /blogs
+          weight: 1
+
+outputs:
+  home:
+    - "HTML"
+    - "RSS"
+    - "JSON"
+  page:
+    - "HTML"
+    - "RSS"
+
+enableRobotsTXT: true
+
+pagination:
+  pagerSize: 6
+
+permalinks:
+  blogs: /posts/:slug/
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+
+params:
+  title: "东阳的个人站点"
+  description: "全栈开发者 · AI 应用构建者 · 安全研究者"
+  favicon: "/fav.png"
+
+  useBootstrapCDN: false
+  mathjax: false
+  animate: true
+
+  theme:
+    # defaultTheme: "light"
+
+  font:
+    fontSize: 1rem
+    fontWeight: 400
+    lineHeight: 1.6
+    textAlign: left
+
+  navbar:
+    align: ms-auto
+    brandName: "东阳"
+    disableSearch: false
+    stickyNavBar:
+      enable: true
+      showOnScrollUp: true
+    enableSeparator: false
+    menus:
+      disableAbout: false
+      disableExperience: true
+      disableEducation: true
+      disableProjects: false
+      disableAchievements: true
+      disableContact: false
+
+  hero:
+    enable: true
+    intro: "你好，我是"
+    title: "东阳。"
+    subtitle: "一名热爱构建与安全的开发者"
+    content: "专注于 AI 应用、全栈开发和网络安全。这里展示我的开源项目与技术博客，记录从想法到实现的探索过程。"
+    image: /images/hero.svg
+    bottomImage:
+      enable: true
+    button:
+      enable: true
+      name: "查看作品集"
+      url: "#projects"
+      download: false
+      newPage: false
+    socialLinks:
+      fontAwesomeIcons:
+        - icon: fab fa-github
+          url: https://github.com/Samantha09
+
+  about:
+    enable: true
+    title: "关于我"
+    content: |-
+      我是东阳，一名热衷于技术探索的开发者。
+
+      过去几年，我的兴趣从 Web 安全、CTF 扩展到 AI 应用与全栈开发。我喜欢把学习过程中的工具和思路做成可运行的项目，也习惯通过博客把复杂的问题拆解成清晰的笔记。
+
+      这个站点是我的作品集与技术博客：作品集展示我最近构建的开源项目，博客则记录安全攻防、AI 工程与开发实践中的思考。
+    skills:
+      enable: true
+      title: "近期关注的技术方向："
+      items:
+        - "AI Agent 开发"
+        - "大模型安全"
+        - "Java / Spring Cloud"
+        - "TypeScript / React"
+        - "Go / C++"
+        - "Web 安全攻防"
+
+  experience:
+    enable: false
+
+  education:
+    enable: false
+
+  achievements:
+    enable: false
+
+  projects:
+    enable: true
+    title: "作品集"
+    items:
+      - title: ratel
+        content: 命令行斗地主 C++ 实现，提供 WebSocket + JSON 网关与 React 网页前端，支持多人在线实时对战。
+        image: /images/projects/ratel.svg
+        featured:
+          name: GitHub
+          link: https://github.com/Samantha09/ratel
+        badges:
+          - "C++"
+          - "WebSocket"
+          - "React"
+          - "多人在线"
+        links:
+          - icon: fab fa-github
+            url: https://github.com/Samantha09/ratel
+
+      - title: finbot-public
+        content: 基于 OpenClaw 二次开发的个人金融投资 Agent，支持 A股/港股/美股/加密货币行情查询、舆情分析与投资组合风险管理。
+        image: /images/projects/finbot.svg
+        featured:
+          name: GitHub
+          link: https://github.com/Samantha09/finbot-public
+        badges:
+          - "TypeScript"
+          - "AI Agent"
+          - "金融"
+          - "OpenClaw"
+        links:
+          - icon: fab fa-github
+            url: https://github.com/Samantha09/finbot-public
+
+      - title: nl2sql-platform
+        content: AI 数据库自然语言问答平台。非技术人员通过中文提问，系统自动生成 SQL、执行并返回可视化结果。
+        image: /images/projects/nl2sql.svg
+        featured:
+          name: GitHub
+          link: https://github.com/Samantha09/nl2sql-platform
+        badges:
+          - "Java"
+          - "Spring Cloud"
+          - "React"
+          - "AI"
+        links:
+          - icon: fab fa-github
+            url: https://github.com/Samantha09/nl2sql-platform
+
+      - title: deepin-ai-island
+        content: 专为 Linux（Deepin/DDE）打造的 AI Agent 监控工具，以屏幕顶部中央浮动胶囊作为核心 UI，实时监 Claude Code 会话进度与审批请求。
+        image: /images/projects/deepin-ai-island.svg
+        featured:
+          name: GitHub
+          link: https://github.com/Samantha09/deepin-ai-island
+        badges:
+          - "Python"
+          - "Qt"
+          - "Linux"
+          - "AI 工具"
+        links:
+          - icon: fab fa-github
+            url: https://github.com/Samantha09/deepin-ai-island
+
+      - title: llm-safety-papers
+        content: 大模型安全论文阅读笔记，系统整理 LLM 安全领域的核心论文，涵盖越狱攻击、提示注入、对抗样本、安全对齐与评估基准等方向。
+        image: /images/projects/llm-safety.svg
+        featured:
+          name: GitHub
+          link: https://github.com/Samantha09/llm-safety-papers
+        badges:
+          - "Python"
+          - "LLM 安全"
+          - "论文整理"
+          - "研究"
+        links:
+          - icon: fab fa-github
+            url: https://github.com/Samantha09/llm-safety-papers
+
+      - title: mcpguard
+        content: MCP 安全护栏，双向拦截 MCP JSON-RPC 请求与响应，检测并拦截不安全的 Agent 工具调用。
+        image: /images/projects/mcpguard.svg
+        featured:
+          name: GitHub
+          link: https://github.com/Samantha09/mcpguard
+        badges:
+          - "Go"
+          - "React"
+          - "MCP"
+          - "安全"
+        links:
+          - icon: fab fa-github
+            url: https://github.com/Samantha09/mcpguard
+
+  contact:
+    enable: true
+    title: "联系我"
+    content: 如果你对我的项目感兴趣，或者想聊聊技术、安全与 AI，欢迎通过 GitHub 与我联系。
+    btnName: "访问 GitHub"
+    btnLink: https://github.com/Samantha09
+
+  footer:
+    recentPosts:
+      path: "blogs"
+      count: 3
+      title: "最近文章"
+      enable: true
+      disableFeaturedImage: true
+    socialNetworks:
+      github: https://github.com/Samantha09
+
+  listPages:
+    disableFeaturedImage: false
+
+  singlePages:
+    socialShare: true
+    readTime:
+      enable: true
+      content: "分钟阅读"
+    scrollprogress:
+      enable: true
+    tags:
+      openInNewTab: true
+
+  terms:
+    read: "阅读"
+    toc: "目录"
+    copyright: "保留所有权利"
+    emailText: "看看这个站点"
+
+  datesFormat:
+    article: "2006年1月2日"
+    articleList: "2006年1月2日"
+    articleRecent: "2006年1月2日"

