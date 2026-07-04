@@ -1,0 +1,34 @@
+{{ define "head" }}
+<meta name="description" content="{{ .Title }} | {{ .Site.Title }}">
+<link rel="stylesheet" href="{{ (printf "%scss/list.css" (.Site.Params.staticPath | default "")) | relURL }}" media="all">
+{{ end }}
+
+{{ define "title" }}
+{{ .Title }} | {{ .Site.Title }}
+{{ end }}
+
+{{ define "main" }}
+<div class="container pt-5" id="archives-page">
+    <h2 class="text-center pb-4">{{ .Title }}</h2>
+
+    {{ $pages := where site.RegularPages "Type" "blogs" }}
+    {{ if $pages }}
+        {{ $grouped := $pages.GroupByDate "2006" }}
+        {{ range $grouped }}
+        <div class="mb-5">
+            <h3 class="border-bottom pb-2 mb-3">{{ .Key }} 年</h3>
+            <ul class="list-unstyled">
+                {{ range .Pages }}
+                <li class="d-flex justify-content-between align-items-start py-2">
+                    <span class="text-muted me-3" style="white-space: nowrap;">{{ .Date | time.Format "01-02" }}</span>
+                    <a href="{{ .RelPermalink }}" class="flex-grow-1">{{ .Title }}</a>
+                </li>
+                {{ end }}
+            </ul>
+        </div>
+        {{ end }}
+    {{ else }}
+        <p class="text-center text-muted">暂无文章。</p>
+    {{ end }}
+</div>
+{{ end }}

@@ -1,0 +1,24 @@
+/* Fix dark mode background gaps */
+
+/* Ensure body/html use theme background in dark mode */
+.dark,
+.dark body,
+.dark html {
+  background-color: var(--background-color) !important;
+}
+
+/* Make footer and all its descendants transparent so body background shows through */
+footer,
+footer > div,
+footer .container,
+footer .text-center,
+footer .text-center.pt-2,
+.text-center.pt-2 {
+  background-color: transparent !important;
+}
+
+/* Ensure archive page containers don't create white gaps */
+#archives-page,
+#archives-page .container {
+  background-color: transparent;
+}

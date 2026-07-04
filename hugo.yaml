@@ -18,6 +18,11 @@ languages:
           title: "技术博客"
           url: /blogs
           weight: 1
+        - identifier: archives
+          name: "归档"
+          title: "文章归档"
+          url: /archives
+          weight: 2
 
 outputs:
   home:
@@ -49,6 +54,7 @@ params:
   useBootstrapCDN: false
   mathjax: false
   animate: true
+  customCSS: true
 
   theme:
     # defaultTheme: "light"
@@ -193,7 +199,7 @@ params:
             url: https://github.com/Samantha09/nl2sql-platform
 
       - title: deepin-ai-island
-        content: 专为 Linux（Deepin/DDE）打造的 AI Agent 监控工具，以屏幕顶部中央浮动胶囊作为核心 UI，实时监 Claude Code 会话进度与审批请求。
+        content: 专为 Linux（Deepin/DDE）打造的 AI Agent 监控工具，以屏幕顶部中央浮动胶囊作为核心 UI，实时监听 Claude Code 会话进度与审批请求。
         image: images/projects/deepin-expanded.png
         featured:
           name: GitHub
