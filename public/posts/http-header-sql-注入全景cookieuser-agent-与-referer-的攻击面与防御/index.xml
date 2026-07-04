@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
 		<title>HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御 on 东阳的个人站点</title>
-		<link>http://127.0.0.1:1313/san-blog/posts/http-header-sql-%E6%B3%A8%E5%85%A5%E5%85%A8%E6%99%AFcookieuser-agent-%E4%B8%8E-referer-%E7%9A%84%E6%94%BB%E5%87%BB%E9%9D%A2%E4%B8%8E%E9%98%B2%E5%BE%A1/</link>
+		<link>https://Samantha09.github.io/san-blog/posts/http-header-sql-%E6%B3%A8%E5%85%A5%E5%85%A8%E6%99%AFcookieuser-agent-%E4%B8%8E-referer-%E7%9A%84%E6%94%BB%E5%87%BB%E9%9D%A2%E4%B8%8E%E9%98%B2%E5%BE%A1/</link>
 		<description>Recent content in HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御 on 东阳的个人站点</description>
 		<generator>Hugo</generator>
 		<language>zh-cn</language>
@@ -12,6 +12,6 @@
 		
 			<lastBuildDate></lastBuildDate>
 		
-			<atom:link href="http://127.0.0.1:1313/san-blog/posts/http-header-sql-%E6%B3%A8%E5%85%A5%E5%85%A8%E6%99%AFcookieuser-agent-%E4%B8%8E-referer-%E7%9A%84%E6%94%BB%E5%87%BB%E9%9D%A2%E4%B8%8E%E9%98%B2%E5%BE%A1/index.xml" rel="self" type="application/rss+xml" />
+			<atom:link href="https://Samantha09.github.io/san-blog/posts/http-header-sql-%E6%B3%A8%E5%85%A5%E5%85%A8%E6%99%AFcookieuser-agent-%E4%B8%8E-referer-%E7%9A%84%E6%94%BB%E5%87%BB%E9%9D%A2%E4%B8%8E%E9%98%B2%E5%BE%A1/index.xml" rel="self" type="application/rss+xml" />
 	</channel>
 </rss>

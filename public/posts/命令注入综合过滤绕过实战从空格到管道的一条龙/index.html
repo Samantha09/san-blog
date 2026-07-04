@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="UTF-8">
+<head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta http-equiv="Accept-CH" content="DPR, Viewport-Width, Width">
@@ -28,7 +28,7 @@
 
 
 
-<meta property="og:url" content="http://127.0.0.1:1313/san-blog/posts/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E7%BB%BC%E5%90%88%E8%BF%87%E6%BB%A4%E7%BB%95%E8%BF%87%E5%AE%9E%E6%88%98%E4%BB%8E%E7%A9%BA%E6%A0%BC%E5%88%B0%E7%AE%A1%E9%81%93%E7%9A%84%E4%B8%80%E6%9D%A1%E9%BE%99/">
+<meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E7%BB%BC%E5%90%88%E8%BF%87%E6%BB%A4%E7%BB%95%E8%BF%87%E5%AE%9E%E6%88%98%E4%BB%8E%E7%A9%BA%E6%A0%BC%E5%88%B0%E7%AE%A1%E9%81%93%E7%9A%84%E4%B8%80%E6%9D%A1%E9%BE%99/">
 	<meta property="og:site_name" content="东阳的个人站点">
 	<meta property="og:title" content="命令注入综合过滤绕过实战：从空格到管道的一条龙">
 	<meta property="og:description" content="题目信息 类型：Web / 命令注入（Command Injection） 考点：黑名单过滤绕过、Shell 语法特性、编码与通配符 核心漏洞：exec() 直接拼接用户输入，黑名单过滤存在遗漏 源码分析 题目给了一段典型的命令注入代码，过滤规则逐步加强：
@@ -70,12 +70,12 @@
 
 <style>
     :root {
-        --text-color: #3d3d3d;
-        --text-secondary-color: #6b6b6b;
-        --text-link-color: #8b7bb5;
+        --text-color: #1f1f1f;
+        --text-secondary-color: #4a4a4a;
+        --text-link-color: #7a6aa8;
         --background-color: #f7f5f2;
         --secondary-background-color: #efece7;
-        --primary-color: #8b7bb5;
+        --primary-color: #7a6aa8;
         --secondary-color: #ffffff;
 
          
@@ -132,6 +132,8 @@
 
   
   
+    <link rel="stylesheet" href="/san-blog/style.css">
+  
 
   <title>
 命令注入综合过滤绕过实战：从空格到管道的一条龙 | 东阳的个人站点
@@ -144,7 +146,6 @@
   
 <script>
     let localStorageValue = localStorage.getItem("pref-theme");
-    let mediaQuery = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     switch (localStorageValue) {
         case "dark":
@@ -156,10 +157,9 @@
             document.documentElement.classList.remove('dark');
             break;
         default:
-            if (mediaQuery) {
-                document.documentElement.classList.add('dark');
-                document.body.classList.add('dark');
-            }
+            
+            document.body.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
             break;
     }
 </script>
@@ -198,7 +198,7 @@
             
             <a class="navbar-brand primary-font text-wrap" href="/san-blog/">
                 
-                <img src="images/avatar.jpg" width="30" height="30"
+                <img src="/san-blog/images/avatar.jpg" width="30" height="30"
                     class="d-inline-block align-top">
                 东阳
                 
@@ -272,6 +272,16 @@
                         <a class="nav-link" href="/san-blog/blogs" title="技术博客">
                             
                             博客
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/san-blog/archives" title="文章归档">
+                            
+                            归档
                         </a>
                     </li>
                     
@@ -564,22 +574,22 @@
             <div class="social-content">
               <ul class="list-inline">
                 <li class="list-inline-item text-center">
-                  <a target="_blank" href="https://www.linkedin.com/feed/?shareActive=true&text= http%3a%2f%2f127.0.0.1%3a1313%2fsan-blog%2fposts%2f%25E5%2591%25BD%25E4%25BB%25A4%25E6%25B3%25A8%25E5%2585%25A5%25E7%25BB%25BC%25E5%2590%2588%25E8%25BF%2587%25E6%25BB%25A4%25E7%25BB%2595%25E8%25BF%2587%25E5%25AE%259E%25E6%2588%2598%25E4%25BB%258E%25E7%25A9%25BA%25E6%25A0%25BC%25E5%2588%25B0%25E7%25AE%25A1%25E9%2581%2593%25E7%259A%2584%25E4%25B8%2580%25E6%259D%25A1%25E9%25BE%2599%2f">
+                  <a target="_blank" href="https://www.linkedin.com/feed/?shareActive=true&text= https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2f%25E5%2591%25BD%25E4%25BB%25A4%25E6%25B3%25A8%25E5%2585%25A5%25E7%25BB%25BC%25E5%2590%2588%25E8%25BF%2587%25E6%25BB%25A4%25E7%25BB%2595%25E8%25BF%2587%25E5%25AE%259E%25E6%2588%2598%25E4%25BB%258E%25E7%25A9%25BA%25E6%25A0%25BC%25E5%2588%25B0%25E7%25AE%25A1%25E9%2581%2593%25E7%259A%2584%25E4%25B8%2580%25E6%259D%25A1%25E9%25BE%2599%2f">
                     <i class="fab fa-linkedin"></i>
                   </a>
                 </li>
                 <li class="list-inline-item text-center">
-                  <a target="_blank" href='https://twitter.com/share?text=%e5%91%bd%e4%bb%a4%e6%b3%a8%e5%85%a5%e7%bb%bc%e5%90%88%e8%bf%87%e6%bb%a4%e7%bb%95%e8%bf%87%e5%ae%9e%e6%88%98%ef%bc%9a%e4%bb%8e%e7%a9%ba%e6%a0%bc%e5%88%b0%e7%ae%a1%e9%81%93%e7%9a%84%e4%b8%80%e6%9d%a1%e9%be%99&url=http%3a%2f%2f127.0.0.1%3a1313%2fsan-blog%2fposts%2f%25E5%2591%25BD%25E4%25BB%25A4%25E6%25B3%25A8%25E5%2585%25A5%25E7%25BB%25BC%25E5%2590%2588%25E8%25BF%2587%25E6%25BB%25A4%25E7%25BB%2595%25E8%25BF%2587%25E5%25AE%259E%25E6%2588%2598%25E4%25BB%258E%25E7%25A9%25BA%25E6%25A0%25BC%25E5%2588%25B0%25E7%25AE%25A1%25E9%2581%2593%25E7%259A%2584%25E4%25B8%2580%25E6%259D%25A1%25E9%25BE%2599%2f&hashtags=CTF%2cWeb%e5%ae%89%e5%85%a8%2c%e5%91%bd%e4%bb%a4%e6%b3%a8%e5%85%a5%2cRCE%2c%e7%bb%95%e8%bf%87%2c%e9%bb%91%e5%90%8d%e5%8d%95'>
+                  <a target="_blank" href='https://twitter.com/share?text=%e5%91%bd%e4%bb%a4%e6%b3%a8%e5%85%a5%e7%bb%bc%e5%90%88%e8%bf%87%e6%bb%a4%e7%bb%95%e8%bf%87%e5%ae%9e%e6%88%98%ef%bc%9a%e4%bb%8e%e7%a9%ba%e6%a0%bc%e5%88%b0%e7%ae%a1%e9%81%93%e7%9a%84%e4%b8%80%e6%9d%a1%e9%be%99&url=https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2f%25E5%2591%25BD%25E4%25BB%25A4%25E6%25B3%25A8%25E5%2585%25A5%25E7%25BB%25BC%25E5%2590%2588%25E8%25BF%2587%25E6%25BB%25A4%25E7%25BB%2595%25E8%25BF%2587%25E5%25AE%259E%25E6%2588%2598%25E4%25BB%258E%25E7%25A9%25BA%25E6%25A0%25BC%25E5%2588%25B0%25E7%25AE%25A1%25E9%2581%2593%25E7%259A%2584%25E4%25B8%2580%25E6%259D%25A1%25E9%25BE%2599%2f&hashtags=CTF%2cWeb%e5%ae%89%e5%85%a8%2c%e5%91%bd%e4%bb%a4%e6%b3%a8%e5%85%a5%2cRCE%2c%e7%bb%95%e8%bf%87%2c%e9%bb%91%e5%90%8d%e5%8d%95'>
                     <i class="fab fa-twitter"></i>
                   </a>
                 </li>
                 <li class="list-inline-item text-center">
-                  <a target="_blank" href="https://api.whatsapp.com/send?text=%e5%91%bd%e4%bb%a4%e6%b3%a8%e5%85%a5%e7%bb%bc%e5%90%88%e8%bf%87%e6%bb%a4%e7%bb%95%e8%bf%87%e5%ae%9e%e6%88%98%ef%bc%9a%e4%bb%8e%e7%a9%ba%e6%a0%bc%e5%88%b0%e7%ae%a1%e9%81%93%e7%9a%84%e4%b8%80%e6%9d%a1%e9%be%99: http%3a%2f%2f127.0.0.1%3a1313%2fsan-blog%2fposts%2f%25E5%2591%25BD%25E4%25BB%25A4%25E6%25B3%25A8%25E5%2585%25A5%25E7%25BB%25BC%25E5%2590%2588%25E8%25BF%2587%25E6%25BB%25A4%25E7%25BB%2595%25E8%25BF%2587%25E5%25AE%259E%25E6%2588%2598%25E4%25BB%258E%25E7%25A9%25BA%25E6%25A0%25BC%25E5%2588%25B0%25E7%25AE%25A1%25E9%2581%2593%25E7%259A%2584%25E4%25B8%2580%25E6%259D%25A1%25E9%25BE%2599%2f">
+                  <a target="_blank" href="https://api.whatsapp.com/send?text=%e5%91%bd%e4%bb%a4%e6%b3%a8%e5%85%a5%e7%bb%bc%e5%90%88%e8%bf%87%e6%bb%a4%e7%bb%95%e8%bf%87%e5%ae%9e%e6%88%98%ef%bc%9a%e4%bb%8e%e7%a9%ba%e6%a0%bc%e5%88%b0%e7%ae%a1%e9%81%93%e7%9a%84%e4%b8%80%e6%9d%a1%e9%be%99: https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2f%25E5%2591%25BD%25E4%25BB%25A4%25E6%25B3%25A8%25E5%2585%25A5%25E7%25BB%25BC%25E5%2590%2588%25E8%25BF%2587%25E6%25BB%25A4%25E7%25BB%2595%25E8%25BF%2587%25E5%25AE%259E%25E6%2588%2598%25E4%25BB%258E%25E7%25A9%25BA%25E6%25A0%25BC%25E5%2588%25B0%25E7%25AE%25A1%25E9%2581%2593%25E7%259A%2584%25E4%25B8%2580%25E6%259D%25A1%25E9%25BE%2599%2f">
                     <i class="fab fa-whatsapp"></i>
                   </a>
                 </li>
                 <li class="list-inline-item text-center">
-                  <a target="_blank" href='mailto:?subject=%e5%91%bd%e4%bb%a4%e6%b3%a8%e5%85%a5%e7%bb%bc%e5%90%88%e8%bf%87%e6%bb%a4%e7%bb%95%e8%bf%87%e5%ae%9e%e6%88%98%ef%bc%9a%e4%bb%8e%e7%a9%ba%e6%a0%bc%e5%88%b0%e7%ae%a1%e9%81%93%e7%9a%84%e4%b8%80%e6%9d%a1%e9%be%99&amp;body=%e7%9c%8b%e7%9c%8b%e8%bf%99%e4%b8%aa%e7%ab%99%e7%82%b9 http%3a%2f%2f127.0.0.1%3a1313%2fsan-blog%2fposts%2f%25E5%2591%25BD%25E4%25BB%25A4%25E6%25B3%25A8%25E5%2585%25A5%25E7%25BB%25BC%25E5%2590%2588%25E8%25BF%2587%25E6%25BB%25A4%25E7%25BB%2595%25E8%25BF%2587%25E5%25AE%259E%25E6%2588%2598%25E4%25BB%258E%25E7%25A9%25BA%25E6%25A0%25BC%25E5%2588%25B0%25E7%25AE%25A1%25E9%2581%2593%25E7%259A%2584%25E4%25B8%2580%25E6%259D%25A1%25E9%25BE%2599%2f'>
+                  <a target="_blank" href='mailto:?subject=%e5%91%bd%e4%bb%a4%e6%b3%a8%e5%85%a5%e7%bb%bc%e5%90%88%e8%bf%87%e6%bb%a4%e7%bb%95%e8%bf%87%e5%ae%9e%e6%88%98%ef%bc%9a%e4%bb%8e%e7%a9%ba%e6%a0%bc%e5%88%b0%e7%ae%a1%e9%81%93%e7%9a%84%e4%b8%80%e6%9d%a1%e9%be%99&amp;body=%e7%9c%8b%e7%9c%8b%e8%bf%99%e4%b8%aa%e7%ab%99%e7%82%b9 https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2f%25E5%2591%25BD%25E4%25BB%25A4%25E6%25B3%25A8%25E5%2585%25A5%25E7%25BB%25BC%25E5%2590%2588%25E8%25BF%2587%25E6%25BB%25A4%25E7%25BB%2595%25E8%25BF%2587%25E5%25AE%259E%25E6%2588%2598%25E4%25BB%258E%25E7%25A9%25BA%25E6%25A0%25BC%25E5%2588%25B0%25E7%25AE%25A1%25E9%2581%2593%25E7%259A%2584%25E4%25B8%2580%25E6%259D%25A1%25E9%25BE%2599%2f'>
                     <i class="fa fa-envelope"></i>
                   </a>
                 </li>
@@ -642,14 +652,15 @@
 
 
 
-  </div><footer>
+  </div><footer style="background-color: transparent;">
+    
     
 
 
   
 
- 
- 
+
+
 <div class="container py-3" id="recent-posts">
     
     
@@ -662,24 +673,35 @@
             <div class="card h-100">
                 
                 <div class="card-body bg-transparent p-3 shadow-sm">
+                    <a href="/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="primary-font card-title">
+                        <h5 class="card-title bg-transparent" title="React 学习 Day 01：基础入门">React 学习 Day 01：基础入门</h5>
+                    </a>
+                    <div class="card-text secondary-font">
+                        <p> 从零开始，用一个 react-basic 项目串起 React 入门必备知识。
+一、项目搭建 使用 Vite 创建 React 项目：
+npm create vite@latest react-basic -- --template …</p>
+                    </div>
+                </div>
+                <div class="mt-auto card-footer">
+                    <span class="float-start">2026年7月4日</span>
+                    <a href="/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 pt-2">
+            <div class="card h-100">
+                
+                <div class="card-body bg-transparent p-3 shadow-sm">
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/" class="primary-font card-title">
                         <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Redis 协议攻击与 Webshell 写入">CTFHub SSRF 实战：Redis 协议攻击 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入</li>
-<li><strong>工具</strong>：自写 Python 脚本、cURL、Burp Suite</li>
-</ul>
-<p>题目给出一个 <code>?url=</code> 参数，服务器使用 PHP curl 代为请求用户指定的地址。</p>
-<pre tabindex="0"><code>http://challenge-xxxx.sandbox.ctfhub.com:10800/?url=
-</code></pre><p>目标是通过 SSRF 攻击内网的 <strong>Redis</strong> 服务（通常运行在 <code>127.0.0.1:6379</code>），利用 Redis 的 <code>SAVE</code> 命令将 …</p></p>
+                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入 工具：自写 Python 脚本 …</p>
                     </div>
                 </div>
                 <div class="mt-auto card-footer">
-                    <span class="float-start">June 11, 2026</span>
+                    <span class="float-start">2026年6月11日</span>
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -693,52 +715,12 @@
                         <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：FastCGI 协议攻击与 Gopherus 工具使用">CTFHub SSRF 实战：FastCGI 协议 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、FastCGI 协议、Gopher 协议、PHP-FPM 攻击、双重 URL 编码</li>
-<li><strong>工具</strong>：Gopherus、Burp Suite、cURL</li>
-</ul>
-<p>题目给出一个 <code>?url=</code> 参数，服务器使用 PHP curl 代为请求用户指定的地址。</p>
-<pre tabindex="0"><code>http://challenge-xxxx.sandbox.ctfhub.com:10800/?url=
-</code></pre><p>目标是通过 SSRF 攻击内网的 <strong>PHP-FPM (FastCGI)</strong> 服务（通常运行在 <code>127.0.0.1:9000</code>），实现远程代码执行（RCE）， …</p></p>
+                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、FastCGI 协议、Gopher 协议、PHP-FPM 攻击、双重 URL 编码 工具：Gopherus、Burp …</p>
                     </div>
                 </div>
                 <div class="mt-auto card-footer">
-                    <span class="float-start">June 10, 2026</span>
+                    <span class="float-start">2026年6月10日</span>
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98fastcgi-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-gopherus-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6 pt-2">
-            <div class="card h-100">
-                
-                <div class="card-body bg-transparent p-3 shadow-sm">
-                    <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E5%B7%A5%E5%85%B7%E5%8C%96%E5%88%A9%E7%94%A8/" class="primary-font card-title">
-                        <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用">CTFHub SSRF 实战：Gopher 协议文 …</h5>
-                    </a>
-                    <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF / 文件上传</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、Gopher 协议、<code>multipart/form-data</code> 报文构造、文件上传</li>
-</ul>
-<p>题目场景：存在一个 <code>?url=</code> 参数，服务器会代为请求用户指定的地址。目标 <code>flag.php</code> 限制仅本地访问，且需要 POST 上传一个非空文件。</p>
-<hr>
-<h2 id="二源码分析">二、源码分析</h2>
-<p>通过 Gopher GET 请求访问 <code>flag.php</code>，拿到源码：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>($_SERVER[<span style="color:#e6db74">&#34;REMOTE_ADDR&#34;</span>] <span style="color:#f92672">!= …</span></span></span></span></span></span></span></span></span></code></pre></div></p>
-                    </div>
-                </div>
-                <div class="mt-auto card-footer">
-                    <span class="float-start">June 9, 2026</span>
-                    <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E5%B7%A5%E5%85%B7%E5%8C%96%E5%88%A9%E7%94%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
         </div>
@@ -746,11 +728,13 @@
     </div>
 </div>
 
-<div class="text-center pt-2">
+
+
+    <div class="text-center pt-2">
     
     <span class="px-1">
-        <a href="http://127.0.0.1:1313/san-blog/" title="东阳的个人站点">
-            <img alt="Footer logo" src="images/avatar.jpg"
+        <a href="https://Samantha09.github.io/san-blog/" title="东阳的个人站点">
+            <img alt="Footer logo" src="/san-blog/images/avatar.jpg"
                 height="40px" width="40px" style="border-radius: 50%;">
         </a>
     </span>
@@ -809,20 +793,17 @@
         </div>
     </div>
 </div>
-</footer><script src="/san-blog/bootstrap-5/js/bootstrap.bundle.min.js"></script>
+</footer>
+<script src="/san-blog/bootstrap-5/js/bootstrap.bundle.min.js"></script>
 <script>
-    if (localStorage.getItem("pref-theme") === "dark") {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-    } else if (localStorage.getItem("pref-theme") === "light") {
-        document.body.classList.remove('dark')
+    if (document.body.className.includes("dark")) {
+        document.body.classList.remove('dark');
         document.documentElement.classList.remove('dark');
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
+        localStorage.setItem("pref-theme", 'light');
     }
-
 </script>
+
+
 <script>
     document.getElementById("theme-toggle").addEventListener("click", () => {
         if (document.body.className.includes("dark")) {

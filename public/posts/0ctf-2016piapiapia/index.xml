@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
 		<title>[0CTF 2016]piapiapia on 东阳的个人站点</title>
-		<link>http://127.0.0.1:1313/san-blog/posts/0ctf-2016piapiapia/</link>
+		<link>https://Samantha09.github.io/san-blog/posts/0ctf-2016piapiapia/</link>
 		<description>Recent content in [0CTF 2016]piapiapia on 东阳的个人站点</description>
 		<generator>Hugo</generator>
 		<language>zh-cn</language>
@@ -12,6 +12,6 @@
 		
 			<lastBuildDate></lastBuildDate>
 		
-			<atom:link href="http://127.0.0.1:1313/san-blog/posts/0ctf-2016piapiapia/index.xml" rel="self" type="application/rss+xml" />
+			<atom:link href="https://Samantha09.github.io/san-blog/posts/0ctf-2016piapiapia/index.xml" rel="self" type="application/rss+xml" />
 	</channel>
 </rss>

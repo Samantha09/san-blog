@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="UTF-8">
+<head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta http-equiv="Accept-CH" content="DPR, Viewport-Width, Width">
@@ -28,7 +28,7 @@
 
 
 
-<meta property="og:url" content="http://127.0.0.1:1313/san-blog/blogs/">
+<meta property="og:url" content="https://Samantha09.github.io/san-blog/blogs/">
 	<meta property="og:site_name" content="东阳的个人站点">
 	<meta property="og:title" content="博客">
 	<meta property="og:description" content="全栈开发者 · AI 应用构建者 · 安全研究者">
@@ -53,12 +53,12 @@
 
 <style>
     :root {
-        --text-color: #3d3d3d;
-        --text-secondary-color: #6b6b6b;
-        --text-link-color: #8b7bb5;
+        --text-color: #1f1f1f;
+        --text-secondary-color: #4a4a4a;
+        --text-link-color: #7a6aa8;
         --background-color: #f7f5f2;
         --secondary-background-color: #efece7;
-        --primary-color: #8b7bb5;
+        --primary-color: #7a6aa8;
         --secondary-color: #ffffff;
 
          
@@ -112,6 +112,8 @@
 
   
   
+    <link rel="stylesheet" href="/san-blog/style.css">
+  
 
   <title>
 博客 | 东阳的个人站点
@@ -124,7 +126,6 @@
   
 <script>
     let localStorageValue = localStorage.getItem("pref-theme");
-    let mediaQuery = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     switch (localStorageValue) {
         case "dark":
@@ -136,10 +137,9 @@
             document.documentElement.classList.remove('dark');
             break;
         default:
-            if (mediaQuery) {
-                document.documentElement.classList.add('dark');
-                document.body.classList.add('dark');
-            }
+            
+            document.body.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
             break;
     }
 </script>
@@ -178,7 +178,7 @@
             
             <a class="navbar-brand primary-font text-wrap" href="/san-blog/">
                 
-                <img src="images/avatar.jpg" width="30" height="30"
+                <img src="/san-blog/images/avatar.jpg" width="30" height="30"
                     class="d-inline-block align-top">
                 东阳
                 
@@ -256,6 +256,16 @@
                     </li>
                     
                     
+                    
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/san-blog/archives" title="文章归档">
+                            
+                            归档
+                        </a>
+                    </li>
+                    
+                    
 
                     <li class="nav-item navbar-text">
                         
@@ -295,24 +305,35 @@
             <div class="card h-100">
                 
                 <div class="card-body bg-transparent p-4 shadow-sm">
+                    <a href="/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="primary-font card-title">
+                        <h5 class="card-title bg-transparent" title="React 学习 Day 01：基础入门">React 学习 Day 01：基础入门</h5>
+                    </a>
+                    <div class="card-text secondary-font">
+                        <p> 从零开始，用一个 react-basic 项目串起 React 入门必备知识。
+一、项目搭建 使用 Vite 创建 React 项目：
+npm create vite@latest react-basic -- --template …</p>
+                    </div>
+                </div>
+                <div class="mt-auto post-footer bg-transparent py-3">
+                    <span class="float-start bg-transparent">2026年7月4日</span>
+                    <a href="/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 my-3">
+            <div class="card h-100">
+                
+                <div class="card-body bg-transparent p-4 shadow-sm">
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/" class="primary-font card-title">
                         <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Redis 协议攻击与 Webshell 写入">CTFHub SSRF 实战：Redis 协议攻击 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入</li>
-<li><strong>工具</strong>：自写 Python 脚本、cURL、Burp Suite</li>
-</ul>
-<p>题目给出一个 <code>?url=</code> 参数，服务器使用 PHP curl 代为请求用户指定的地址。</p>
-<pre tabindex="0"><code>http://challenge-xxxx.sandbox.ctfhub.com:10800/?url=
-</code></pre><p>目标是通过 SSRF 攻击内网的 <strong>Redis</strong> 服务（通常运行在 <code>127.0.0.1:6379</code>），利用 Redis 的 <code>SAVE</code> 命令将 …</p></p>
+                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入 工具：自写 Python 脚本 …</p>
                     </div>
                 </div>
                 <div class="mt-auto post-footer bg-transparent py-3">
-                    <span class="float-start bg-transparent">June 11, 2026</span>
+                    <span class="float-start bg-transparent">2026年6月11日</span>
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -326,20 +347,11 @@
                         <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：FastCGI 协议攻击与 Gopherus 工具使用">CTFHub SSRF 实战：FastCGI 协议 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、FastCGI 协议、Gopher 协议、PHP-FPM 攻击、双重 URL 编码</li>
-<li><strong>工具</strong>：Gopherus、Burp Suite、cURL</li>
-</ul>
-<p>题目给出一个 <code>?url=</code> 参数，服务器使用 PHP curl 代为请求用户指定的地址。</p>
-<pre tabindex="0"><code>http://challenge-xxxx.sandbox.ctfhub.com:10800/?url=
-</code></pre><p>目标是通过 SSRF 攻击内网的 <strong>PHP-FPM (FastCGI)</strong> 服务（通常运行在 <code>127.0.0.1:9000</code>），实现远程代码执行（RCE）， …</p></p>
+                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、FastCGI 协议、Gopher 协议、PHP-FPM 攻击、双重 URL 编码 工具：Gopherus、Burp …</p>
                     </div>
                 </div>
                 <div class="mt-auto post-footer bg-transparent py-3">
-                    <span class="float-start bg-transparent">June 10, 2026</span>
+                    <span class="float-start bg-transparent">2026年6月10日</span>
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98fastcgi-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-gopherus-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -353,24 +365,11 @@
                         <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用">CTFHub SSRF 实战：Gopher 协议文 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF / 文件上传</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、Gopher 协议、<code>multipart/form-data</code> 报文构造、文件上传</li>
-</ul>
-<p>题目场景：存在一个 <code>?url=</code> 参数，服务器会代为请求用户指定的地址。目标 <code>flag.php</code> 限制仅本地访问，且需要 POST 上传一个非空文件。</p>
-<hr>
-<h2 id="二源码分析">二、源码分析</h2>
-<p>通过 Gopher GET 请求访问 <code>flag.php</code>，拿到源码：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>($_SERVER[<span style="color:#e6db74">&#34;REMOTE_ADDR&#34;</span>] <span style="color:#f92672">!= …</span></span></span></span></span></span></span></span></span></code></pre></div></p>
+                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF / 文件上传 考点：SSRF（服务器端请求伪造）、Gopher 协议、multipart/form-data 报文构造、文件上传 题目场景：存在一个 ?url= …</p>
                     </div>
                 </div>
                 <div class="mt-auto post-footer bg-transparent py-3">
-                    <span class="float-start bg-transparent">June 9, 2026</span>
+                    <span class="float-start bg-transparent">2026年6月9日</span>
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E5%B7%A5%E5%85%B7%E5%8C%96%E5%88%A9%E7%94%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -384,22 +383,13 @@
                         <h5 class="card-title bg-transparent" title="Gemini 协议：Gopher 的精神继承者与极简 Web 的另一种可能">Gemini 协议：Gopher 的精神继承者与极 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一gemini-是什么">一、Gemini 是什么</h2>
-<p><strong>Gemini</strong> 是一种新兴的互联网应用层协议，诞生于 <strong>2019 年</strong>，由 Solderpunk 发起设计。它的定位非常明确：</p>
-<blockquote>
-<p><strong>介于 Gopher 和 HTTP 之间，比 Gopher 更现代，比 HTTP 更简单。</strong></p>
-</blockquote>
-<p>如果你厌倦了现代 Web 的臃肿——动辄几 MB 的 JavaScript、无穷无尽的 Cookie 弹窗、追踪脚本和广告框架——Gemini 提供了一条回归信息本质的逃生通道。</p>
-<hr>
-<h2 id="二为什么需要-gemini">二、为什么需要 Gemini</h2>
-<h3 id="21-gopher-太古老">2.1 Gopher 太古老</h3>
-<p>Gopher（1991）的设计理念很棒（极简、层级、纯文本），但它有硬伤：</p>
-<ul>
-<li><strong>无加密</strong>：明文传输，在现代互联网不可接受 …</li></ul></p>
+                        <p>一、Gemini 是什么 Gemini 是一种新兴的互联网应用层协议，诞生于 2019 年，由 Solderpunk 发起设计。它的定位非常明确：
+介于 Gopher 和 HTTP 之间，比 Gopher 更现代，比 HTTP 更简单。
+如 …</p>
                     </div>
                 </div>
                 <div class="mt-auto post-footer bg-transparent py-3">
-                    <span class="float-start bg-transparent">June 9, 2026</span>
+                    <span class="float-start bg-transparent">2026年6月9日</span>
                     <a href="/san-blog/posts/gemini-%E5%8D%8F%E8%AE%AEgopher-%E7%9A%84%E7%B2%BE%E7%A5%9E%E7%BB%A7%E6%89%BF%E8%80%85%E4%B8%8E%E6%9E%81%E7%AE%80-web-%E7%9A%84%E5%8F%A6%E4%B8%80%E7%A7%8D%E5%8F%AF%E8%83%BD/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -413,55 +403,12 @@
                         <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Gopher 协议构造 POST 请求绕过本地限制">CTFHub SSRF 实战：Gopher 协议构 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、Gopher 协议、双重 URL 编码、HTTP 报文构造</li>
-</ul>
-<p>题目场景：存在一个 <code>?url=</code> 参数，服务器会代为请求用户指定的地址。目标 <code>flag.php</code> 限制仅本地访问，且需要 POST 提交正确的 key。</p>
-<hr>
-<h2 id="二ssrf-原理">二、SSRF 原理</h2>
-<h3 id="21-什么是-ssrf">2.1 什么是 SSRF？</h3>
-<p>SSRF（Server-Side Request Forgery，服务器端请求伪造）是指攻击者通过服务端应用，向服务端所在网络或本地发起请求的攻击方式。</p>
-<p>在本题中，<code>?url=</code> 参数就是 SSRF 的注入点。服务器接收到用户 …</p></p>
+                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、Gopher 协议、双重 URL 编码、HTTP 报文构造 题目场景：存在一个 ?url= 参数，服务器会代为请求用户指定的地 …</p>
                     </div>
                 </div>
                 <div class="mt-auto post-footer bg-transparent py-3">
-                    <span class="float-start bg-transparent">June 9, 2026</span>
+                    <span class="float-start bg-transparent">2026年6月9日</span>
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%9E%84%E9%80%A0-post-%E8%AF%B7%E6%B1%82%E7%BB%95%E8%BF%87%E6%9C%AC%E5%9C%B0%E9%99%90%E5%88%B6/" class="float-end btn btn-outline-info btn-sm">阅读</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6 my-3">
-            <div class="card h-100">
-                
-                <div class="card-body bg-transparent p-4 shadow-sm">
-                    <a href="/san-blog/posts/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E7%BB%BC%E5%90%88%E8%BF%87%E6%BB%A4%E7%BB%95%E8%BF%87%E5%AE%9E%E6%88%98%E4%BB%8E%E7%A9%BA%E6%A0%BC%E5%88%B0%E7%AE%A1%E9%81%93%E7%9A%84%E4%B8%80%E6%9D%A1%E9%BE%99/" class="primary-font card-title">
-                        <h5 class="card-title bg-transparent" title="命令注入综合过滤绕过实战：从空格到管道的一条龙">命令注入综合过滤绕过实战：从空格到管道的一条龙</h5>
-                    </a>
-                    <div class="card-text secondary-font">
-                        <p><h2 id="题目信息">题目信息</h2>
-<ul>
-<li><strong>类型</strong>：Web / 命令注入（Command Injection）</li>
-<li><strong>考点</strong>：黑名单过滤绕过、Shell 语法特性、编码与通配符</li>
-<li><strong>核心漏洞</strong>：<code>exec()</code> 直接拼接用户输入，黑名单过滤存在遗漏</li>
-</ul>
-<hr>
-<h2 id="源码分析">源码分析</h2>
-<p>题目给了一段典型的命令注入代码，过滤规则逐步加强：</p>
-<h3 id="第一版只过滤-">第一版：只过滤 <code>/</code></h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">preg_match_all</span>(<span style="color:#e6db74">&#34;/\//&#34;</span>, $ip, $m)) {
-</span></span><span style="display:flex;"><span>    $cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ping -c 4 </span><span style="color:#e6db74">{</span>$ip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">exec</span>($cmd, $res);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p><strong>分析</strong>：只防了斜杠，但命令注入绝大多数情况下根本不需要 <code>/</code>。<code>;id</code>、<code>$(id)</code>、<code>`id`</code> 直接通杀 …</p></p>
-                    </div>
-                </div>
-                <div class="mt-auto post-footer bg-transparent py-3">
-                    <span class="float-start bg-transparent">June 9, 2026</span>
-                    <a href="/san-blog/posts/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E7%BB%BC%E5%90%88%E8%BF%87%E6%BB%A4%E7%BB%95%E8%BF%87%E5%AE%9E%E6%88%98%E4%BB%8E%E7%A9%BA%E6%A0%BC%E5%88%B0%E7%AE%A1%E9%81%93%E7%9A%84%E4%B8%80%E6%9D%A1%E9%BE%99/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
         </div>
@@ -500,14 +447,15 @@
     </div>
 </div>
 
-  </div><footer>
+  </div><footer style="background-color: transparent;">
+    
     
 
 
   
 
- 
- 
+
+
 <div class="container py-3" id="recent-posts">
     
     
@@ -520,24 +468,35 @@
             <div class="card h-100">
                 
                 <div class="card-body bg-transparent p-3 shadow-sm">
+                    <a href="/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="primary-font card-title">
+                        <h5 class="card-title bg-transparent" title="React 学习 Day 01：基础入门">React 学习 Day 01：基础入门</h5>
+                    </a>
+                    <div class="card-text secondary-font">
+                        <p> 从零开始，用一个 react-basic 项目串起 React 入门必备知识。
+一、项目搭建 使用 Vite 创建 React 项目：
+npm create vite@latest react-basic -- --template …</p>
+                    </div>
+                </div>
+                <div class="mt-auto card-footer">
+                    <span class="float-start">2026年7月4日</span>
+                    <a href="/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 pt-2">
+            <div class="card h-100">
+                
+                <div class="card-body bg-transparent p-3 shadow-sm">
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/" class="primary-font card-title">
                         <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Redis 协议攻击与 Webshell 写入">CTFHub SSRF 实战：Redis 协议攻击 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入</li>
-<li><strong>工具</strong>：自写 Python 脚本、cURL、Burp Suite</li>
-</ul>
-<p>题目给出一个 <code>?url=</code> 参数，服务器使用 PHP curl 代为请求用户指定的地址。</p>
-<pre tabindex="0"><code>http://challenge-xxxx.sandbox.ctfhub.com:10800/?url=
-</code></pre><p>目标是通过 SSRF 攻击内网的 <strong>Redis</strong> 服务（通常运行在 <code>127.0.0.1:6379</code>），利用 Redis 的 <code>SAVE</code> 命令将 …</p></p>
+                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入 工具：自写 Python 脚本 …</p>
                     </div>
                 </div>
                 <div class="mt-auto card-footer">
-                    <span class="float-start">June 11, 2026</span>
+                    <span class="float-start">2026年6月11日</span>
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -551,52 +510,12 @@
                         <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：FastCGI 协议攻击与 Gopherus 工具使用">CTFHub SSRF 实战：FastCGI 协议 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、FastCGI 协议、Gopher 协议、PHP-FPM 攻击、双重 URL 编码</li>
-<li><strong>工具</strong>：Gopherus、Burp Suite、cURL</li>
-</ul>
-<p>题目给出一个 <code>?url=</code> 参数，服务器使用 PHP curl 代为请求用户指定的地址。</p>
-<pre tabindex="0"><code>http://challenge-xxxx.sandbox.ctfhub.com:10800/?url=
-</code></pre><p>目标是通过 SSRF 攻击内网的 <strong>PHP-FPM (FastCGI)</strong> 服务（通常运行在 <code>127.0.0.1:9000</code>），实现远程代码执行（RCE）， …</p></p>
+                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、FastCGI 协议、Gopher 协议、PHP-FPM 攻击、双重 URL 编码 工具：Gopherus、Burp …</p>
                     </div>
                 </div>
                 <div class="mt-auto card-footer">
-                    <span class="float-start">June 10, 2026</span>
+                    <span class="float-start">2026年6月10日</span>
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98fastcgi-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-gopherus-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6 pt-2">
-            <div class="card h-100">
-                
-                <div class="card-body bg-transparent p-3 shadow-sm">
-                    <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E5%B7%A5%E5%85%B7%E5%8C%96%E5%88%A9%E7%94%A8/" class="primary-font card-title">
-                        <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用">CTFHub SSRF 实战：Gopher 协议文 …</h5>
-                    </a>
-                    <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF / 文件上传</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、Gopher 协议、<code>multipart/form-data</code> 报文构造、文件上传</li>
-</ul>
-<p>题目场景：存在一个 <code>?url=</code> 参数，服务器会代为请求用户指定的地址。目标 <code>flag.php</code> 限制仅本地访问，且需要 POST 上传一个非空文件。</p>
-<hr>
-<h2 id="二源码分析">二、源码分析</h2>
-<p>通过 Gopher GET 请求访问 <code>flag.php</code>，拿到源码：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>($_SERVER[<span style="color:#e6db74">&#34;REMOTE_ADDR&#34;</span>] <span style="color:#f92672">!= …</span></span></span></span></span></span></span></span></span></code></pre></div></p>
-                    </div>
-                </div>
-                <div class="mt-auto card-footer">
-                    <span class="float-start">June 9, 2026</span>
-                    <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E5%B7%A5%E5%85%B7%E5%8C%96%E5%88%A9%E7%94%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
         </div>
@@ -604,11 +523,13 @@
     </div>
 </div>
 
-<div class="text-center pt-2">
+
+
+    <div class="text-center pt-2">
     
     <span class="px-1">
-        <a href="http://127.0.0.1:1313/san-blog/" title="东阳的个人站点">
-            <img alt="Footer logo" src="images/avatar.jpg"
+        <a href="https://Samantha09.github.io/san-blog/" title="东阳的个人站点">
+            <img alt="Footer logo" src="/san-blog/images/avatar.jpg"
                 height="40px" width="40px" style="border-radius: 50%;">
         </a>
     </span>
@@ -667,20 +588,17 @@
         </div>
     </div>
 </div>
-</footer><script src="/san-blog/bootstrap-5/js/bootstrap.bundle.min.js"></script>
+</footer>
+<script src="/san-blog/bootstrap-5/js/bootstrap.bundle.min.js"></script>
 <script>
-    if (localStorage.getItem("pref-theme") === "dark") {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-    } else if (localStorage.getItem("pref-theme") === "light") {
-        document.body.classList.remove('dark')
+    if (document.body.className.includes("dark")) {
+        document.body.classList.remove('dark');
         document.documentElement.classList.remove('dark');
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
+        localStorage.setItem("pref-theme", 'light');
     }
-
 </script>
+
+
 <script>
     document.getElementById("theme-toggle").addEventListener("click", () => {
         if (document.body.className.includes("dark")) {

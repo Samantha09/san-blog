@@ -1,0 +1,50 @@
+/* Fix dark mode background gaps */
+
+/* Ensure body/html use theme background in both light and dark mode */
+.light,
+.light body,
+.light html,
+.dark,
+.dark body,
+.dark html {
+  background-color: var(--background-color) !important;
+}
+
+/* Ensure content and footer areas use theme background */
+#content,
+footer,
+footer > div,
+footer .container,
+footer .text-center,
+footer .text-center.pt-2,
+.text-center.pt-2 {
+  background-color: var(--background-color) !important;
+}
+
+/* Ensure archive page containers don't create gaps */
+#archives-page,
+#archives-page .container {
+  background-color: var(--background-color);
+}
+
+/* Remove default white background from search section */
+#search-content {
+  background-color: var(--background-color) !important;
+}
+
+/* 统一作品集卡片图片尺寸 */
+#projects .card-head {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#projects .card-img-top,
+#projects .project-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}

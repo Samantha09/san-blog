@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
 
-<head><script src="/san-blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=san-blog/livereload" data-no-instant defer></script><meta charset="UTF-8">
+<head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta http-equiv="Accept-CH" content="DPR, Viewport-Width, Width">
@@ -28,7 +28,7 @@
 
 
 
-<meta property="og:url" content="http://127.0.0.1:1313/san-blog/tags/sqlmap/">
+<meta property="og:url" content="https://Samantha09.github.io/san-blog/tags/sqlmap/">
 	<meta property="og:site_name" content="东阳的个人站点">
 	<meta property="og:title" content="Sqlmap">
 	<meta property="og:description" content="全栈开发者 · AI 应用构建者 · 安全研究者">
@@ -53,12 +53,12 @@
 
 <style>
     :root {
-        --text-color: #3d3d3d;
-        --text-secondary-color: #6b6b6b;
-        --text-link-color: #8b7bb5;
+        --text-color: #1f1f1f;
+        --text-secondary-color: #4a4a4a;
+        --text-link-color: #7a6aa8;
         --background-color: #f7f5f2;
         --secondary-background-color: #efece7;
-        --primary-color: #8b7bb5;
+        --primary-color: #7a6aa8;
         --secondary-color: #ffffff;
 
          
@@ -112,6 +112,8 @@
 
   
   
+    <link rel="stylesheet" href="/san-blog/style.css">
+  
 
   <title>
 Sqlmap | 东阳的个人站点
@@ -124,7 +126,6 @@ Sqlmap | 东阳的个人站点
   
 <script>
     let localStorageValue = localStorage.getItem("pref-theme");
-    let mediaQuery = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     switch (localStorageValue) {
         case "dark":
@@ -136,10 +137,9 @@ Sqlmap | 东阳的个人站点
             document.documentElement.classList.remove('dark');
             break;
         default:
-            if (mediaQuery) {
-                document.documentElement.classList.add('dark');
-                document.body.classList.add('dark');
-            }
+            
+            document.body.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
             break;
     }
 </script>
@@ -178,7 +178,7 @@ Sqlmap | 东阳的个人站点
             
             <a class="navbar-brand primary-font text-wrap" href="/san-blog/">
                 
-                <img src="images/avatar.jpg" width="30" height="30"
+                <img src="/san-blog/images/avatar.jpg" width="30" height="30"
                     class="d-inline-block align-top">
                 东阳
                 
@@ -256,6 +256,16 @@ Sqlmap | 东阳的个人站点
                     </li>
                     
                     
+                    
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/san-blog/archives" title="文章归档">
+                            
+                            归档
+                        </a>
+                    </li>
+                    
+                    
 
                     <li class="nav-item navbar-text">
                         
@@ -299,22 +309,13 @@ Sqlmap | 东阳的个人站点
                         <h5 class="card-title bg-transparent" title="SQL 注入空格过滤绕过：原理、手法与 sqlmap 实战">SQL 注入空格过滤绕过：原理、手法与 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一什么是空格过滤">一、什么是空格过滤</h2>
-<p>空格过滤是指目标系统（WAF、Web 应用代码或中间件）对 HTTP 请求中的空格字符进行<strong>检测、替换或删除</strong>，以阻止 SQL 注入攻击的一种防御手段。</p>
-<h3 id="11-过滤的实现方式">1.1 过滤的实现方式</h3>
-<p><strong>代码层面</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#75715e">// 直接删除所有空格
-</span></span></span><span style="display:flex;"><span>$input <span style="color:#f92672">=</span> <span style="color:#a6e22e">str_replace</span>(<span style="color:#e6db74">&#34; &#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, $_GET[<span style="color:#e6db74">&#39;id&#39;</span>]);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 替换为空
-</span></span></span><span style="display:flex;"><span>$input <span style="color:#f92672">=</span> <span style="color:#a6e22e">str_replace</span>(<span style="color:#e6db74">&#34; &#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, $_GET[<span style="color:#e6db74">&#39;id&#39;</span>]);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 正则匹配删除所有空白字符
-</span></span></span><span style="display:flex;"><span>$input <span style="color:#f92672">=</span> <span style="color:#a6e22e">preg_replace</span>( …</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></code></pre></div></p>
+                        <p>一、什么是空格过滤 空格过滤是指目标系统（WAF、Web 应用代码或中间件）对 HTTP 请求中的空格字符进行检测、替换或删除，以阻止 SQL 注入攻击的一种防御手段。
+1.1 过滤的实现方式 代码层面
+// 直接删除所有空格 $input …</p>
                     </div>
                 </div>
                 <div class="mt-auto post-footer bg-transparent py-3">
-                    <span class="float-start bg-transparent">June 3, 2026</span>
+                    <span class="float-start bg-transparent">2026年6月3日</span>
                     <a href="/san-blog/posts/sql-%E6%B3%A8%E5%85%A5%E7%A9%BA%E6%A0%BC%E8%BF%87%E6%BB%A4%E7%BB%95%E8%BF%87%E5%8E%9F%E7%90%86%E6%89%8B%E6%B3%95%E4%B8%8E-sqlmap-%E5%AE%9E%E6%88%98/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -328,17 +329,11 @@ Sqlmap | 东阳的个人站点
                         <h5 class="card-title bg-transparent" title="HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御">HTTP Header SQL 注入全景 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一什么是-http-header-sql-注入">一、什么是 HTTP Header SQL 注入</h2>
-<p>HTTP Header SQL 注入是指攻击者将 SQL 注入 payload 植入 HTTP 请求头部的各类字段中（如 Cookie、User-Agent、Referer 等），当服务端<strong>直接将这些头部值拼接到 SQL 语句</strong>时触发的注入漏洞。</p>
-<p>与 GET/POST 注入不同，Header 注入的触发逻辑往往不在主业务流程中，而是隐藏在<strong>日志记录、统计分析、会话管理、来源追踪</strong>等周边功能里。它们共享同一个核心特征：<strong>开发者通常不会怀疑这些「元信息」头部会成为攻击入口</strong>。</p>
-<hr>
-<h2 id="二为什么-header-注入容易被忽视">二、为什么 Header 注入容易被忽视</h2>
-<h3 id="21-认知盲区">2.1 认知盲区</h3>
-<p>安全测试的注意力通常集 …</p></p>
+                        <p>一、什么是 HTTP Header SQL 注入 HTTP Header SQL 注入是指攻击者将 SQL 注入 payload 植入 HTTP 请求头部的各类字段中（如 Cookie、User-Agent、Referer 等），当服务端直 …</p>
                     </div>
                 </div>
                 <div class="mt-auto post-footer bg-transparent py-3">
-                    <span class="float-start bg-transparent">June 3, 2026</span>
+                    <span class="float-start bg-transparent">2026年6月3日</span>
                     <a href="/san-blog/posts/http-header-sql-%E6%B3%A8%E5%85%A5%E5%85%A8%E6%99%AFcookieuser-agent-%E4%B8%8E-referer-%E7%9A%84%E6%94%BB%E5%87%BB%E9%9D%A2%E4%B8%8E%E9%98%B2%E5%BE%A1/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -352,29 +347,11 @@ Sqlmap | 东阳的个人站点
                         <h5 class="card-title bg-transparent" title="深入理解 Time-based Blind SQL 注入：原理、利用与 sqlmap 实操">深入理解 Time-based Blind SQL …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一什么是-blind-sql-注入">一、什么是 Blind SQL 注入</h2>
-<p>当应用程序存在 SQL 注入漏洞，但<strong>不会在前端直接回显查询结果或错误信息</strong>时，传统的 UNION 注入和报错注入便无法直接使用。此时攻击者只能依赖 <strong>Blind SQL Injection（盲注）</strong> —— 通过观察应用程序的<strong>间接反应</strong>来逐位推断数据库中的数据。</p>
-<p>盲注分为两大类：</p>
-<table>
-	<thead>
-			<tr>
-					<th>类型</th>
-					<th>判断依据</th>
-					<th>速度</th>
-			</tr>
-	</thead>
-	<tbody>
-			<tr>
-					<td><strong>Boolean-based Blind（布尔盲注）</strong></td>
-					<td>页面返回内容/长度是否有差异</td>
-					<td>较快</td>
-			</tr>
-			<tr>
-					<td><strong>Time-based Blind（时间盲注） …</strong></td></tr></tbody></table></p>
+                        <p>一、什么是 Blind SQL 注入 当应用程序存在 SQL 注入漏洞，但不会在前端直接回显查询结果或错误信息时，传统的 UNION 注入和报错注入便无法直接使用。此时攻击者只能依赖 Blind SQL Injection（盲注） —— 通 …</p>
                     </div>
                 </div>
                 <div class="mt-auto post-footer bg-transparent py-3">
-                    <span class="float-start bg-transparent">June 3, 2026</span>
+                    <span class="float-start bg-transparent">2026年6月3日</span>
                     <a href="/san-blog/posts/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-time-based-blind-sql-%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%88%A9%E7%94%A8%E4%B8%8E-sqlmap-%E5%AE%9E%E6%93%8D/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -388,21 +365,11 @@ Sqlmap | 东阳的个人站点
                         <h5 class="card-title bg-transparent" title="sqlmap 使用指南：从入门到 CTF 夺旗">sqlmap 使用指南：从入门到 CTF 夺旗</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="什么是-sqlmap">什么是 sqlmap</h2>
-<p>sqlmap 是一款开源的自动化 SQL 注入工具，支持检测和利用多种类型的 SQL 注入漏洞，能够自动识别后端数据库类型、枚举数据库结构、提取数据，甚至获取操作系统 shell。在 CTF 比赛和渗透测试中，它是处理 SQL 注入效率最高的工具之一。</p>
-<hr>
-<h2 id="安装">安装</h2>
-<h3 id="方式一直接克隆源码推荐">方式一：直接克隆源码（推荐）</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone --depth <span style="color:#ae81ff">1</span> https://github.com/sqlmapproject/sqlmap.git
-</span></span><span style="display:flex;"><span>cd sqlmap
-</span></span><span style="display:flex;"><span>python sqlmap.py --version
-</span></span></code></pre></div><h3 id="方式二包管理器安装">方式二：包管理器安装</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Debian/Ubuntu</span>
-</span></span><span style="display:flex;"><span>sudo apt …</span></span></span></span></code></pre></div></p>
+                        <p>什么是 sqlmap sqlmap 是一款开源的自动化 SQL 注入工具，支持检测和利用多种类型的 SQL 注入漏洞，能够自动识别后端数据库类型、枚举数据库结构、提取数据，甚至获取操作系统 shell。在 CTF 比赛和渗透测试中，它是处理 …</p>
                     </div>
                 </div>
                 <div class="mt-auto post-footer bg-transparent py-3">
-                    <span class="float-start bg-transparent">June 2, 2026</span>
+                    <span class="float-start bg-transparent">2026年6月2日</span>
                     <a href="/san-blog/posts/sqlmap-%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0-ctf-%E5%A4%BA%E6%97%97/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -416,14 +383,15 @@ Sqlmap | 东阳的个人站点
     </div>
 </div>
 
-  </div><footer>
+  </div><footer style="background-color: transparent;">
+    
     
 
 
   
 
- 
- 
+
+
 <div class="container py-3" id="recent-posts">
     
     
@@ -436,24 +404,35 @@ Sqlmap | 东阳的个人站点
             <div class="card h-100">
                 
                 <div class="card-body bg-transparent p-3 shadow-sm">
+                    <a href="/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="primary-font card-title">
+                        <h5 class="card-title bg-transparent" title="React 学习 Day 01：基础入门">React 学习 Day 01：基础入门</h5>
+                    </a>
+                    <div class="card-text secondary-font">
+                        <p> 从零开始，用一个 react-basic 项目串起 React 入门必备知识。
+一、项目搭建 使用 Vite 创建 React 项目：
+npm create vite@latest react-basic -- --template …</p>
+                    </div>
+                </div>
+                <div class="mt-auto card-footer">
+                    <span class="float-start">2026年7月4日</span>
+                    <a href="/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 pt-2">
+            <div class="card h-100">
+                
+                <div class="card-body bg-transparent p-3 shadow-sm">
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/" class="primary-font card-title">
                         <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Redis 协议攻击与 Webshell 写入">CTFHub SSRF 实战：Redis 协议攻击 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入</li>
-<li><strong>工具</strong>：自写 Python 脚本、cURL、Burp Suite</li>
-</ul>
-<p>题目给出一个 <code>?url=</code> 参数，服务器使用 PHP curl 代为请求用户指定的地址。</p>
-<pre tabindex="0"><code>http://challenge-xxxx.sandbox.ctfhub.com:10800/?url=
-</code></pre><p>目标是通过 SSRF 攻击内网的 <strong>Redis</strong> 服务（通常运行在 <code>127.0.0.1:6379</code>），利用 Redis 的 <code>SAVE</code> 命令将 …</p></p>
+                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入 工具：自写 Python 脚本 …</p>
                     </div>
                 </div>
                 <div class="mt-auto card-footer">
-                    <span class="float-start">June 11, 2026</span>
+                    <span class="float-start">2026年6月11日</span>
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
@@ -467,52 +446,12 @@ Sqlmap | 东阳的个人站点
                         <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：FastCGI 协议攻击与 Gopherus 工具使用">CTFHub SSRF 实战：FastCGI 协议 …</h5>
                     </a>
                     <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、FastCGI 协议、Gopher 协议、PHP-FPM 攻击、双重 URL 编码</li>
-<li><strong>工具</strong>：Gopherus、Burp Suite、cURL</li>
-</ul>
-<p>题目给出一个 <code>?url=</code> 参数，服务器使用 PHP curl 代为请求用户指定的地址。</p>
-<pre tabindex="0"><code>http://challenge-xxxx.sandbox.ctfhub.com:10800/?url=
-</code></pre><p>目标是通过 SSRF 攻击内网的 <strong>PHP-FPM (FastCGI)</strong> 服务（通常运行在 <code>127.0.0.1:9000</code>），实现远程代码执行（RCE）， …</p></p>
+                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、FastCGI 协议、Gopher 协议、PHP-FPM 攻击、双重 URL 编码 工具：Gopherus、Burp …</p>
                     </div>
                 </div>
                 <div class="mt-auto card-footer">
-                    <span class="float-start">June 10, 2026</span>
+                    <span class="float-start">2026年6月10日</span>
                     <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98fastcgi-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-gopherus-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6 pt-2">
-            <div class="card h-100">
-                
-                <div class="card-body bg-transparent p-3 shadow-sm">
-                    <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E5%B7%A5%E5%85%B7%E5%8C%96%E5%88%A9%E7%94%A8/" class="primary-font card-title">
-                        <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Gopher 协议文件上传与工具化利用">CTFHub SSRF 实战：Gopher 协议文 …</h5>
-                    </a>
-                    <div class="card-text secondary-font">
-                        <p><h2 id="一题目信息">一、题目信息</h2>
-<ul>
-<li><strong>平台</strong>：CTFHub</li>
-<li><strong>分类</strong>：Skill / Web / SSRF / 文件上传</li>
-<li><strong>考点</strong>：SSRF（服务器端请求伪造）、Gopher 协议、<code>multipart/form-data</code> 报文构造、文件上传</li>
-</ul>
-<p>题目场景：存在一个 <code>?url=</code> 参数，服务器会代为请求用户指定的地址。目标 <code>flag.php</code> 限制仅本地访问，且需要 POST 上传一个非空文件。</p>
-<hr>
-<h2 id="二源码分析">二、源码分析</h2>
-<p>通过 Gopher GET 请求访问 <code>flag.php</code>，拿到源码：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>($_SERVER[<span style="color:#e6db74">&#34;REMOTE_ADDR&#34;</span>] <span style="color:#f92672">!= …</span></span></span></span></span></span></span></span></span></code></pre></div></p>
-                    </div>
-                </div>
-                <div class="mt-auto card-footer">
-                    <span class="float-start">June 9, 2026</span>
-                    <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98gopher-%E5%8D%8F%E8%AE%AE%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E5%B7%A5%E5%85%B7%E5%8C%96%E5%88%A9%E7%94%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
                 </div>
             </div>
         </div>
@@ -520,11 +459,13 @@ Sqlmap | 东阳的个人站点
     </div>
 </div>
 
-<div class="text-center pt-2">
+
+
+    <div class="text-center pt-2">
     
     <span class="px-1">
-        <a href="http://127.0.0.1:1313/san-blog/" title="东阳的个人站点">
-            <img alt="Footer logo" src="images/avatar.jpg"
+        <a href="https://Samantha09.github.io/san-blog/" title="东阳的个人站点">
+            <img alt="Footer logo" src="/san-blog/images/avatar.jpg"
                 height="40px" width="40px" style="border-radius: 50%;">
         </a>
     </span>
@@ -583,20 +524,17 @@ Sqlmap | 东阳的个人站点
         </div>
     </div>
 </div>
-</footer><script src="/san-blog/bootstrap-5/js/bootstrap.bundle.min.js"></script>
+</footer>
+<script src="/san-blog/bootstrap-5/js/bootstrap.bundle.min.js"></script>
 <script>
-    if (localStorage.getItem("pref-theme") === "dark") {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-    } else if (localStorage.getItem("pref-theme") === "light") {
-        document.body.classList.remove('dark')
+    if (document.body.className.includes("dark")) {
+        document.body.classList.remove('dark');
         document.documentElement.classList.remove('dark');
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
+        localStorage.setItem("pref-theme", 'light');
     }
-
 </script>
+
+
 <script>
     document.getElementById("theme-toggle").addEventListener("click", () => {
         if (document.body.className.includes("dark")) {
