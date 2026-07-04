@@ -66,12 +66,12 @@ params:
     textAlign: left
 
   color:
-    textColor: "#3d3d3d"
-    secondaryTextColor: "#6b6b6b"
-    textLinkColor: "#8b7bb5"
+    textColor: "#1f1f1f"
+    secondaryTextColor: "#4a4a4a"
+    textLinkColor: "#7a6aa8"
     backgroundColor: "#f7f5f2"
     secondaryBackgroundColor: "#efece7"
-    primaryColor: "#8b7bb5"
+    primaryColor: "#7a6aa8"
     secondaryColor: "#ffffff"
 
     darkmode:
