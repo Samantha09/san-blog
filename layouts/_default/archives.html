@@ -15,16 +15,42 @@
     {{ if $pages }}
         {{ $grouped := $pages.GroupByDate "2006" }}
         {{ range $grouped }}
-        <div class="mb-5">
-            <h3 class="border-bottom pb-2 mb-3">{{ .Key }} 年</h3>
-            <ul class="list-unstyled">
-                {{ range .Pages }}
-                <li class="d-flex justify-content-between align-items-start py-2">
-                    <span class="text-muted me-3" style="white-space: nowrap;">{{ .Date | time.Format "01-02" }}</span>
-                    <a href="{{ .RelPermalink }}" class="flex-grow-1">{{ .Title }}</a>
-                </li>
+        {{ $year := .Key }}
+        <div class="mb-4">
+            <h3 class="border-bottom pb-2 mb-3">
+                <button class="btn btn-link text-decoration-none p-0 fs-3 text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#archive-year-{{ $year }}" aria-expanded="true" aria-controls="archive-year-{{ $year }}">
+                    {{ $year }} 年
+                </button>
+            </h3>
+            <div class="collapse show" id="archive-year-{{ $year }}">
+                {{ range .Pages.GroupByDate "2006-01" }}
+                {{ $month := .Key }}
+                <div class="mb-3 ms-md-3">
+                    <h4 class="border-bottom pb-2 mb-2">
+                        <button class="btn btn-link text-decoration-none p-0 fs-5 text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#archive-month-{{ $month }}" aria-expanded="true" aria-controls="archive-month-{{ $month }}">
+                            {{ (index .Pages 0).Date | time.Format "01" }} 月
+                        </button>
+                    </h4>
+                    <div class="collapse show" id="archive-month-{{ $month }}">
+                        <ul class="list-unstyled ms-md-3">
+                            {{ $lastDate := "" }}
+                            {{ range .Pages }}
+                            {{ $currentDate := .Date | time.Format "01-02" }}
+                            <li class="d-flex justify-content-between align-items-start py-2">
+                                {{ if ne $currentDate $lastDate }}
+                                <span class="text-muted me-3" style="white-space: nowrap;">{{ $currentDate }}</span>
+                                {{ $lastDate = $currentDate }}
+                                {{ else }}
+                                <span class="text-muted me-3" style="white-space: nowrap; visibility: hidden;">{{ $currentDate }}</span>
+                                {{ end }}
+                                <a href="{{ .RelPermalink }}" class="flex-grow-1">{{ .Title }}</a>
+                            </li>
+                            {{ end }}
+                        </ul>
+                    </div>
+                </div>
                 {{ end }}
-            </ul>
+            </div>
         </div>
         {{ end }}
     {{ else }}

@@ -2,7 +2,7 @@
     {{ if or .Site.Params.navbar.brandLogo .Site.Params.favicon }}
     <span class="px-1">
         <a href="{{ .Site.BaseURL }}" title="{{ .Site.Title }}">
-            <img alt="Footer logo" src="{{ .Site.Params.navbar.brandLogo | default .Site.Params.favicon }}"
+            <img alt="Footer logo" src="{{ (.Site.Params.navbar.brandLogo | default .Site.Params.favicon) | relURL }}"
                 height="40px" width="40px" style="border-radius: 50%;">
         </a>
     </span>
