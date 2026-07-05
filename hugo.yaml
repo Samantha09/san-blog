@@ -45,6 +45,14 @@ markup:
   goldmark:
     renderer:
       unsafe: true
+  highlight:
+    style: monokai
+    lineNos: true
+    codeFences: true
+    guessSyntax: true
+    lineNumbersInTable: false
+    noClasses: true
+    tabWidth: 2
 
 params:
   title: "东阳的个人站点"

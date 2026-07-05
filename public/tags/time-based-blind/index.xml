@@ -1,24 +1,42 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-	<channel>
-		<title>Time-Based Blind on 东阳的个人站点</title>
-		<link>https://Samantha09.github.io/san-blog/tags/time-based-blind/</link>
-		<description>Recent content in Time-Based Blind on 东阳的个人站点</description>
-		<generator>Hugo</generator>
-		<language>zh-cn</language>
-		
-		
-		
-		
-			<lastBuildDate>Wed, 03 Jun 2026 21:30:00 +0800</lastBuildDate>
-		
-			<atom:link href="https://Samantha09.github.io/san-blog/tags/time-based-blind/index.xml" rel="self" type="application/rss+xml" />
-			<item>
-				<title>深入理解 Time-based Blind SQL 注入：原理、利用与 sqlmap 实操</title>
-				<link>https://Samantha09.github.io/san-blog/posts/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-time-based-blind-sql-%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%88%A9%E7%94%A8%E4%B8%8E-sqlmap-%E5%AE%9E%E6%93%8D/</link>
-				<pubDate>Wed, 03 Jun 2026 21:30:00 +0800</pubDate>
-				<guid>https://Samantha09.github.io/san-blog/posts/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-time-based-blind-sql-%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%88%A9%E7%94%A8%E4%B8%8E-sqlmap-%E5%AE%9E%E6%93%8D/</guid>
-				<description>&lt;h2 id=&#34;一什么是-blind-sql-注入&#34;&gt;一、什么是 Blind SQL 注入&lt;/h2&gt;&#xA;&lt;p&gt;当应用程序存在 SQL 注入漏洞，但&lt;strong&gt;不会在前端直接回显查询结果或错误信息&lt;/strong&gt;时，传统的 UNION 注入和报错注入便无法直接使用。此时攻击者只能依赖 &lt;strong&gt;Blind SQL Injection（盲注）&lt;/strong&gt; —— 通过观察应用程序的&lt;strong&gt;间接反应&lt;/strong&gt;来逐位推断数据库中的数据。&lt;/p&gt;&#xA;&lt;p&gt;盲注分为两大类：&lt;/p&gt;&#xA;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;类型&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;判断依据&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;速度&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;strong&gt;Boolean-based Blind（布尔盲注）&lt;/strong&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;页面返回内容/长度是否有差异&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;较快&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;strong&gt;Time-based Blind（时间盲注）&lt;/strong&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;响应时间是否有延迟&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;很慢&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;p&gt;当页面无论查询成功还是失败都返回&lt;strong&gt;完全相同的响应&lt;/strong&gt;时，布尔盲注失效，时间盲注成为唯一选择。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;二time-based-blind-注入原理&#34;&gt;二、Time-based Blind 注入原理&lt;/h2&gt;&#xA;&lt;h3 id=&#34;21-核心思想&#34;&gt;2.1 核心思想&lt;/h3&gt;&#xA;&lt;p&gt;时间盲注不依赖页面内容的变化，而是利用数据库的&lt;strong&gt;时间延迟函数&lt;/strong&gt;（如 MySQL 的 &lt;code&gt;SLEEP()&lt;/code&gt;、PostgreSQL 的 &lt;code&gt;pg_sleep()&lt;/code&gt;、SQL Server 的 &lt;code&gt;WAITFOR DELAY&lt;/code&gt;）来构造条件：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;条件为&lt;strong&gt;真&lt;/strong&gt; → 执行 &lt;code&gt;SLEEP(n)&lt;/code&gt; → 响应延迟 n 秒&lt;/li&gt;&#xA;&lt;li&gt;条件为&lt;strong&gt;假&lt;/strong&gt; → 不执行延迟 → 响应正常&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;通过测量响应时间，攻击者就能判断条件的真假，从而逐位提取数据。&lt;/p&gt;&#xA;&lt;h3 id=&#34;22-手工-payload-示例&#34;&gt;2.2 手工 Payload 示例&lt;/h3&gt;&#xA;&lt;p&gt;以 MySQL 为例，假设注入点为 &lt;code&gt;?id=1&lt;/code&gt;，目标是获取 &lt;code&gt;flag&lt;/code&gt; 表中的 &lt;code&gt;flag&lt;/code&gt; 字段：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;-- 判断数据库名第一个字符是否为 &amp;#39;s&amp;#39;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;?&lt;/span&gt;id&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;AND&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;IF&lt;/span&gt;(ASCII(&lt;span style=&#34;color:#66d9ef&#34;&gt;SUBSTRING&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;DATABASE&lt;/span&gt;(),&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;))&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;115&lt;/span&gt;, SLEEP(&lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;), &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;)&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;-- 判断 flag 表第一条记录的第一个字符是否为 &amp;#39;c&amp;#39;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;?&lt;/span&gt;id&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;AND&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;IF&lt;/span&gt;(ASCII(&lt;span style=&#34;color:#66d9ef&#34;&gt;SUBSTRING&lt;/span&gt;((&lt;span style=&#34;color:#66d9ef&#34;&gt;SELECT&lt;/span&gt; flag &lt;span style=&#34;color:#66d9ef&#34;&gt;FROM&lt;/span&gt; flag &lt;span style=&#34;color:#66d9ef&#34;&gt;LIMIT&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;),&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;))&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;99&lt;/span&gt;, SLEEP(&lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;), &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;)&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;执行逻辑&lt;/strong&gt;：&lt;/p&gt;</description>
-			</item>
-	</channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Time-Based Blind on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/tags/time-based-blind/</link><description>Recent content in Time-Based Blind on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 03 Jun 2026 21:30:00 +0800</lastBuildDate><atom:link href="https://Samantha09.github.io/san-blog/tags/time-based-blind/index.xml" rel="self" type="application/rss+xml"/><item><title>深入理解 Time-based Blind SQL 注入：原理、利用与 sqlmap 实操</title><link>https://Samantha09.github.io/san-blog/posts/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-time-based-blind-sql-%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%88%A9%E7%94%A8%E4%B8%8E-sqlmap-%E5%AE%9E%E6%93%8D/</link><pubDate>Wed, 03 Jun 2026 21:30:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-time-based-blind-sql-%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%88%A9%E7%94%A8%E4%B8%8E-sqlmap-%E5%AE%9E%E6%93%8D/</guid><description>&lt;h2 id="一什么是-blind-sql-注入"&gt;一、什么是 Blind SQL 注入&lt;/h2&gt;
+&lt;p&gt;当应用程序存在 SQL 注入漏洞，但&lt;strong&gt;不会在前端直接回显查询结果或错误信息&lt;/strong&gt;时，传统的 UNION 注入和报错注入便无法直接使用。此时攻击者只能依赖 &lt;strong&gt;Blind SQL Injection（盲注）&lt;/strong&gt; —— 通过观察应用程序的&lt;strong&gt;间接反应&lt;/strong&gt;来逐位推断数据库中的数据。&lt;/p&gt;
+&lt;p&gt;盲注分为两大类：&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;类型&lt;/th&gt;
+					&lt;th&gt;判断依据&lt;/th&gt;
+					&lt;th&gt;速度&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;strong&gt;Boolean-based Blind（布尔盲注）&lt;/strong&gt;&lt;/td&gt;
+					&lt;td&gt;页面返回内容/长度是否有差异&lt;/td&gt;
+					&lt;td&gt;较快&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;strong&gt;Time-based Blind（时间盲注）&lt;/strong&gt;&lt;/td&gt;
+					&lt;td&gt;响应时间是否有延迟&lt;/td&gt;
+					&lt;td&gt;很慢&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;当页面无论查询成功还是失败都返回&lt;strong&gt;完全相同的响应&lt;/strong&gt;时，布尔盲注失效，时间盲注成为唯一选择。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="二time-based-blind-注入原理"&gt;二、Time-based Blind 注入原理&lt;/h2&gt;
+&lt;h3 id="21-核心思想"&gt;2.1 核心思想&lt;/h3&gt;
+&lt;p&gt;时间盲注不依赖页面内容的变化，而是利用数据库的&lt;strong&gt;时间延迟函数&lt;/strong&gt;（如 MySQL 的 &lt;code&gt;SLEEP()&lt;/code&gt;、PostgreSQL 的 &lt;code&gt;pg_sleep()&lt;/code&gt;、SQL Server 的 &lt;code&gt;WAITFOR DELAY&lt;/code&gt;）来构造条件：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;条件为&lt;strong&gt;真&lt;/strong&gt; → 执行 &lt;code&gt;SLEEP(n)&lt;/code&gt; → 响应延迟 n 秒&lt;/li&gt;
+&lt;li&gt;条件为&lt;strong&gt;假&lt;/strong&gt; → 不执行延迟 → 响应正常&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;通过测量响应时间，攻击者就能判断条件的真假，从而逐位提取数据。&lt;/p&gt;
+&lt;h3 id="22-手工-payload-示例"&gt;2.2 手工 Payload 示例&lt;/h3&gt;
+&lt;p&gt;以 MySQL 为例，假设注入点为 &lt;code&gt;?id=1&lt;/code&gt;，目标是获取 &lt;code&gt;flag&lt;/code&gt; 表中的 &lt;code&gt;flag&lt;/code&gt; 字段：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;1&lt;/span&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;-- 判断数据库名第一个字符是否为 &amp;#39;s&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;2&lt;/span&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;?&lt;/span&gt;id&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;AND&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;IF&lt;/span&gt;(ASCII(&lt;span style="color:#66d9ef"&gt;SUBSTRING&lt;/span&gt;(&lt;span style="color:#66d9ef"&gt;DATABASE&lt;/span&gt;(),&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;))&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;115&lt;/span&gt;, SLEEP(&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;), &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;3&lt;/span&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;4&lt;/span&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;-- 判断 flag 表第一条记录的第一个字符是否为 &amp;#39;c&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;5&lt;/span&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;?&lt;/span&gt;id&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;AND&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;IF&lt;/span&gt;(ASCII(&lt;span style="color:#66d9ef"&gt;SUBSTRING&lt;/span&gt;((&lt;span style="color:#66d9ef"&gt;SELECT&lt;/span&gt; flag &lt;span style="color:#66d9ef"&gt;FROM&lt;/span&gt; flag &lt;span style="color:#66d9ef"&gt;LIMIT&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;),&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;))&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;99&lt;/span&gt;, SLEEP(&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;), &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;执行逻辑&lt;/strong&gt;：&lt;/p&gt;</description></item></channel></rss>

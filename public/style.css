@@ -41,10 +41,32 @@ footer .text-center.pt-2,
   justify-content: center;
 }
 
-#projects .card-img-top,
-#projects .project-card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+/* 代码块可读性优化：深色高对比背景 + 等宽字体 */
+/* 使用 Monokai 背景色，在浅色主题下也能清晰区分代码块与正文 */
+#single .page-content pre {
+  background-color: #272822 !important;
+  border-radius: 0.7em !important;
+  border: 1px solid #3e3d32 !important;
+  padding: 1.5em !important;
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+  overflow-x: auto !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* 移除主题对 pre > code 的强制颜色，让 Chroma 语法高亮生效 */
+#single .page-content pre > code {
+  color: unset !important;
+  background-color: transparent !important;
+  font-family: 'Fira Code', 'JetBrains Mono', 'SF Mono', Consolas, Monaco, monospace !important;
+  font-size: inherit !important;
+}
+
+/* 行内代码 */
+#single .page-content code {
+  color: var(--primary-color) !important;
+  background-color: var(--secondary-color);
+  padding: 0.2em 0.4em;
+  border-radius: 0.3em;
+  font-family: 'Fira Code', 'JetBrains Mono', 'SF Mono', Consolas, Monaco, monospace;
 }

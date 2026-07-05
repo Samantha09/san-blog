@@ -1,842 +1,93 @@
-<!DOCTYPE html>
-<html lang="zh-cn">
-
-<head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<meta http-equiv="Accept-CH" content="DPR, Viewport-Width, Width">
-<link rel="icon" href="/san-blog/images/avatar.jpg" type="image/gif">
-
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
->
-<link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-      media="print" onload="this.media='all'" />
-<noscript>
-  <link
-          href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-          rel="stylesheet">
-</noscript>
-
-
-<link rel="stylesheet" href="/san-blog/css/font.css" media="all">
-
-
-
-<meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/githack-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E4%B8%8E-.git-%E6%B3%84%E9%9C%B2%E5%88%A9%E7%94%A8%E8%AF%A6%E8%A7%A3/">
-	<meta property="og:site_name" content="东阳的个人站点">
-	<meta property="og:title" content="GitHack 工具使用与 .git 泄露利用详解">
-	<meta property="og:description" content="前言 在 Web 安全中，.git 目录泄露是一种常见的信息泄露漏洞。当开发人员将代码直接部署到 Web 目录时，如果未正确配置，访问者可能直接下载到 .git 文件夹，从而获取完整的源代码、提交历史、甚至敏感信息（如密码、API Key、Flag 等）。
+<!doctype html><html lang=zh-cn><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=X-UA-Compatible content="ie=edge"><meta http-equiv=Accept-CH content="DPR, Viewport-Width, Width"><link rel=icon href=/san-blog/images/avatar.jpg type=image/gif><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=preload as=style href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" media=print onload='this.media="all"'><noscript><link href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel=stylesheet></noscript><link rel=stylesheet href=/san-blog/css/font.css media=all><meta property="og:url" content="https://Samantha09.github.io/san-blog/posts/githack-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E4%B8%8E-.git-%E6%B3%84%E9%9C%B2%E5%88%A9%E7%94%A8%E8%AF%A6%E8%A7%A3/"><meta property="og:site_name" content="东阳的个人站点"><meta property="og:title" content="GitHack 工具使用与 .git 泄露利用详解"><meta property="og:description" content="前言 在 Web 安全中，.git 目录泄露是一种常见的信息泄露漏洞。当开发人员将代码直接部署到 Web 目录时，如果未正确配置，访问者可能直接下载到 .git 文件夹，从而获取完整的源代码、提交历史、甚至敏感信息（如密码、API Key、Flag 等）。
 GitHack 是一款专门用于利用 .git 泄露的工具，支持三种恢复模式，能够还原历史版本、提取 stash 内容、从 index 文件恢复代码。
 依赖安装 GitHack 本身不需要额外的 Python 库，但依赖系统中已安装 git 命令。
-# Ubuntu/Debian sudo apt-get install git # macOS brew install git # Windows 下载 Git for Windows 基本使用 python GitHack.py http://目标网站/.git/ 恢复后的文件默认存放在 dist/目标域名/ 目录下。
-工作流程 GitHack 会依次尝试三种恢复方式：
-直接 Clone：尝试用 git clone 直接克隆仓库 目录遍历：检测是否支持目录遍历，逐个文件下载 缓存恢复：从 .git/index、commit 记录、objects 缓存中恢复文件 三大核心利用方式 一、Log —— 历史提交中找回删除的内容 git log 会记录仓库的所有提交历史。即使敏感文件在最新版本中被删除，通过查看历史提交仍可找回。">
-	<meta property="og:locale" content="zh_cn">
-	<meta property="og:type" content="article">
-		<meta property="article:section" content="blogs">
-		<meta property="article:published_time" content="2026-06-02T21:00:00+08:00">
-		<meta property="article:modified_time" content="2026-06-02T21:00:00+08:00">
-		<meta property="article:tag" content="CTF">
-		<meta property="article:tag" content="Git">
-		<meta property="article:tag" content="信息泄露">
-		<meta property="article:tag" content="工具使用">
-
-
-	<meta name="twitter:card" content="summary">
-	<meta name="twitter:title" content="GitHack 工具使用与 .git 泄露利用详解">
-	<meta name="twitter:description" content="前言 在 Web 安全中，.git 目录泄露是一种常见的信息泄露漏洞。当开发人员将代码直接部署到 Web 目录时，如果未正确配置，访问者可能直接下载到 .git 文件夹，从而获取完整的源代码、提交历史、甚至敏感信息（如密码、API Key、Flag 等）。
+1# Ubuntu/Debian 2sudo apt-get install git 3 4# macOS 5brew install git 6 7# Windows 下载 Git for Windows 基本使用 1python GitHack.py http://目标网站/.git/ 恢复后的文件默认存放在 dist/目标域名/ 目录下。"><meta property="og:locale" content="zh_cn"><meta property="og:type" content="article"><meta property="article:section" content="blogs"><meta property="article:published_time" content="2026-06-02T21:00:00+08:00"><meta property="article:modified_time" content="2026-06-02T21:00:00+08:00"><meta property="article:tag" content="CTF"><meta property="article:tag" content="Git"><meta property="article:tag" content="信息泄露"><meta property="article:tag" content="工具使用"><meta name=twitter:card content="summary"><meta name=twitter:title content="GitHack 工具使用与 .git 泄露利用详解"><meta name=twitter:description content="前言 在 Web 安全中，.git 目录泄露是一种常见的信息泄露漏洞。当开发人员将代码直接部署到 Web 目录时，如果未正确配置，访问者可能直接下载到 .git 文件夹，从而获取完整的源代码、提交历史、甚至敏感信息（如密码、API Key、Flag 等）。
 GitHack 是一款专门用于利用 .git 泄露的工具，支持三种恢复模式，能够还原历史版本、提取 stash 内容、从 index 文件恢复代码。
 依赖安装 GitHack 本身不需要额外的 Python 库，但依赖系统中已安装 git 命令。
-# Ubuntu/Debian sudo apt-get install git # macOS brew install git # Windows 下载 Git for Windows 基本使用 python GitHack.py http://目标网站/.git/ 恢复后的文件默认存放在 dist/目标域名/ 目录下。
-工作流程 GitHack 会依次尝试三种恢复方式：
-直接 Clone：尝试用 git clone 直接克隆仓库 目录遍历：检测是否支持目录遍历，逐个文件下载 缓存恢复：从 .git/index、commit 记录、objects 缓存中恢复文件 三大核心利用方式 一、Log —— 历史提交中找回删除的内容 git log 会记录仓库的所有提交历史。即使敏感文件在最新版本中被删除，通过查看历史提交仍可找回。">
-
-
-
-
-
-<link rel="stylesheet" href="/san-blog/bootstrap-5/css/bootstrap.min.css" media="all"><link rel="stylesheet" href="/san-blog/css/header.css" media="all">
-<link rel="stylesheet" href="/san-blog/css/language-switcher.css" media="all">
-<link rel="stylesheet" href="/san-blog/css/footer.css" media="all">
-
-
-<link rel="stylesheet" href="/san-blog/css/theme.css" media="all">
-
-<style>
-    :root {
-        --text-color: #1f1f1f;
-        --text-secondary-color: #4a4a4a;
-        --text-link-color: #7a6aa8;
-        --background-color: #f7f5f2;
-        --secondary-background-color: #efece7;
-        --primary-color: #7a6aa8;
-        --secondary-color: #ffffff;
-
-         
-        --text-color-dark: #e4e6eb;
-        --text-secondary-color-dark: #b0b3b8;
-        --text-link-color-dark: #c4b8e6;
-        --background-color-dark: #1a1917;
-        --secondary-background-color-dark: #252422;
-        --primary-color-dark: #c4b8e6;
-        --secondary-color-dark: #2d2c2a;
-    }
-    body {
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.6;
-        text-align: left;
-    }
-
-    html {
-        background-color: var(--background-color) !important;
-    }
-
-    body::-webkit-scrollbar {
-        height: 0px;
-        width: 8px;
-        background-color: var(--background-color);
-    }
-
-    ::-webkit-scrollbar-track {
-        border-radius: 1rem;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        border-radius: 1rem;
-        background: #b0b0b0;
-        outline: 1px solid var(--background-color);
-    }
-
-    #search-content::-webkit-scrollbar {
-        width: .5em;
-        height: .1em;
-        background-color: var(--background-color);
-    }
-</style>
-
-
-
-<meta name="description" content="">
-<link rel="stylesheet" href="/san-blog/css/single.css">
-
-
-<script defer src="/san-blog/fontawesome-6/all-6.4.2.js"></script>
-
-
-  
-  
-    <link rel="stylesheet" href="/san-blog/style.css">
-  
-
-  <title>
-GitHack 工具使用与 .git 泄露利用详解 | 东阳的个人站点
-
-  </title>
-</head>
-
-<body class="light">
-  
-  
-<script>
-    let localStorageValue = localStorage.getItem("pref-theme");
-
-    switch (localStorageValue) {
-        case "dark":
-            document.documentElement.classList.add('dark');
-            document.body.classList.add('dark');
-            break;
-        case "light":
-            document.body.classList.remove('dark');
-            document.documentElement.classList.remove('dark');
-            break;
-        default:
-            
-            document.body.classList.remove('dark');
-            document.documentElement.classList.remove('dark');
-            break;
-    }
-</script>
-
-
-
-
-<script>
-    var prevScrollPos = window.pageYOffset;
-    window.addEventListener("scroll", function showHeaderOnScroll() {
-        let profileHeaderElem = document.getElementById("profileHeader");
-        let currentScrollPos = window.pageYOffset;
-        let resetHeaderStyle = false;
-        let showNavBarOnScrollUp =  true ;
-        let showNavBar = showNavBarOnScrollUp ? prevScrollPos > currentScrollPos : currentScrollPos > 0;
-        if (showNavBar) {
-            profileHeaderElem.classList.add("showHeaderOnTop");
-        } else {
-            resetHeaderStyle = true;
-        }
-        if(currentScrollPos === 0) {
-            resetHeaderStyle = true;
-        }
-        if(resetHeaderStyle) {
-            profileHeaderElem.classList.remove("showHeaderOnTop");
-        }
-        prevScrollPos = currentScrollPos;
-    });
-</script>
-
-
-
-<header id="profileHeader">
-    <nav class="pt-3 navbar navbar-expand-lg animate">
-        <div class="container-fluid mx-xs-2 mx-sm-5 mx-md-5 mx-lg-5">
-            
-            <a class="navbar-brand primary-font text-wrap" href="/san-blog/">
-                
-                <img src="/san-blog/images/avatar.jpg" width="30" height="30"
-                    class="d-inline-block align-top">
-                东阳
-                
-            </a>
-
-            
-                <div>
-                    <input id="search" autocomplete="off" class="form-control mr-sm-2 d-none d-md-block" placeholder=''
-                        aria-label="Search" oninput="searchOnChange(event)">
-                </div>
-            
-
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-                <svg aria-hidden="true" height="24" viewBox="0 0 16 16" version="1.1" width="24" data-view-component="true">
-                    <path fill-rule="evenodd" d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z"></path>
-                </svg>
-            </button>
-
-            
-            <div class="collapse navbar-collapse text-wrap primary-font" id="navbarContent">
-                <ul class="navbar-nav ms-auto text-center">
-                    
-                        <li class="nav-item navbar-text d-block d-md-none">
-                            <div class="nav-link">
-                                <input id="search" autocomplete="off" class="form-control mr-sm-2" placeholder='' aria-label="Search" oninput="searchOnChange(event)">
-                            </div>
-                        </li>
-                    
-
-                    
-                    <li class="nav-item navbar-text">
-                        <a class="nav-link" href="/san-blog/#about" aria-label="about">
-                            关于我
-                        </a>
-                    </li>
-                    
-
-                    
-
-                    
-
-                    
-                    <li class="nav-item navbar-text">
-                        <a class="nav-link" href="/san-blog/#projects"
-                            aria-label="projects">
-                            作品集
-                        </a>
-                    </li>
-                    
-
-                    
-
-                    
-                    <li class="nav-item navbar-text">
-                        <a class="nav-link" href="/san-blog/#contact"
-                            aria-label="contact">
-                            联系我
-                        </a>
-                    </li>
-                    
-
-                    
-
-                    
-                    
-                    
-                    
-                    <li class="nav-item navbar-text">
-                        <a class="nav-link" href="/san-blog/blogs" title="技术博客">
-                            
-                            博客
-                        </a>
-                    </li>
-                    
-                    
-                    
-                    
-                    <li class="nav-item navbar-text">
-                        <a class="nav-link" href="/san-blog/archives" title="文章归档">
-                            
-                            归档
-                        </a>
-                    </li>
-                    
-                    
-
-                    <li class="nav-item navbar-text">
-                        
-                        <div class="text-center">
-                            <button id="theme-toggle" type="button" aria-label="Toggle dark mode">
-                                <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                                </svg>
-                                <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="5"></circle>
-                                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                                </svg>
-                            </button>
-                        </div>
-                    </li>
-                    
-
-                </ul>
-
-            </div>
-        </div>
-    </nav>
-</header>
-<div id="content">
-<section id="single">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-sm-12 col-md-12 col-lg-9">
-        <div class="pr-lg-4">
-          <div class="title mb-5">
-            <h1 class="text-center mb-4">GitHack 工具使用与 .git 泄露利用详解</h1>
-            <div class="text-center">
-              
-              Jun 2, 2026
-
-              
-              <span id="readingTime">
-                分钟阅读
-              </span>
-              
-            </div>
-          </div>
-          
-          <article class="page-content  p-2">
-          <h2 id="前言">前言</h2>
-<p>在 Web 安全中，<code>.git</code> 目录泄露是一种常见的信息泄露漏洞。当开发人员将代码直接部署到 Web 目录时，如果未正确配置，访问者可能直接下载到 <code>.git</code> 文件夹，从而获取完整的源代码、提交历史、甚至敏感信息（如密码、API Key、Flag 等）。</p>
-<p><strong>GitHack</strong> 是一款专门用于利用 <code>.git</code> 泄露的工具，支持三种恢复模式，能够还原历史版本、提取 stash 内容、从 index 文件恢复代码。</p>
-<hr>
-<h2 id="依赖安装">依赖安装</h2>
-<p>GitHack 本身不需要额外的 Python 库，但依赖系统中已安装 <code>git</code> 命令。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Ubuntu/Debian</span>
-</span></span><span style="display:flex;"><span>sudo apt-get install git
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># macOS</span>
-</span></span><span style="display:flex;"><span>brew install git
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Windows 下载 Git for Windows</span>
-</span></span></code></pre></div><hr>
-<h2 id="基本使用">基本使用</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python GitHack.py http://目标网站/.git/
-</span></span></code></pre></div><p>恢复后的文件默认存放在 <code>dist/目标域名/</code> 目录下。</p>
-<h3 id="工作流程">工作流程</h3>
-<p>GitHack 会依次尝试三种恢复方式：</p>
-<ol>
-<li><strong>直接 Clone</strong>：尝试用 <code>git clone</code> 直接克隆仓库</li>
-<li><strong>目录遍历</strong>：检测是否支持目录遍历，逐个文件下载</li>
-<li><strong>缓存恢复</strong>：从 <code>.git/index</code>、commit 记录、objects 缓存中恢复文件</li>
-</ol>
-<hr>
-<h2 id="三大核心利用方式">三大核心利用方式</h2>
-<h3 id="一log--历史提交中找回删除的内容">一、Log —— 历史提交中找回删除的内容</h3>
-<p><code>git log</code> 会记录仓库的所有提交历史。即使敏感文件在最新版本中被删除，通过查看历史提交仍可找回。</p>
-<p><strong>常用命令：</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看提交历史</span>
-</span></span><span style="display:flex;"><span>git log --oneline
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看某次提交的详细变更</span>
-</span></span><span style="display:flex;"><span>git show &lt;commit-hash&gt;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 对比两次提交之间的差异</span>
-</span></span><span style="display:flex;"><span>git diff &lt;commit-a&gt; &lt;commit-b&gt;
-</span></span></code></pre></div><p><strong>实战场景：</strong></p>
-<p>在 CTF 题目中，经常遇到 &ldquo;remove flag&rdquo; 的提交，flag 文件被删除，但在 &ldquo;add flag&rdquo; 提交中仍存在：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git log --oneline
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 输出：</span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 7a65366 remove flag</span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 192c08d add flag</span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 738fcad init</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>git show 192c08d
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 即可看到 add flag 提交中新增的 flag 文件内容</span>
-</span></span></code></pre></div><hr>
-<h3 id="二stash--藏匿在贮藏区中的秘密">二、Stash —— 藏匿在贮藏区中的秘密</h3>
-<p><code>git stash</code> 用于临时保存工作进度。开发人员可能将修改后的敏感内容 stash 起来，但忘记清理，导致这些信息随 <code>.git</code> 目录一同泄露。</p>
-<p><strong>常用命令：</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 列出所有 stash</span>
-</span></span><span style="display:flex;"><span>git stash list
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看 stash 的修改概览</span>
-</span></span><span style="display:flex;"><span>git stash show stash@<span style="color:#f92672">{</span>0<span style="color:#f92672">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看 stash 的详细 diff（推荐）</span>
-</span></span><span style="display:flex;"><span>git stash show -p stash@<span style="color:#f92672">{</span>0<span style="color:#f92672">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 应用 stash 到工作区</span>
-</span></span><span style="display:flex;"><span>git stash apply stash@<span style="color:#f92672">{</span>0<span style="color:#f92672">}</span>    <span style="color:#75715e"># 保留 stash</span>
-</span></span><span style="display:flex;"><span>git stash pop stash@<span style="color:#f92672">{</span>0<span style="color:#f92672">}</span>      <span style="color:#75715e"># 应用并删除 stash</span>
-</span></span></code></pre></div><p><strong>实战场景：</strong></p>
-<p>某个 CTF 题目的提交历史中，flag 文件内容是 <code>where is flag</code>，看似没有价值。但检查 stash 后发现：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git stash list
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># stash@{0}: WIP on master: 192c08d add flag</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>git stash show -p
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># diff 显示文件内容从 &#34;where is flag&#34; 变成了真正的 flag</span>
-</span></span></code></pre></div><p><strong>结论：</strong> 恢复 <code>.git</code> 后，除了看 <code>git log</code>，<strong>一定别忘了执行 <code>git stash list</code></strong>。</p>
-<hr>
-<h3 id="三index--从暂存区恢复未提交的代码">三、Index —— 从暂存区恢复未提交的代码</h3>
-<p><code>.git/index</code> 文件是 Git 的暂存区索引，记录了当前工作目录中文件的快照。即使某些文件没有被正式提交到 commit 中，只要被 <code>git add</code> 过，就可能从 index 中恢复。</p>
-<p>GitHack 的第三种恢复模式会自动解析 <code>index</code> 文件，从中提取 blob 对象并恢复到工作目录。</p>
-<p><strong>手动解析 index（了解原理）：</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 使用 git ls-files 查看暂存区中的文件列表</span>
-</span></span><span style="display:flex;"><span>cd dist/目标域名/
-</span></span><span style="display:flex;"><span>git ls-files --stage
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 使用 git checkout -- &lt;file&gt; 恢复暂存区中的文件版本</span>
-</span></span><span style="display:flex;"><span>git checkout -- flag.txt
-</span></span></code></pre></div><p><strong>实战价值：</strong></p>
-<ul>
-<li>开发者可能 <code>git add</code> 了敏感文件后又 <code>git rm --cached</code> 移除，但 index 历史仍可能保留痕迹</li>
-<li>在 <code>.git</code> 泄露场景下，GitHack 会自动从 index 重建文件树，无需手动操作</li>
-</ul>
-<hr>
-<h2 id="完整实战流程">完整实战流程</h2>
-<p>以 CTFHub <code>.git</code> 泄露题目为例：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. 使用 GitHack 恢复仓库</span>
-</span></span><span style="display:flex;"><span>python GitHack.py http://challenge-xxxx.sandbox.ctfhub.com:10800/.git/
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 进入恢复目录</span>
-</span></span><span style="display:flex;"><span>cd dist/challenge-xxxx.sandbox.ctfhub.com_10800/
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 查看提交历史</span>
-</span></span><span style="display:flex;"><span>git log --oneline
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 查看 stash</span>
-</span></span><span style="display:flex;"><span>git stash list
-</span></span><span style="display:flex;"><span>git stash show -p
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 5. 检查 index 恢复出的文件</span>
-</span></span><span style="display:flex;"><span>ls -la
-</span></span></code></pre></div><hr>
-<h2 id="防御建议">防御建议</h2>
-<ol>
-<li>
-<p><strong>禁止 Web 访问 <code>.git</code> 目录</strong>
-Nginx 配置示例：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nginx" data-lang="nginx"><span style="display:flex;"><span><span style="color:#66d9ef">location</span> ~ <span style="color:#e6db74">/\.git</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">deny</span> <span style="color:#e6db74">all</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">return</span> <span style="color:#ae81ff">403</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div></li>
-<li>
-<p><strong>部署前清理 <code>.git</code> 目录</strong>
-生产环境只部署编译后的产物，不携带 <code>.git</code> 文件夹。</p>
-</li>
-<li>
-<p><strong>敏感信息不提交到仓库</strong>
-使用 <code>.gitignore</code> 忽略配置文件，密码通过环境变量注入。</p>
-</li>
-<li>
-<p><strong>定期审计提交历史</strong>
-使用 <code>git-filter-repo</code> 或 <code>BFG Repo-Cleaner</code> 清理历史中的敏感数据。</p>
-</li>
-</ol>
-<hr>
-<h2 id="总结">总结</h2>
-<table>
-	<thead>
-			<tr>
-					<th>利用方式</th>
-					<th>查看命令</th>
-					<th>适用场景</th>
-			</tr>
-	</thead>
-	<tbody>
-			<tr>
-					<td>Log</td>
-					<td><code>git log</code> / <code>git show</code></td>
-					<td>找回历史提交中被删除的文件</td>
-			</tr>
-			<tr>
-					<td>Stash</td>
-					<td><code>git stash list</code> / <code>git stash show -p</code></td>
-					<td>发现开发者临时藏起来的修改</td>
-			</tr>
-			<tr>
-					<td>Index</td>
-					<td>GitHack 自动恢复 / <code>git ls-files</code></td>
-					<td>恢复未提交但已 add 的代码</td>
-			</tr>
-	</tbody>
-</table>
-<p><code>.git</code> 泄露的危害远不止源代码泄露，完整的 commit 历史、stash、index 都可能成为突破口。恢复后务必全面检查这三个区域。</p>
-
-          </article>
-        </div>
-      </div>
-      <div class="col-sm-12 col-md-12 col-lg-3">
-        <div id="stickySideBar" class="sticky-sidebar">
-          
-          <aside class="toc">
-              <h5>
-                目录
-              </h5>
-              <div class="toc-content">
-                <nav id="TableOfContents">
-  <ul>
-    <li><a href="#前言">前言</a></li>
-    <li><a href="#依赖安装">依赖安装</a></li>
-    <li><a href="#基本使用">基本使用</a>
-      <ul>
-        <li><a href="#工作流程">工作流程</a></li>
-      </ul>
-    </li>
-    <li><a href="#三大核心利用方式">三大核心利用方式</a>
-      <ul>
-        <li><a href="#一log--历史提交中找回删除的内容">一、Log —— 历史提交中找回删除的内容</a></li>
-        <li><a href="#二stash--藏匿在贮藏区中的秘密">二、Stash —— 藏匿在贮藏区中的秘密</a></li>
-        <li><a href="#三index--从暂存区恢复未提交的代码">三、Index —— 从暂存区恢复未提交的代码</a></li>
-      </ul>
-    </li>
-    <li><a href="#完整实战流程">完整实战流程</a></li>
-    <li><a href="#防御建议">防御建议</a></li>
-    <li><a href="#总结">总结</a></li>
-  </ul>
-</nav>
-              </div>
-          </aside>
-          
-
-          
-          <aside class="tags">
-            <h5></h5>
-            <ul class="tags-ul list-unstyled list-inline">
-              
-              
-              <li class="list-inline-item"><a href="/san-blog/tags/ctf"
-                target="_blank"
-              >CTF</a></li>
-              
-              
-              <li class="list-inline-item"><a href="/san-blog/tags/git"
-                target="_blank"
-              >Git</a></li>
-              
-              
-              <li class="list-inline-item"><a href="/san-blog/tags/%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2"
-                target="_blank"
-              >信息泄露</a></li>
-              
-              
-              <li class="list-inline-item"><a href="/san-blog/tags/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8"
-                target="_blank"
-              >工具使用</a></li>
-              
-            </ul>
-          </aside>
-          
-
-          
-          <aside class="social">
-            <h5></h5>
-            <div class="social-content">
-              <ul class="list-inline">
-                <li class="list-inline-item text-center">
-                  <a target="_blank" href="https://www.linkedin.com/feed/?shareActive=true&text= https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2fgithack-%25E5%25B7%25A5%25E5%2585%25B7%25E4%25BD%25BF%25E7%2594%25A8%25E4%25B8%258E-.git-%25E6%25B3%2584%25E9%259C%25B2%25E5%2588%25A9%25E7%2594%25A8%25E8%25AF%25A6%25E8%25A7%25A3%2f">
-                    <i class="fab fa-linkedin"></i>
-                  </a>
-                </li>
-                <li class="list-inline-item text-center">
-                  <a target="_blank" href='https://twitter.com/share?text=GitHack%20%e5%b7%a5%e5%85%b7%e4%bd%bf%e7%94%a8%e4%b8%8e%20.git%20%e6%b3%84%e9%9c%b2%e5%88%a9%e7%94%a8%e8%af%a6%e8%a7%a3&url=https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2fgithack-%25E5%25B7%25A5%25E5%2585%25B7%25E4%25BD%25BF%25E7%2594%25A8%25E4%25B8%258E-.git-%25E6%25B3%2584%25E9%259C%25B2%25E5%2588%25A9%25E7%2594%25A8%25E8%25AF%25A6%25E8%25A7%25A3%2f&hashtags=CTF%2cGit%2c%e4%bf%a1%e6%81%af%e6%b3%84%e9%9c%b2%2c%e5%b7%a5%e5%85%b7%e4%bd%bf%e7%94%a8'>
-                    <i class="fab fa-twitter"></i>
-                  </a>
-                </li>
-                <li class="list-inline-item text-center">
-                  <a target="_blank" href="https://api.whatsapp.com/send?text=GitHack%20%e5%b7%a5%e5%85%b7%e4%bd%bf%e7%94%a8%e4%b8%8e%20.git%20%e6%b3%84%e9%9c%b2%e5%88%a9%e7%94%a8%e8%af%a6%e8%a7%a3: https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2fgithack-%25E5%25B7%25A5%25E5%2585%25B7%25E4%25BD%25BF%25E7%2594%25A8%25E4%25B8%258E-.git-%25E6%25B3%2584%25E9%259C%25B2%25E5%2588%25A9%25E7%2594%25A8%25E8%25AF%25A6%25E8%25A7%25A3%2f">
-                    <i class="fab fa-whatsapp"></i>
-                  </a>
-                </li>
-                <li class="list-inline-item text-center">
-                  <a target="_blank" href='mailto:?subject=GitHack%20%e5%b7%a5%e5%85%b7%e4%bd%bf%e7%94%a8%e4%b8%8e%20.git%20%e6%b3%84%e9%9c%b2%e5%88%a9%e7%94%a8%e8%af%a6%e8%a7%a3&amp;body=%e7%9c%8b%e7%9c%8b%e8%bf%99%e4%b8%aa%e7%ab%99%e7%82%b9 https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2fgithack-%25E5%25B7%25A5%25E5%2585%25B7%25E4%25BD%25BF%25E7%2594%25A8%25E4%25B8%258E-.git-%25E6%25B3%2584%25E9%259C%25B2%25E5%2588%25A9%25E7%2594%25A8%25E8%25AF%25A6%25E8%25A7%25A3%2f'>
-                    <i class="fa fa-envelope"></i>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </aside>
-          
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-12 col-md-12 col-lg-9 p-4">
-        
-      </div>
-    </div>
-  </div>
-  <button class="p-2 px-3" onclick="topFunction()" id="topScroll">
-    <i class="fas fa-angle-up"></i>
-  </button>
-</section>
-
-
-<div class="progress">
-  <div id="scroll-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
-<Script src="/san-blog/js/scrollProgressBar.js"></script>
-
-
-<script>
-  var topScroll = document.getElementById("topScroll");
-  window.onscroll = function() {scrollFunction()};
-
-  function scrollFunction() {
-    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-      topScroll.style.display = "block";
-    } else {
-      topScroll.style.display = "none";
-    }
-  }
-
-  function topFunction() {
-    document.body.scrollTop = 0;
-    document.documentElement.scrollTop = 0;
-  }
-
-  
-  let stickySideBarElem = document.getElementById("stickySideBar");
-  let stickyNavBar =  true ;
-  if(stickyNavBar) {
-    let headerElem = document.getElementById("profileHeader");
-    let headerHeight = headerElem.offsetHeight + 15;
-    stickySideBarElem.style.top = headerHeight + "px";
-  } else {
-    stickySideBarElem.style.top = "50px";
-  }
-</script>
-
-
-<script src="/san-blog/js/readingTime.js"></script>
-
-
-
-  </div><footer style="background-color: transparent;">
-    
-    
-
-
-  
-
-
-
-<div class="container py-3" id="recent-posts">
-    
-    
-    <div class="h3 text-center text-secondary py-3">
-        最近文章
-    </div>
-    <div class="row justify-content-center">
-        
-        <div class="col-lg-4 col-md-6 pt-2">
-            <div class="card h-100">
-                
-                <div class="card-body bg-transparent p-3 shadow-sm">
-                    <a href="/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="primary-font card-title">
-                        <h5 class="card-title bg-transparent" title="React 学习 Day 01：基础入门">React 学习 Day 01：基础入门</h5>
-                    </a>
-                    <div class="card-text secondary-font">
-                        <p> 从零开始，用一个 react-basic 项目串起 React 入门必备知识。
+1# Ubuntu/Debian 2sudo apt-get install git 3 4# macOS 5brew install git 6 7# Windows 下载 Git for Windows 基本使用 1python GitHack.py http://目标网站/.git/ 恢复后的文件默认存放在 dist/目标域名/ 目录下。"><link rel=stylesheet href=/san-blog/bootstrap-5/css/bootstrap.min.css media=all><link rel=stylesheet href=/san-blog/css/header.css media=all><link rel=stylesheet href=/san-blog/css/language-switcher.css media=all><link rel=stylesheet href=/san-blog/css/footer.css media=all><link rel=stylesheet href=/san-blog/css/theme.css media=all><style>:root{--text-color:#1f1f1f;--text-secondary-color:#4a4a4a;--text-link-color:#7a6aa8;--background-color:#f7f5f2;--secondary-background-color:#efece7;--primary-color:#7a6aa8;--secondary-color:#ffffff;--text-color-dark:#e4e6eb;--text-secondary-color-dark:#b0b3b8;--text-link-color-dark:#c4b8e6;--background-color-dark:#1a1917;--secondary-background-color-dark:#252422;--primary-color-dark:#c4b8e6;--secondary-color-dark:#2d2c2a}body{font-size:1rem;font-weight:400;line-height:1.6;text-align:left}html{background-color:var(--background-color)!important}body::-webkit-scrollbar{height:0;width:8px;background-color:var(--background-color)}::-webkit-scrollbar-track{border-radius:1rem}::-webkit-scrollbar-thumb{border-radius:1rem;background:#b0b0b0;outline:1px solid var(--background-color)}#search-content::-webkit-scrollbar{width:.5em;height:.1em;background-color:var(--background-color)}</style><meta name=description content><link rel=stylesheet href=/san-blog/css/single.css><script defer src=/san-blog/fontawesome-6/all-6.4.2.js></script><link rel=stylesheet href=/san-blog/style.css><title>GitHack 工具使用与 .git 泄露利用详解 | 东阳的个人站点</title></head><body class=light><script>let localStorageValue=localStorage.getItem("pref-theme");switch(localStorageValue){case"dark":document.documentElement.classList.add("dark"),document.body.classList.add("dark");break;case"light":document.body.classList.remove("dark"),document.documentElement.classList.remove("dark");break;default:document.body.classList.remove("dark"),document.documentElement.classList.remove("dark");break}</script><script>var prevScrollPos=window.pageYOffset;window.addEventListener("scroll",function(){let s=document.getElementById("profileHeader"),t=window.pageYOffset,n=!1,o=!0,i=o?prevScrollPos>t:t>0;i?s.classList.add("showHeaderOnTop"):n=!0,t===0&&(n=!0),n&&s.classList.remove("showHeaderOnTop"),prevScrollPos=t})</script><header id=profileHeader><nav class="pt-3 navbar navbar-expand-lg animate"><div class="container-fluid mx-xs-2 mx-sm-5 mx-md-5 mx-lg-5"><a class="navbar-brand primary-font text-wrap" href=/san-blog/><img src=/san-blog/images/avatar.jpg width=30 height=30 class="d-inline-block align-top">
+东阳</a><div><input id=search autocomplete=off class="form-control mr-sm-2 d-none d-md-block" placeholder aria-label=Search oninput=searchOnChange(event)></div><button class=navbar-toggler type=button data-bs-toggle=collapse data-bs-target=#navbarContent aria-controls=navbarContent aria-expanded=false aria-label="Toggle navigation">
+<svg aria-hidden="true" height="24" viewBox="0 0 16 16" width="24" data-view-component="true"><path fill-rule="evenodd" d="M1 2.75A.75.75.0 011.75 2h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 2.75zm0 5A.75.75.0 011.75 7h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 7.75zM1.75 12a.75.75.0 100 1.5h12.5a.75.75.0 100-1.5H1.75z"/></svg></button><div class="collapse navbar-collapse text-wrap primary-font" id=navbarContent><ul class="navbar-nav ms-auto text-center"><li class="nav-item navbar-text d-block d-md-none"><div class=nav-link><input id=search autocomplete=off class="form-control mr-sm-2" placeholder aria-label=Search oninput=searchOnChange(event)></div></li><li class="nav-item navbar-text"><a class=nav-link href=/san-blog/#about aria-label=about>关于我</a></li><li class="nav-item navbar-text"><a class=nav-link href=/san-blog/#projects aria-label=projects>作品集</a></li><li class="nav-item navbar-text"><a class=nav-link href=/san-blog/#contact aria-label=contact>联系我</a></li><li class="nav-item navbar-text"><a class=nav-link href=/san-blog/blogs title=技术博客>博客</a></li><li class="nav-item navbar-text"><a class=nav-link href=/san-blog/archives title=文章归档>归档</a></li><li class="nav-item navbar-text"><div class=text-center><button id=theme-toggle type=button aria-label="Toggle dark mode">
+<svg id="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></li></ul></div></div></nav></header><div id=content><section id=single><div class=container><div class="row justify-content-center"><div class="col-sm-12 col-md-12 col-lg-9"><div class=pr-lg-4><div class="title mb-5"><h1 class="text-center mb-4">GitHack 工具使用与 .git 泄露利用详解</h1><div class=text-center>Jun 2, 2026
+<span id=readingTime>分钟阅读</span></div></div><article class="page-content p-2"><h2 id=前言>前言</h2><p>在 Web 安全中，<code>.git</code> 目录泄露是一种常见的信息泄露漏洞。当开发人员将代码直接部署到 Web 目录时，如果未正确配置，访问者可能直接下载到 <code>.git</code> 文件夹，从而获取完整的源代码、提交历史、甚至敏感信息（如密码、API Key、Flag 等）。</p><p><strong>GitHack</strong> 是一款专门用于利用 <code>.git</code> 泄露的工具，支持三种恢复模式，能够还原历史版本、提取 stash 内容、从 index 文件恢复代码。</p><hr><h2 id=依赖安装>依赖安装</h2><p>GitHack 本身不需要额外的 Python 库，但依赖系统中已安装 <code>git</code> 命令。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span><span style=color:#75715e># Ubuntu/Debian</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span>sudo apt-get install git
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span><span><span style=color:#75715e># macOS</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span><span>brew install git
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span><span><span style=color:#75715e># Windows 下载 Git for Windows</span>
+</span></span></code></pre></div><hr><h2 id=基本使用>基本使用</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span>python GitHack.py http://目标网站/.git/
+</span></span></code></pre></div><p>恢复后的文件默认存放在 <code>dist/目标域名/</code> 目录下。</p><h3 id=工作流程>工作流程</h3><p>GitHack 会依次尝试三种恢复方式：</p><ol><li><strong>直接 Clone</strong>：尝试用 <code>git clone</code> 直接克隆仓库</li><li><strong>目录遍历</strong>：检测是否支持目录遍历，逐个文件下载</li><li><strong>缓存恢复</strong>：从 <code>.git/index</code>、commit 记录、objects 缓存中恢复文件</li></ol><hr><h2 id=三大核心利用方式>三大核心利用方式</h2><h3 id=一log--历史提交中找回删除的内容>一、Log —— 历史提交中找回删除的内容</h3><p><code>git log</code> 会记录仓库的所有提交历史。即使敏感文件在最新版本中被删除，通过查看历史提交仍可找回。</p><p><strong>常用命令：</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span><span style=color:#75715e># 查看提交历史</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span>git log --oneline
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span><span><span style=color:#75715e># 查看某次提交的详细变更</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span><span>git show &lt;commit-hash&gt;
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span><span><span style=color:#75715e># 对比两次提交之间的差异</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">8</span><span>git diff &lt;commit-a&gt; &lt;commit-b&gt;
+</span></span></code></pre></div><p><strong>实战场景：</strong></p><p>在 CTF 题目中，经常遇到 &ldquo;remove flag&rdquo; 的提交，flag 文件被删除，但在 &ldquo;add flag&rdquo; 提交中仍存在：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span>git log --oneline
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span><span style=color:#75715e># 输出：</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span><span style=color:#75715e># 7a65366 remove flag</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span><span><span style=color:#75715e># 192c08d add flag</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span><span><span style=color:#75715e># 738fcad init</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span><span>git show 192c08d
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">8</span><span><span style=color:#75715e># 即可看到 add flag 提交中新增的 flag 文件内容</span>
+</span></span></code></pre></div><hr><h3 id=二stash--藏匿在贮藏区中的秘密>二、Stash —— 藏匿在贮藏区中的秘密</h3><p><code>git stash</code> 用于临时保存工作进度。开发人员可能将修改后的敏感内容 stash 起来，但忘记清理，导致这些信息随 <code>.git</code> 目录一同泄露。</p><p><strong>常用命令：</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span><span style=color:#75715e># 列出所有 stash</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span><span>git stash list
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span><span><span style=color:#75715e># 查看 stash 的修改概览</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span><span>git stash show stash@<span style=color:#f92672>{</span>0<span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span><span><span style=color:#75715e># 查看 stash 的详细 diff（推荐）</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span><span>git stash show -p stash@<span style=color:#f92672>{</span>0<span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span><span><span style=color:#75715e># 应用 stash 到工作区</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span><span>git stash apply stash@<span style=color:#f92672>{</span>0<span style=color:#f92672>}</span>    <span style=color:#75715e># 保留 stash</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span><span>git stash pop stash@<span style=color:#f92672>{</span>0<span style=color:#f92672>}</span>      <span style=color:#75715e># 应用并删除 stash</span>
+</span></span></code></pre></div><p><strong>实战场景：</strong></p><p>某个 CTF 题目的提交历史中，flag 文件内容是 <code>where is flag</code>，看似没有价值。但检查 stash 后发现：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span>git stash list
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span><span style=color:#75715e># stash@{0}: WIP on master: 192c08d add flag</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span><span>git stash show -p
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span><span><span style=color:#75715e># diff 显示文件内容从 &#34;where is flag&#34; 变成了真正的 flag</span>
+</span></span></code></pre></div><p><strong>结论：</strong> 恢复 <code>.git</code> 后，除了看 <code>git log</code>，<strong>一定别忘了执行 <code>git stash list</code></strong>。</p><hr><h3 id=三index--从暂存区恢复未提交的代码>三、Index —— 从暂存区恢复未提交的代码</h3><p><code>.git/index</code> 文件是 Git 的暂存区索引，记录了当前工作目录中文件的快照。即使某些文件没有被正式提交到 commit 中，只要被 <code>git add</code> 过，就可能从 index 中恢复。</p><p>GitHack 的第三种恢复模式会自动解析 <code>index</code> 文件，从中提取 blob 对象并恢复到工作目录。</p><p><strong>手动解析 index（了解原理）：</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span><span style=color:#75715e># 使用 git ls-files 查看暂存区中的文件列表</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span>cd dist/目标域名/
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span>git ls-files --stage
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span><span><span style=color:#75715e># 使用 git checkout -- &lt;file&gt; 恢复暂存区中的文件版本</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span><span>git checkout -- flag.txt
+</span></span></code></pre></div><p><strong>实战价值：</strong></p><ul><li>开发者可能 <code>git add</code> 了敏感文件后又 <code>git rm --cached</code> 移除，但 index 历史仍可能保留痕迹</li><li>在 <code>.git</code> 泄露场景下，GitHack 会自动从 index 重建文件树，无需手动操作</li></ul><hr><h2 id=完整实战流程>完整实战流程</h2><p>以 CTFHub <code>.git</code> 泄露题目为例：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span><span style=color:#75715e># 1. 使用 GitHack 恢复仓库</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span><span>python GitHack.py http://challenge-xxxx.sandbox.ctfhub.com:10800/.git/
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span><span><span style=color:#75715e># 2. 进入恢复目录</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span><span>cd dist/challenge-xxxx.sandbox.ctfhub.com_10800/
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span><span><span style=color:#75715e># 3. 查看提交历史</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span><span>git log --oneline
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span><span><span style=color:#75715e># 4. 查看 stash</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span><span>git stash list
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span><span>git stash show -p
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span><span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span><span><span style=color:#75715e># 5. 检查 index 恢复出的文件</span>
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span><span>ls -la
+</span></span></code></pre></div><hr><h2 id=防御建议>防御建议</h2><ol><li><p><strong>禁止 Web 访问 <code>.git</code> 目录</strong>
+Nginx 配置示例：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none><code class=language-nginx data-lang=nginx><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span><span style=color:#66d9ef>location</span> ~ <span style=color:#e6db74>/\.git</span> {
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span>    <span style=color:#f92672>deny</span> <span style=color:#e6db74>all</span>;
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span>    <span style=color:#f92672>return</span> <span style=color:#ae81ff>403</span>;
+</span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span><span>}
+</span></span></code></pre></div></li><li><p><strong>部署前清理 <code>.git</code> 目录</strong>
+生产环境只部署编译后的产物，不携带 <code>.git</code> 文件夹。</p></li><li><p><strong>敏感信息不提交到仓库</strong>
+使用 <code>.gitignore</code> 忽略配置文件，密码通过环境变量注入。</p></li><li><p><strong>定期审计提交历史</strong>
+使用 <code>git-filter-repo</code> 或 <code>BFG Repo-Cleaner</code> 清理历史中的敏感数据。</p></li></ol><hr><h2 id=总结>总结</h2><table><thead><tr><th>利用方式</th><th>查看命令</th><th>适用场景</th></tr></thead><tbody><tr><td>Log</td><td><code>git log</code> / <code>git show</code></td><td>找回历史提交中被删除的文件</td></tr><tr><td>Stash</td><td><code>git stash list</code> / <code>git stash show -p</code></td><td>发现开发者临时藏起来的修改</td></tr><tr><td>Index</td><td>GitHack 自动恢复 / <code>git ls-files</code></td><td>恢复未提交但已 add 的代码</td></tr></tbody></table><p><code>.git</code> 泄露的危害远不止源代码泄露，完整的 commit 历史、stash、index 都可能成为突破口。恢复后务必全面检查这三个区域。</p></article></div></div><div class="col-sm-12 col-md-12 col-lg-3"><div id=stickySideBar class=sticky-sidebar><aside class=toc><h5>目录</h5><div class=toc-content><nav id=TableOfContents><ul><li><a href=#前言>前言</a></li><li><a href=#依赖安装>依赖安装</a></li><li><a href=#基本使用>基本使用</a><ul><li><a href=#工作流程>工作流程</a></li></ul></li><li><a href=#三大核心利用方式>三大核心利用方式</a><ul><li><a href=#一log--历史提交中找回删除的内容>一、Log —— 历史提交中找回删除的内容</a></li><li><a href=#二stash--藏匿在贮藏区中的秘密>二、Stash —— 藏匿在贮藏区中的秘密</a></li><li><a href=#三index--从暂存区恢复未提交的代码>三、Index —— 从暂存区恢复未提交的代码</a></li></ul></li><li><a href=#完整实战流程>完整实战流程</a></li><li><a href=#防御建议>防御建议</a></li><li><a href=#总结>总结</a></li></ul></nav></div></aside><aside class=tags><h5></h5><ul class="tags-ul list-unstyled list-inline"><li class=list-inline-item><a href=/san-blog/tags/ctf target=_blank>CTF</a></li><li class=list-inline-item><a href=/san-blog/tags/git target=_blank>Git</a></li><li class=list-inline-item><a href=/san-blog/tags/%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2 target=_blank>信息泄露</a></li><li class=list-inline-item><a href=/san-blog/tags/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8 target=_blank>工具使用</a></li></ul></aside><aside class=social><h5></h5><div class=social-content><ul class=list-inline><li class="list-inline-item text-center"><a target=_blank href="https://www.linkedin.com/feed/?shareActive=true&text= https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2fgithack-%25E5%25B7%25A5%25E5%2585%25B7%25E4%25BD%25BF%25E7%2594%25A8%25E4%25B8%258E-.git-%25E6%25B3%2584%25E9%259C%25B2%25E5%2588%25A9%25E7%2594%25A8%25E8%25AF%25A6%25E8%25A7%25A3%2f"><i class="fab fa-linkedin"></i></a></li><li class="list-inline-item text-center"><a target=_blank href='https://twitter.com/share?text=GitHack%20%e5%b7%a5%e5%85%b7%e4%bd%bf%e7%94%a8%e4%b8%8e%20.git%20%e6%b3%84%e9%9c%b2%e5%88%a9%e7%94%a8%e8%af%a6%e8%a7%a3&url=https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2fgithack-%25E5%25B7%25A5%25E5%2585%25B7%25E4%25BD%25BF%25E7%2594%25A8%25E4%25B8%258E-.git-%25E6%25B3%2584%25E9%259C%25B2%25E5%2588%25A9%25E7%2594%25A8%25E8%25AF%25A6%25E8%25A7%25A3%2f&hashtags=CTF%2cGit%2c%e4%bf%a1%e6%81%af%e6%b3%84%e9%9c%b2%2c%e5%b7%a5%e5%85%b7%e4%bd%bf%e7%94%a8'><i class="fab fa-twitter"></i></a></li><li class="list-inline-item text-center"><a target=_blank href="https://api.whatsapp.com/send?text=GitHack%20%e5%b7%a5%e5%85%b7%e4%bd%bf%e7%94%a8%e4%b8%8e%20.git%20%e6%b3%84%e9%9c%b2%e5%88%a9%e7%94%a8%e8%af%a6%e8%a7%a3: https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2fgithack-%25E5%25B7%25A5%25E5%2585%25B7%25E4%25BD%25BF%25E7%2594%25A8%25E4%25B8%258E-.git-%25E6%25B3%2584%25E9%259C%25B2%25E5%2588%25A9%25E7%2594%25A8%25E8%25AF%25A6%25E8%25A7%25A3%2f"><i class="fab fa-whatsapp"></i></a></li><li class="list-inline-item text-center"><a target=_blank href='mailto:?subject=GitHack%20%e5%b7%a5%e5%85%b7%e4%bd%bf%e7%94%a8%e4%b8%8e%20.git%20%e6%b3%84%e9%9c%b2%e5%88%a9%e7%94%a8%e8%af%a6%e8%a7%a3&amp;body=%e7%9c%8b%e7%9c%8b%e8%bf%99%e4%b8%aa%e7%ab%99%e7%82%b9 https%3a%2f%2fSamantha09.github.io%2fsan-blog%2fposts%2fgithack-%25E5%25B7%25A5%25E5%2585%25B7%25E4%25BD%25BF%25E7%2594%25A8%25E4%25B8%258E-.git-%25E6%25B3%2584%25E9%259C%25B2%25E5%2588%25A9%25E7%2594%25A8%25E8%25AF%25A6%25E8%25A7%25A3%2f'><i class="fa fa-envelope"></i></a></li></ul></div></aside></div></div></div><div class=row><div class="col-sm-12 col-md-12 col-lg-9 p-4"></div></div></div><button class="p-2 px-3" onclick=topFunction() id=topScroll>
+<i class="fas fa-angle-up"></i></button></section><div class=progress><div id=scroll-progress-bar class=progress-bar role=progressbar aria-valuenow=0 aria-valuemin=0 aria-valuemax=100></div></div><script src=/san-blog/js/scrollProgressBar.js></script><script>var topScroll=document.getElementById("topScroll");window.onscroll=function(){scrollFunction()};function scrollFunction(){document.body.scrollTop>20||document.documentElement.scrollTop>20?topScroll.style.display="block":topScroll.style.display="none"}function topFunction(){document.body.scrollTop=0,document.documentElement.scrollTop=0}let stickySideBarElem=document.getElementById("stickySideBar"),stickyNavBar=!0;if(stickyNavBar){let e=document.getElementById("profileHeader"),t=e.offsetHeight+15;stickySideBarElem.style.top=t+"px"}else stickySideBarElem.style.top="50px"</script><script src=/san-blog/js/readingTime.js></script></div><footer style=background-color:initial><div class="container py-3" id=recent-posts><div class="h3 text-center text-secondary py-3">最近文章</div><div class="row justify-content-center"><div class="col-lg-4 col-md-6 pt-2"><div class="card h-100"><div class="card-body bg-transparent p-3 shadow-sm"><a href=/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-02%E5%8F%97%E6%8E%A7%E8%A1%A8%E5%8D%95dom%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1%E4%B8%8E-hooks/ class="primary-font card-title"><h5 class="card-title bg-transparent" title="React 学习 Day 02：受控表单、DOM、组件通信与 Hooks">React 学习 Day 02：受控表单、DOM、 …</h5></a><div class="card-text secondary-font"><p>延续 Day01，今天一口气覆盖「受控表单、受控 vs 非受控、useRef 获取 DOM、UUID/时间、组件通信、useEffect、自定义 Hook」，并用「请求接口的评论列表」综合案例收口。每个知识点都配项目里的真实案例代码。
+一 …</p></div></div><div class="mt-auto card-footer"><span class=float-start>2026年7月5日</span>
+<a href=/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-02%E5%8F%97%E6%8E%A7%E8%A1%A8%E5%8D%95dom%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1%E4%B8%8E-hooks/ class="float-end btn btn-outline-info btn-sm">阅读</a></div></div></div><div class="col-lg-4 col-md-6 pt-2"><div class="card h-100"><div class="card-body bg-transparent p-3 shadow-sm"><a href=/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/ class="primary-font card-title"><h5 class="card-title bg-transparent" title="React 学习 Day 01：基础入门">React 学习 Day 01：基础入门</h5></a><div class="card-text secondary-font"><p>从零开始，用一个 react-basic 项目串起 React 入门必备知识。
 一、项目搭建 使用 Vite 创建 React 项目：
-npm create vite@latest react-basic -- --template …</p>
-                    </div>
-                </div>
-                <div class="mt-auto card-footer">
-                    <span class="float-start">2026年7月4日</span>
-                    <a href="/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6 pt-2">
-            <div class="card h-100">
-                
-                <div class="card-body bg-transparent p-3 shadow-sm">
-                    <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/" class="primary-font card-title">
-                        <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Redis 协议攻击与 Webshell 写入">CTFHub SSRF 实战：Redis 协议攻击 …</h5>
-                    </a>
-                    <div class="card-text secondary-font">
-                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入 工具：自写 Python 脚本 …</p>
-                    </div>
-                </div>
-                <div class="mt-auto card-footer">
-                    <span class="float-start">2026年6月11日</span>
-                    <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/" class="float-end btn btn-outline-info btn-sm">阅读</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6 pt-2">
-            <div class="card h-100">
-                
-                <div class="card-body bg-transparent p-3 shadow-sm">
-                    <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98fastcgi-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-gopherus-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/" class="primary-font card-title">
-                        <h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：FastCGI 协议攻击与 Gopherus 工具使用">CTFHub SSRF 实战：FastCGI 协议 …</h5>
-                    </a>
-                    <div class="card-text secondary-font">
-                        <p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、FastCGI 协议、Gopher 协议、PHP-FPM 攻击、双重 URL 编码 工具：Gopherus、Burp …</p>
-                    </div>
-                </div>
-                <div class="mt-auto card-footer">
-                    <span class="float-start">2026年6月10日</span>
-                    <a href="/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98fastcgi-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-gopherus-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
-                </div>
-            </div>
-        </div>
-        
-    </div>
-</div>
-
-
-
-    <div class="text-center pt-2">
-    
-    <span class="px-1">
-        <a href="https://Samantha09.github.io/san-blog/" title="东阳的个人站点">
-            <img alt="Footer logo" src="/san-blog/images/avatar.jpg"
-                height="40px" width="40px" style="border-radius: 50%;">
-        </a>
-    </span>
-    
-
-    
-    <span class="px-1">
-        <a href="https://github.com/Samantha09" target="_blank" aria-label="github">
-            <svg xmlns="http://www.w3.org/2000/svg" width="2.7em" height="2.7em" viewBox="0 0 1792 1792">
-                <path id="footer-socialNetworks-github-svg-path"
-                    d="M522 1352q-8 9-20-3-13-11-4-19 8-9 20 3 12 11 4 19zm-42-61q9 12 0 19-8 6-17-7t0-18q9-7 17 6zm-61-60q-5 7-13 2-10-5-7-12 3-5 13-2 10 5 7 12zm31 34q-6 7-16-3-9-11-2-16 6-6 16 3 9 11 2 16zm129 112q-4 12-19 6-17-4-13-15t19-7q16 5 13 16zm63 5q0 11-16 11-17 2-17-11 0-11 16-11 17-2 17 11zm58-10q2 10-14 14t-18-8 14-15q16-2 18 9zm964-956v960q0 119-84.5 203.5t-203.5 84.5h-224q-16 0-24.5-1t-19.5-5-16-14.5-5-27.5v-239q0-97-52-142 57-6 102.5-18t94-39 81-66.5 53-105 20.5-150.5q0-121-79-206 37-91-8-204-28-9-81 11t-92 44l-38 24q-93-26-192-26t-192 26q-16-11-42.5-27t-83.5-38.5-86-13.5q-44 113-7 204-79 85-79 206 0 85 20.5 150t52.5 105 80.5 67 94 39 102.5 18q-40 36-49 103-21 10-45 15t-57 5-65.5-21.5-55.5-62.5q-19-32-48.5-52t-49.5-24l-20-3q-21 0-29 4.5t-5 11.5 9 14 13 12l7 5q22 10 43.5 38t31.5 51l10 23q13 38 44 61.5t67 30 69.5 7 55.5-3.5l23-4q0 38 .5 103t.5 68q0 22-11 33.5t-22 13-33 1.5h-224q-119 0-203.5-84.5t-84.5-203.5v-960q0-119 84.5-203.5t203.5-84.5h960q119 0 203.5 84.5t84.5 203.5z" />
-
-                <metadata>
-                    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dc="http://purl.org/dc/elements/1.1/">
-                        <rdf:Description about="https://iconscout.com/legal#licenses"
-                            dc:title="Github, Online, Project, Hosting, Square"
-                            dc:description="Github, Online, Project, Hosting, Square" dc:publisher="Iconscout"
-                            dc:date="2016-12-14" dc:format="image/svg+xml" dc:language="en">
-                            <dc:creator>
-                                <rdf:Bag>
-                                    <rdf:li>Font Awesome</rdf:li>
-                                </rdf:Bag>
-                            </dc:creator>
-                        </rdf:Description>
-                    </rdf:RDF>
-                </metadata>
-            </svg>
-        </a>
-    </span>
-    
-
-    
-
-    
-
-    
-
-    
-</div>
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-4 text-center">
-            &copy; 2026  保留所有权利
-            <div class="text-secondary">
-                Made with
-                <span class="text-danger">
-                    &#10084;
-                </span>
-                and
-                <a href="https://github.com/gurusabarish/hugo-profile" target="_blank"
-                    title="Designed and developed by gurusabarish">
-                    Hugo Profile
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-</footer>
-<script src="/san-blog/bootstrap-5/js/bootstrap.bundle.min.js"></script>
-<script>
-    if (document.body.className.includes("dark")) {
-        document.body.classList.remove('dark');
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem("pref-theme", 'light');
-    }
-</script>
-
-
-<script>
-    document.getElementById("theme-toggle").addEventListener("click", () => {
-        if (document.body.className.includes("dark")) {
-            document.body.classList.remove('dark');
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem("pref-theme", 'light');
-        } else {
-            document.body.classList.add('dark');
-            document.documentElement.classList.add('dark');
-            localStorage.setItem("pref-theme", 'dark');
-        }
-    })
-
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-
-</script>
-
-
-    <script>
-      
-      window.searchIndexURL = "/san-blog/index.json";
-    </script>
-    <script src="/san-blog/js/search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-  <section id="search-content" class="py-2">
-    <div class="container" id="search-results"></div>
-  </section>
-</body>
-
-</html>
+1npm create vite@latest react-basic -- --template …</p></div></div><div class="mt-auto card-footer"><span class=float-start>2026年7月4日</span>
+<a href=/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/ class="float-end btn btn-outline-info btn-sm">阅读</a></div></div></div><div class="col-lg-4 col-md-6 pt-2"><div class="card h-100"><div class="card-body bg-transparent p-3 shadow-sm"><a href=/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/ class="primary-font card-title"><h5 class="card-title bg-transparent" title="CTFHub SSRF 实战：Redis 协议攻击与 Webshell 写入">CTFHub SSRF 实战：Redis 协议攻击 …</h5></a><div class="card-text secondary-font"><p>一、题目信息 平台：CTFHub 分类：Skill / Web / SSRF 考点：SSRF（服务器端请求伪造）、Redis 协议、Gopher 协议、Redis 持久化漏洞、Webshell 写入 工具：自写 Python 脚本 …</p></div></div><div class="mt-auto card-footer"><span class=float-start>2026年6月11日</span>
+<a href=/san-blog/posts/ctfhub-ssrf-%E5%AE%9E%E6%88%98redis-%E5%8D%8F%E8%AE%AE%E6%94%BB%E5%87%BB%E4%B8%8E-webshell-%E5%86%99%E5%85%A5/ class="float-end btn btn-outline-info btn-sm">阅读</a></div></div></div></div></div><div class="text-center pt-2"><span class=px-1><a href=https://Samantha09.github.io/san-blog/ title=东阳的个人站点><img alt="Footer logo" src=/san-blog/images/avatar.jpg height=40px width=40px style=border-radius:50%>
+</a></span><span class=px-1><a href=https://github.com/Samantha09 target=_blank aria-label=github><svg width="2.7em" height="2.7em" viewBox="0 0 1792 1792"><path id="footer-socialNetworks-github-svg-path" d="M522 1352q-8 9-20-3-13-11-4-19 8-9 20 3 12 11 4 19zm-42-61q9 12 0 19-8 6-17-7t0-18q9-7 17 6zm-61-60q-5 7-13 2-10-5-7-12 3-5 13-2 10 5 7 12zm31 34q-6 7-16-3-9-11-2-16 6-6 16 3 9 11 2 16zm129 112q-4 12-19 6-17-4-13-15t19-7q16 5 13 16zm63 5q0 11-16 11-17 2-17-11 0-11 16-11 17-2 17 11zm58-10q2 10-14 14t-18-8 14-15q16-2 18 9zm964-956v960q0 119-84.5 203.5T1376 1664h-224q-16 0-24.5-1t-19.5-5-16-14.5-5-27.5v-239q0-97-52-142 57-6 102.5-18t94-39 81-66.5 53-105T1386 856q0-121-79-206 37-91-8-204-28-9-81 11t-92 44l-38 24q-93-26-192-26t-192 26q-16-11-42.5-27T578 459.5 492 446q-44 113-7 204-79 85-79 206 0 85 20.5 150t52.5 105 80.5 67 94 39 102.5 18q-40 36-49 103-21 10-45 15t-57 5-65.5-21.5T484 1274q-19-32-48.5-52t-49.5-24l-20-3q-21 0-29 4.5t-5 11.5 9 14 13 12l7 5q22 10 43.5 38t31.5 51l10 23q13 38 44 61.5t67 30 69.5 7 55.5-3.5l23-4q0 38 .5 103t.5 68q0 22-11 33.5t-22 13-33 1.5H416q-119 0-203.5-84.5T128 1376V416q0-119 84.5-203.5T416 128h960q119 0 203.5 84.5T1664 416z"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 保留所有权利<div class=text-secondary>Made with
+<span class=text-danger>&#10084;
+</span>and
+<a href=https://github.com/gurusabarish/hugo-profile target=_blank title="Designed and developed by gurusabarish">Hugo Profile</a></div></div></div></div></footer><script src=/san-blog/bootstrap-5/js/bootstrap.bundle.min.js></script><script>document.body.className.includes("dark")&&(document.body.classList.remove("dark"),document.documentElement.classList.remove("dark"),localStorage.setItem("pref-theme","light"))</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),document.documentElement.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),document.documentElement.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script>window.searchIndexURL="/san-blog/index.json"</script><script src=/san-blog/js/search.js></script><section id=search-content class=py-2><div class=container id=search-results></div></section></body></html>

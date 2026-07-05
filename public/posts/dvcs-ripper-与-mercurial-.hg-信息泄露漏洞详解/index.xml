@@ -1,17 +1,1 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-	<channel>
-		<title>dvcs-ripper 与 Mercurial (.hg) 信息泄露漏洞详解 on 东阳的个人站点</title>
-		<link>https://Samantha09.github.io/san-blog/posts/dvcs-ripper-%E4%B8%8E-mercurial-.hg-%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2%E6%BC%8F%E6%B4%9E%E8%AF%A6%E8%A7%A3/</link>
-		<description>Recent content in dvcs-ripper 与 Mercurial (.hg) 信息泄露漏洞详解 on 东阳的个人站点</description>
-		<generator>Hugo</generator>
-		<language>zh-cn</language>
-		
-		
-		
-		
-			<lastBuildDate></lastBuildDate>
-		
-			<atom:link href="https://Samantha09.github.io/san-blog/posts/dvcs-ripper-%E4%B8%8E-mercurial-.hg-%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2%E6%BC%8F%E6%B4%9E%E8%AF%A6%E8%A7%A3/index.xml" rel="self" type="application/rss+xml" />
-	</channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>dvcs-ripper 与 Mercurial (.hg) 信息泄露漏洞详解 on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/posts/dvcs-ripper-%E4%B8%8E-mercurial-.hg-%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2%E6%BC%8F%E6%B4%9E%E8%AF%A6%E8%A7%A3/</link><description>Recent content in dvcs-ripper 与 Mercurial (.hg) 信息泄露漏洞详解 on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate/><atom:link href="https://Samantha09.github.io/san-blog/posts/dvcs-ripper-%E4%B8%8E-mercurial-.hg-%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2%E6%BC%8F%E6%B4%9E%E8%AF%A6%E8%A7%A3/index.xml" rel="self" type="application/rss+xml"/></channel></rss>

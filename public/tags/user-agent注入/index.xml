@@ -1,24 +1,23 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-	<channel>
-		<title>User-Agent注入 on 东阳的个人站点</title>
-		<link>https://Samantha09.github.io/san-blog/tags/user-agent%E6%B3%A8%E5%85%A5/</link>
-		<description>Recent content in User-Agent注入 on 东阳的个人站点</description>
-		<generator>Hugo</generator>
-		<language>zh-cn</language>
-		
-		
-		
-		
-			<lastBuildDate>Wed, 03 Jun 2026 22:30:00 +0800</lastBuildDate>
-		
-			<atom:link href="https://Samantha09.github.io/san-blog/tags/user-agent%E6%B3%A8%E5%85%A5/index.xml" rel="self" type="application/rss+xml" />
-			<item>
-				<title>HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御</title>
-				<link>https://Samantha09.github.io/san-blog/posts/http-header-sql-%E6%B3%A8%E5%85%A5%E5%85%A8%E6%99%AFcookieuser-agent-%E4%B8%8E-referer-%E7%9A%84%E6%94%BB%E5%87%BB%E9%9D%A2%E4%B8%8E%E9%98%B2%E5%BE%A1/</link>
-				<pubDate>Wed, 03 Jun 2026 22:30:00 +0800</pubDate>
-				<guid>https://Samantha09.github.io/san-blog/posts/http-header-sql-%E6%B3%A8%E5%85%A5%E5%85%A8%E6%99%AFcookieuser-agent-%E4%B8%8E-referer-%E7%9A%84%E6%94%BB%E5%87%BB%E9%9D%A2%E4%B8%8E%E9%98%B2%E5%BE%A1/</guid>
-				<description>&lt;h2 id=&#34;一什么是-http-header-sql-注入&#34;&gt;一、什么是 HTTP Header SQL 注入&lt;/h2&gt;&#xA;&lt;p&gt;HTTP Header SQL 注入是指攻击者将 SQL 注入 payload 植入 HTTP 请求头部的各类字段中（如 Cookie、User-Agent、Referer 等），当服务端&lt;strong&gt;直接将这些头部值拼接到 SQL 语句&lt;/strong&gt;时触发的注入漏洞。&lt;/p&gt;&#xA;&lt;p&gt;与 GET/POST 注入不同，Header 注入的触发逻辑往往不在主业务流程中，而是隐藏在&lt;strong&gt;日志记录、统计分析、会话管理、来源追踪&lt;/strong&gt;等周边功能里。它们共享同一个核心特征：&lt;strong&gt;开发者通常不会怀疑这些「元信息」头部会成为攻击入口&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;二为什么-header-注入容易被忽视&#34;&gt;二、为什么 Header 注入容易被忽视&lt;/h2&gt;&#xA;&lt;h3 id=&#34;21-认知盲区&#34;&gt;2.1 认知盲区&lt;/h3&gt;&#xA;&lt;p&gt;安全测试的注意力通常集中在：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;URL 的 GET 参数 (&lt;code&gt;?id=1&lt;/code&gt;)&lt;/li&gt;&#xA;&lt;li&gt;表单提交的 POST 数据&lt;/li&gt;&#xA;&lt;li&gt;JSON/XML API 请求体&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;而 HTTP Header 被视为「请求元数据」，很少被怀疑会携带恶意数据。&lt;/p&gt;&#xA;&lt;h3 id=&#34;22-waf-绕过优势&#34;&gt;2.2 WAF 绕过优势&lt;/h3&gt;&#xA;&lt;p&gt;许多 WAF 重点监控 URL 查询字符串和 POST Body，但对 &lt;strong&gt;Cookie、User-Agent、Referer 等头部的检测往往较弱&lt;/strong&gt;。同样的 payload，放在 URL 里会被拦截，放在 Header 里可能畅通无阻。&lt;/p&gt;&#xA;&lt;h3 id=&#34;23-业务场景驱动&#34;&gt;2.3 业务场景驱动&lt;/h3&gt;&#xA;&lt;p&gt;有些架构天然依赖 Header 传参：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Cookie 存储用户偏好、分页状态&lt;/li&gt;&#xA;&lt;li&gt;User-Agent 用于设备识别与内容适配&lt;/li&gt;&#xA;&lt;li&gt;Referer 用于来源统计与反盗链&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;这些场景下，服务端往往会直接读取 Header 值并用于数据库查询。&lt;/p&gt;</description>
-			</item>
-	</channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>User-Agent注入 on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/tags/user-agent%E6%B3%A8%E5%85%A5/</link><description>Recent content in User-Agent注入 on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 03 Jun 2026 22:30:00 +0800</lastBuildDate><atom:link href="https://Samantha09.github.io/san-blog/tags/user-agent%E6%B3%A8%E5%85%A5/index.xml" rel="self" type="application/rss+xml"/><item><title>HTTP Header SQL 注入全景：Cookie、User-Agent 与 Referer 的攻击面与防御</title><link>https://Samantha09.github.io/san-blog/posts/http-header-sql-%E6%B3%A8%E5%85%A5%E5%85%A8%E6%99%AFcookieuser-agent-%E4%B8%8E-referer-%E7%9A%84%E6%94%BB%E5%87%BB%E9%9D%A2%E4%B8%8E%E9%98%B2%E5%BE%A1/</link><pubDate>Wed, 03 Jun 2026 22:30:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/http-header-sql-%E6%B3%A8%E5%85%A5%E5%85%A8%E6%99%AFcookieuser-agent-%E4%B8%8E-referer-%E7%9A%84%E6%94%BB%E5%87%BB%E9%9D%A2%E4%B8%8E%E9%98%B2%E5%BE%A1/</guid><description>&lt;h2 id="一什么是-http-header-sql-注入"&gt;一、什么是 HTTP Header SQL 注入&lt;/h2&gt;
+&lt;p&gt;HTTP Header SQL 注入是指攻击者将 SQL 注入 payload 植入 HTTP 请求头部的各类字段中（如 Cookie、User-Agent、Referer 等），当服务端&lt;strong&gt;直接将这些头部值拼接到 SQL 语句&lt;/strong&gt;时触发的注入漏洞。&lt;/p&gt;
+&lt;p&gt;与 GET/POST 注入不同，Header 注入的触发逻辑往往不在主业务流程中，而是隐藏在&lt;strong&gt;日志记录、统计分析、会话管理、来源追踪&lt;/strong&gt;等周边功能里。它们共享同一个核心特征：&lt;strong&gt;开发者通常不会怀疑这些「元信息」头部会成为攻击入口&lt;/strong&gt;。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="二为什么-header-注入容易被忽视"&gt;二、为什么 Header 注入容易被忽视&lt;/h2&gt;
+&lt;h3 id="21-认知盲区"&gt;2.1 认知盲区&lt;/h3&gt;
+&lt;p&gt;安全测试的注意力通常集中在：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;URL 的 GET 参数 (&lt;code&gt;?id=1&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;表单提交的 POST 数据&lt;/li&gt;
+&lt;li&gt;JSON/XML API 请求体&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;而 HTTP Header 被视为「请求元数据」，很少被怀疑会携带恶意数据。&lt;/p&gt;
+&lt;h3 id="22-waf-绕过优势"&gt;2.2 WAF 绕过优势&lt;/h3&gt;
+&lt;p&gt;许多 WAF 重点监控 URL 查询字符串和 POST Body，但对 &lt;strong&gt;Cookie、User-Agent、Referer 等头部的检测往往较弱&lt;/strong&gt;。同样的 payload，放在 URL 里会被拦截，放在 Header 里可能畅通无阻。&lt;/p&gt;
+&lt;h3 id="23-业务场景驱动"&gt;2.3 业务场景驱动&lt;/h3&gt;
+&lt;p&gt;有些架构天然依赖 Header 传参：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Cookie 存储用户偏好、分页状态&lt;/li&gt;
+&lt;li&gt;User-Agent 用于设备识别与内容适配&lt;/li&gt;
+&lt;li&gt;Referer 用于来源统计与反盗链&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这些场景下，服务端往往会直接读取 Header 值并用于数据库查询。&lt;/p&gt;</description></item></channel></rss>
