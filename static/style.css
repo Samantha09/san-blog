@@ -41,6 +41,15 @@ footer .text-center.pt-2,
   justify-content: center;
 }
 
+/* 统一作品集卡片图片尺寸 */
+#projects .card-img-top,
+#projects .project-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
 /* 代码块可读性优化：深色高对比背景 + 等宽字体 */
 /* 使用 Monokai 背景色，在浅色主题下也能清晰区分代码块与正文 */
 #single .page-content pre {
