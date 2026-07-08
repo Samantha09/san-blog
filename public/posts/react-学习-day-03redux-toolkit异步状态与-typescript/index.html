@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta http-equiv="Accept-CH" content="DPR, Viewport-Width, Width">
+<link rel="icon" href="/images/avatar.jpg" type="image/gif">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+>
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      media="print" onload="this.media='all'" />
+<noscript>
+  <link
+          href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+          rel="stylesheet">
+</noscript>
+
+
+<link rel="stylesheet" href="/css/font.css" media="all">
+
+
+
+<meta property="og:url" content="http://localhost:1313/posts/react-%E5%AD%A6%E4%B9%A0-day-03redux-toolkit%E5%BC%82%E6%AD%A5%E7%8A%B6%E6%80%81%E4%B8%8E-typescript/">
+	<meta property="og:site_name" content="东阳的个人站点">
+	<meta property="og:title" content="React 学习 Day 03:Redux Toolkit、异步状态与 TypeScript">
+	<meta property="og:description" content="延续 Day01/Day02（react-basic 项目），今天进入 react-redux 项目，学三块：① 全局状态管理 Redux Toolkit；② 异步数据流 createAsyncThunk &#43; axios；③ 把项目 TypeScript 化。综合案例：用 RTK &#43; axios &#43; TS 重写「评论列表」，并与 Day02 的 useComments 版本对比。代码位于 react-redux 项目。
+一、为什么需要 Redux Day02 学过的状态管理方式，覆盖了大多数场景：
+方式 适用 props（父→子） 父把数据传给子 回调（子→父） 子把数据传回父 状态提升（兄弟） 兄弟组件共享，提到共同父 Context（跨层级） 跨多层传值，省去层层转发 但当应用变大，这些方式会力不从心：
+props 钻取：状态提升到很高层级后，中间组件被迫一层层转发它根本不关心的 props。 Context 的局限：适合「低频变化的全局值」（主题、用户信息），不适合「高频更新、多处共享的复杂状态」（评论列表、购物车）——Context 值一变，所有消费组件全量重渲染，难做精细优化。 Redux 的思路：把共享状态从「组件内部」搬到「组件外部的一个仓库（store）」，任何组件直接读写，不用层层传递。
+心智模型：组件只是仓库的「读写者」，仓库是唯一数据源。
+二、Redux 核心概念 单向数据流：
+1UI 事件 → dispatch(action) → reducer(state, action) → 新 state → UI 更新 概念 是什么 例子 store 仓库，存全局 state configureStore({...}) state 仓库里的当前数据 { counter: {value:0}, comments:{...} } action 描述「发生了什么」的对象 { type: &#39;counter/incremented&#39; } reducer 纯函数 (state, action) =&gt; newState 根据 action 算新 state dispatch 派发 action 触发更新 dispatch(incremented()) 三个原则：">
+	<meta property="og:locale" content="zh_cn">
+	<meta property="og:type" content="article">
+		<meta property="article:section" content="blogs">
+		<meta property="article:published_time" content="2026-07-08T12:00:00+08:00">
+		<meta property="article:modified_time" content="2026-07-08T12:00:00+08:00">
+		<meta property="article:tag" content="React">
+		<meta property="article:tag" content="前端">
+		<meta property="article:tag" content="学习笔记">
+		<meta property="article:tag" content="Redux">
+		<meta property="article:tag" content="Redux Toolkit">
+		<meta property="article:tag" content="TypeScript">
+
+
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:title" content="React 学习 Day 03:Redux Toolkit、异步状态与 TypeScript">
+	<meta name="twitter:description" content="延续 Day01/Day02（react-basic 项目），今天进入 react-redux 项目，学三块：① 全局状态管理 Redux Toolkit；② 异步数据流 createAsyncThunk &#43; axios；③ 把项目 TypeScript 化。综合案例：用 RTK &#43; axios &#43; TS 重写「评论列表」，并与 Day02 的 useComments 版本对比。代码位于 react-redux 项目。
+一、为什么需要 Redux Day02 学过的状态管理方式，覆盖了大多数场景：
+方式 适用 props（父→子） 父把数据传给子 回调（子→父） 子把数据传回父 状态提升（兄弟） 兄弟组件共享，提到共同父 Context（跨层级） 跨多层传值，省去层层转发 但当应用变大，这些方式会力不从心：
+props 钻取：状态提升到很高层级后，中间组件被迫一层层转发它根本不关心的 props。 Context 的局限：适合「低频变化的全局值」（主题、用户信息），不适合「高频更新、多处共享的复杂状态」（评论列表、购物车）——Context 值一变，所有消费组件全量重渲染，难做精细优化。 Redux 的思路：把共享状态从「组件内部」搬到「组件外部的一个仓库（store）」，任何组件直接读写，不用层层传递。
+心智模型：组件只是仓库的「读写者」，仓库是唯一数据源。
+二、Redux 核心概念 单向数据流：
+1UI 事件 → dispatch(action) → reducer(state, action) → 新 state → UI 更新 概念 是什么 例子 store 仓库，存全局 state configureStore({...}) state 仓库里的当前数据 { counter: {value:0}, comments:{...} } action 描述「发生了什么」的对象 { type: &#39;counter/incremented&#39; } reducer 纯函数 (state, action) =&gt; newState 根据 action 算新 state dispatch 派发 action 触发更新 dispatch(incremented()) 三个原则：">
+
+
+
+
+
+<link rel="stylesheet" href="/bootstrap-5/css/bootstrap.min.css" media="all"><link rel="stylesheet" href="/css/header.css" media="all">
+<link rel="stylesheet" href="/css/language-switcher.css" media="all">
+<link rel="stylesheet" href="/css/footer.css" media="all">
+
+
+<link rel="stylesheet" href="/css/theme.css" media="all">
+
+<style>
+    :root {
+        --text-color: #1f1f1f;
+        --text-secondary-color: #4a4a4a;
+        --text-link-color: #7a6aa8;
+        --background-color: #f7f5f2;
+        --secondary-background-color: #efece7;
+        --primary-color: #7a6aa8;
+        --secondary-color: #ffffff;
+
+         
+        --text-color-dark: #e4e6eb;
+        --text-secondary-color-dark: #b0b3b8;
+        --text-link-color-dark: #c4b8e6;
+        --background-color-dark: #1a1917;
+        --secondary-background-color-dark: #252422;
+        --primary-color-dark: #c4b8e6;
+        --secondary-color-dark: #2d2c2a;
+    }
+    body {
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.6;
+        text-align: left;
+    }
+
+    html {
+        background-color: var(--background-color) !important;
+    }
+
+    body::-webkit-scrollbar {
+        height: 0px;
+        width: 8px;
+        background-color: var(--background-color);
+    }
+
+    ::-webkit-scrollbar-track {
+        border-radius: 1rem;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 1rem;
+        background: #b0b0b0;
+        outline: 1px solid var(--background-color);
+    }
+
+    #search-content::-webkit-scrollbar {
+        width: .5em;
+        height: .1em;
+        background-color: var(--background-color);
+    }
+</style>
+
+
+
+<meta name="description" content="">
+<link rel="stylesheet" href="/css/single.css">
+
+
+<script defer src="/fontawesome-6/all-6.4.2.js"></script>
+
+
+  
+  
+    <link rel="stylesheet" href="/style.css">
+  
+
+  <title>
+React 学习 Day 03:Redux Toolkit、异步状态与 TypeScript | 东阳的个人站点
+
+  </title>
+</head>
+
+<body class="light">
+  
+  
+<script>
+    let localStorageValue = localStorage.getItem("pref-theme");
+
+    switch (localStorageValue) {
+        case "dark":
+            document.documentElement.classList.add('dark');
+            document.body.classList.add('dark');
+            break;
+        case "light":
+            document.body.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
+            break;
+        default:
+            
+            document.body.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
+            break;
+    }
+</script>
+
+
+
+
+<script>
+    var prevScrollPos = window.pageYOffset;
+    window.addEventListener("scroll", function showHeaderOnScroll() {
+        let profileHeaderElem = document.getElementById("profileHeader");
+        let currentScrollPos = window.pageYOffset;
+        let resetHeaderStyle = false;
+        let showNavBarOnScrollUp =  true ;
+        let showNavBar = showNavBarOnScrollUp ? prevScrollPos > currentScrollPos : currentScrollPos > 0;
+        if (showNavBar) {
+            profileHeaderElem.classList.add("showHeaderOnTop");
+        } else {
+            resetHeaderStyle = true;
+        }
+        if(currentScrollPos === 0) {
+            resetHeaderStyle = true;
+        }
+        if(resetHeaderStyle) {
+            profileHeaderElem.classList.remove("showHeaderOnTop");
+        }
+        prevScrollPos = currentScrollPos;
+    });
+</script>
+
+
+
+<header id="profileHeader">
+    <nav class="pt-3 navbar navbar-expand-lg animate">
+        <div class="container-fluid mx-xs-2 mx-sm-5 mx-md-5 mx-lg-5">
+            
+            <a class="navbar-brand primary-font text-wrap" href="/">
+                
+                <img src="/images/avatar.jpg" width="30" height="30"
+                    class="d-inline-block align-top">
+                东阳
+                
+            </a>
+
+            
+                <div>
+                    <input id="search" autocomplete="off" class="form-control mr-sm-2 d-none d-md-block" placeholder=''
+                        aria-label="Search" oninput="searchOnChange(event)">
+                </div>
+            
+
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <svg aria-hidden="true" height="24" viewBox="0 0 16 16" version="1.1" width="24" data-view-component="true">
+                    <path fill-rule="evenodd" d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z"></path>
+                </svg>
+            </button>
+
+            
+            <div class="collapse navbar-collapse text-wrap primary-font" id="navbarContent">
+                <ul class="navbar-nav ms-auto text-center">
+                    
+                        <li class="nav-item navbar-text d-block d-md-none">
+                            <div class="nav-link">
+                                <input id="search" autocomplete="off" class="form-control mr-sm-2" placeholder='' aria-label="Search" oninput="searchOnChange(event)">
+                            </div>
+                        </li>
+                    
+
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/#about" aria-label="about">
+                            关于我
+                        </a>
+                    </li>
+                    
+
+                    
+
+                    
+
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/#projects"
+                            aria-label="projects">
+                            作品集
+                        </a>
+                    </li>
+                    
+
+                    
+
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/#contact"
+                            aria-label="contact">
+                            联系我
+                        </a>
+                    </li>
+                    
+
+                    
+
+                    
+                    
+                    
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/blogs" title="技术博客">
+                            
+                            博客
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/archives" title="文章归档">
+                            
+                            归档
+                        </a>
+                    </li>
+                    
+                    
+
+                    <li class="nav-item navbar-text">
+                        
+                        <div class="text-center">
+                            <button id="theme-toggle" type="button" aria-label="Toggle dark mode">
+                                <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                </svg>
+                                <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="5"></circle>
+                                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </li>
+                    
+
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+</header>
+<div id="content">
+<section id="single">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-sm-12 col-md-12 col-lg-9">
+        <div class="pr-lg-4">
+          <div class="title mb-5">
+            <h1 class="text-center mb-4">React 学习 Day 03:Redux Toolkit、异步状态与 TypeScript</h1>
+            <div class="text-center">
+              
+              Jul 8, 2026
+
+              
+              <span id="readingTime">
+                分钟阅读
+              </span>
+              
+            </div>
+          </div>
+          
+          <article class="page-content  p-2">
+          <blockquote>
+<p>延续 Day01/Day02（<code>react-basic</code> 项目），今天进入 <code>react-redux</code> 项目，学三块：① 全局状态管理 <strong>Redux Toolkit</strong>；② 异步数据流 <strong>createAsyncThunk + axios</strong>；③ 把项目 <strong>TypeScript 化</strong>。综合案例：用 RTK + axios + TS 重写「评论列表」，并与 Day02 的 <code>useComments</code> 版本对比。代码位于 <code>react-redux</code> 项目。</p>
+</blockquote>
+<hr>
+<h2 id="一为什么需要-redux">一、为什么需要 Redux</h2>
+<p>Day02 学过的状态管理方式，覆盖了大多数场景：</p>
+<table>
+	<thead>
+			<tr>
+					<th>方式</th>
+					<th>适用</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>props（父→子）</td>
+					<td>父把数据传给子</td>
+			</tr>
+			<tr>
+					<td>回调（子→父）</td>
+					<td>子把数据传回父</td>
+			</tr>
+			<tr>
+					<td>状态提升（兄弟）</td>
+					<td>兄弟组件共享，提到共同父</td>
+			</tr>
+			<tr>
+					<td>Context（跨层级）</td>
+					<td>跨多层传值，省去层层转发</td>
+			</tr>
+	</tbody>
+</table>
+<p>但当应用变大，这些方式会力不从心：</p>
+<ol>
+<li><strong>props 钻取</strong>：状态提升到很高层级后，中间组件被迫一层层转发它根本不关心的 props。</li>
+<li><strong>Context 的局限</strong>：适合「低频变化的全局值」（主题、用户信息），不适合「高频更新、多处共享的复杂状态」（评论列表、购物车）——Context 值一变，所有消费组件全量重渲染，难做精细优化。</li>
+</ol>
+<p><strong>Redux 的思路</strong>：把共享状态从「组件内部」搬到「组件外部的一个仓库（store）」，任何组件直接读写，不用层层传递。</p>
+<blockquote>
+<p>心智模型：组件只是仓库的「读写者」，仓库是唯一数据源。</p>
+</blockquote>
+<hr>
+<h2 id="二redux-核心概念">二、Redux 核心概念</h2>
+<p><strong>单向数据流</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>UI 事件  →  dispatch(action)  →  reducer(state, action)  →  新 state  →  UI 更新
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>概念</th>
+					<th>是什么</th>
+					<th>例子</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><strong>store</strong></td>
+					<td>仓库，存全局 state</td>
+					<td><code>configureStore({...})</code></td>
+			</tr>
+			<tr>
+					<td><strong>state</strong></td>
+					<td>仓库里的当前数据</td>
+					<td><code>{ counter: {value:0}, comments:{...} }</code></td>
+			</tr>
+			<tr>
+					<td><strong>action</strong></td>
+					<td>描述「发生了什么」的对象</td>
+					<td><code>{ type: 'counter/incremented' }</code></td>
+			</tr>
+			<tr>
+					<td><strong>reducer</strong></td>
+					<td>纯函数 <code>(state, action) =&gt; newState</code></td>
+					<td>根据 action 算新 state</td>
+			</tr>
+			<tr>
+					<td><strong>dispatch</strong></td>
+					<td>派发 action 触发更新</td>
+					<td><code>dispatch(incremented())</code></td>
+			</tr>
+	</tbody>
+</table>
+<p><strong>三个原则</strong>：</p>
+<ol>
+<li><strong>单一数据源</strong>：整个应用只有一个 store、一棵 state 树。</li>
+<li><strong>state 只读</strong>：唯一改变 state 的方式是 dispatch action。</li>
+<li><strong>纯函数改变</strong>：reducer 必须是纯函数（同样输入同样输出，无副作用）。</li>
+</ol>
+<hr>
+<h2 id="三redux-toolkitrtk">三、Redux Toolkit（RTK）</h2>
+<p>原生 Redux 样板代码多（action type 常量、action creator、reducer 要分开写还要手写不可变更新）。<strong>RTK 是官方推荐的高层封装</strong>，大幅减少样板。</p>
+<h3 id="31-configurestore--创建仓库">3.1 configureStore —— 创建仓库</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#75715e">// src/store/index.ts
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">configureStore</span> } <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#39;@reduxjs/toolkit&#39;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">counterReducer</span> <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#39;./counterSlice&#39;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">commentsReducer</span> <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#39;./commentsSlice&#39;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">store</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">configureStore</span>({
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>  <span style="color:#a6e22e">reducer</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>    <span style="color:#a6e22e">counter</span>: <span style="color:#66d9ef">counterReducer</span>,    <span style="color:#75715e">// → state.counter 由它管
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>    <span style="color:#a6e22e">comments</span>: <span style="color:#66d9ef">commentsReducer</span>,  <span style="color:#75715e">// → state.comments 由它管
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>  },
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>})
+</span></span></code></pre></div><p><code>reducer</code> 配置对象的 <strong>key 就是 state 树的分支名</strong>。<code>state.counter</code>、<code>state.comments</code> 由此而来——这也是为什么组件里写 <code>useSelector((state) =&gt; state.comments)</code>。</p>
+<h3 id="32-createslice--切片">3.2 createSlice —— 切片</h3>
+<p>一个 slice 管 state 树的一块分支，包含：名字、初始状态、同步 reducers。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-js" data-lang="js"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#75715e">// src/store/counterSlice.js
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">createSlice</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;@reduxjs/toolkit&#39;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">initialState</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">value</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span> }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">counterSlice</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">createSlice</span>({
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>  <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;counter&#39;</span>,
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>  <span style="color:#a6e22e">initialState</span>,
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>  <span style="color:#a6e22e">reducers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>    <span style="color:#a6e22e">incremented</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">state</span>) =&gt; { <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span> },        <span style="color:#75715e">// 看似直接改，实则 Immer 代理
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>    <span style="color:#a6e22e">decremented</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">state</span>) =&gt; { <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">-=</span> <span style="color:#ae81ff">1</span> },
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>    <span style="color:#a6e22e">reset</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">state</span>) =&gt; { <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> },
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>    <span style="color:#a6e22e">incrementedByAmount</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">state</span>, <span style="color:#a6e22e">action</span>) =&gt; { <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">action</span>.<span style="color:#a6e22e">payload</span> },
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>  },
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>})
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">incremented</span>, <span style="color:#a6e22e">decremented</span>, <span style="color:#a6e22e">reset</span>, <span style="color:#a6e22e">incrementedByAmount</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">counterSlice</span>.<span style="color:#a6e22e">actions</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">default</span> <span style="color:#a6e22e">counterSlice</span>.<span style="color:#a6e22e">reducer</span>
+</span></span></code></pre></div><p>几个关键点：</p>
+<ul>
+<li><code>reducers</code> 里的写法像「直接修改 state」(<code>state.value += 1</code>)，但 RTK 内部用 <strong>Immer</strong>，实际产出的是不可变更新。所以<strong>不用手写 <code>...state</code> 展开</strong>。</li>
+<li><code>counterSlice.actions</code> 自动生成 action creator：<code>incremented()</code> 返回 <code>{ type: 'counter/incremented' }</code>。</li>
+<li>action type 自动拼成 <code>name/reducer名</code>（<code>counter/incremented</code>），不用手写 type 常量。</li>
+</ul>
+<hr>
+<h2 id="四react-redux连接-react-和-redux">四、React-Redux：连接 React 和 Redux</h2>
+<p>Redux 是独立的状态库，要和 React 连起来用 <code>react-redux</code>。</p>
+<h3 id="41-provider--注入仓库">4.1 Provider —— 注入仓库</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#75715e">// src/main.jsx
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">Provider</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;react-redux&#39;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">store</span> <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;./store&#39;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span><span style="color:#a6e22e">createRoot</span>(document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#39;root&#39;</span>)).<span style="color:#a6e22e">render</span>(
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>  &lt;<span style="color:#f92672">StrictMode</span>&gt;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>    &lt;<span style="color:#f92672">Provider</span> <span style="color:#a6e22e">store</span><span style="color:#f92672">=</span>{<span style="color:#a6e22e">store</span>}&gt;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>      &lt;<span style="color:#f92672">App</span> /&gt;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>    &lt;/<span style="color:#f92672">Provider</span>&gt;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>  &lt;/<span style="color:#f92672">StrictMode</span>&gt;,
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>)
+</span></span></code></pre></div><p><code>Provider</code> 把 store 放进 React 上下文，它内部的所有组件都能访问同一个 store。</p>
+<h3 id="42-useselector--usedispatch--读写仓库">4.2 useSelector / useDispatch —— 读写仓库</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#75715e">// src/App.jsx
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">useSelector</span>, <span style="color:#a6e22e">useDispatch</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;react-redux&#39;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">incremented</span>, <span style="color:#a6e22e">decremented</span>, <span style="color:#a6e22e">reset</span>, <span style="color:#a6e22e">incrementedByAmount</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;./store/counterSlice&#39;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">App</span>() {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">count</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">useSelector</span>((<span style="color:#a6e22e">state</span>) =&gt; <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">counter</span>.<span style="color:#a6e22e">value</span>)  <span style="color:#75715e">// 读
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dispatch</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">useDispatch</span>()                              <span style="color:#75715e">// 拿派发器
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>  <span style="color:#66d9ef">return</span> (
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>    &lt;&gt;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>      &lt;<span style="color:#f92672">button</span> <span style="color:#a6e22e">onClick</span><span style="color:#f92672">=</span>{() =&gt; <span style="color:#a6e22e">dispatch</span>(<span style="color:#a6e22e">decremented</span>())}&gt;<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>&lt;/<span style="color:#f92672">button</span>&gt;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>      &lt;<span style="color:#f92672">span</span>&gt;<span style="color:#a6e22e">Count</span> <span style="color:#a6e22e">is</span> {<span style="color:#a6e22e">count</span>}&lt;/<span style="color:#f92672">span</span>&gt;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>      &lt;<span style="color:#f92672">button</span> <span style="color:#a6e22e">onClick</span><span style="color:#f92672">=</span>{() =&gt; <span style="color:#a6e22e">dispatch</span>(<span style="color:#a6e22e">incremented</span>())}&gt;<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>&lt;/<span style="color:#f92672">button</span>&gt;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>    &lt;/&gt;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>  )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>}
+</span></span></code></pre></div><ul>
+<li><strong>useSelector</strong>：订阅 store，选择器函数 <code>(state) =&gt; ...</code> 返回组件需要的那块数据；那块数据变了，组件才重渲染。</li>
+<li><strong>useDispatch</strong>：拿到 <code>dispatch</code>，用来派发 action。</li>
+</ul>
+<p>完整数据流（点 +1）：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>点击 +1  →  dispatch(incremented())  →  reducer 把 value+1  →  state 更新
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>       →  useSelector 订阅到变化  →  count 变  →  按钮文案更新
+</span></span></code></pre></div><hr>
+<h2 id="五异步状态createasyncthunk">五、异步状态：createAsyncThunk</h2>
+<h3 id="51-同步-reducer-的局限">5.1 同步 reducer 的局限</h3>
+<p><code>counterSlice</code> 的 <code>reducers</code> 处理的是同步操作。但「发请求拿数据」是异步的，而 <strong>reducer 必须是纯函数，不能有副作用</strong>（不能在 reducer 里发请求）。怎么把异步请求的结果送进 store？</p>
+<h3 id="52-createasyncthunk">5.2 createAsyncThunk</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#75715e">// src/store/commentsSlice.ts
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fetchComments</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">createAsyncThunk</span>&lt;<span style="color:#f92672">Comment</span><span style="color:#960050;background-color:#1e0010">[]</span>, <span style="color:#a6e22e">void</span>, { <span style="color:#a6e22e">rejectValue</span><span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#a6e22e">string</span> }&gt;(
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>  <span style="color:#e6db74">&#39;comments/fetchComments&#39;</span>,
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>  <span style="color:#66d9ef">async</span> (<span style="color:#a6e22e">_</span>, { <span style="color:#a6e22e">rejectWithValue</span> }) <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">axios</span>.<span style="color:#66d9ef">get</span>&lt;<span style="color:#f92672">Comment</span><span style="color:#960050;background-color:#1e0010">[]</span>&gt;(<span style="color:#e6db74">&#39;http://localhost:3004/list&#39;</span>)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>.<span style="color:#a6e22e">data</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>    } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">rejectWithValue</span>(<span style="color:#a6e22e">error</span> <span style="color:#66d9ef">instanceof</span> Error <span style="color:#f92672">?</span> <span style="color:#a6e22e">error</span>.<span style="color:#a6e22e">message</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;未知错误&#39;</span>)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>    }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>  },
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>)
+</span></span></code></pre></div><p><code>createAsyncThunk</code> 接收一个 async 函数，<strong>自动派发三个 action</strong>：</p>
+<table>
+	<thead>
+			<tr>
+					<th>生命周期</th>
+					<th>触发时机</th>
+					<th>payload</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>pending</code></td>
+					<td>请求发出时</td>
+					<td>无</td>
+			</tr>
+			<tr>
+					<td><code>fulfilled</code></td>
+					<td>成功时</td>
+					<td>async 函数的返回值</td>
+			</tr>
+			<tr>
+					<td><code>rejected</code></td>
+					<td>失败时</td>
+					<td><code>rejectWithValue</code> 传的值</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="53-三态模式loading--error--items">5.3 三态模式：loading / error / items</h3>
+<p>异步请求天然有三种状态，用三个字段表达：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">CommentsState</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>  <span style="color:#a6e22e">items</span>: <span style="color:#66d9ef">Comment</span>[]      <span style="color:#75715e">// 数据
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>  <span style="color:#a6e22e">loading</span>: <span style="color:#66d9ef">boolean</span>      <span style="color:#75715e">// 是否请求中
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>  <span style="color:#a6e22e">error</span>: <span style="color:#66d9ef">string</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">null</span>  <span style="color:#75715e">// 错误信息
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>}
+</span></span></code></pre></div><p>这是异步数据获取的<strong>通用模板</strong>，几乎所有「请求 + 展示」的场景都这套。</p>
+<h3 id="54-extrareducers-处理三个生命周期">5.4 extraReducers 处理三个生命周期</h3>
+<p><code>reducers</code> 管同步 action，<code>extraReducers</code> 管 thunk 派发的异步 action：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">commentsSlice</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">createSlice</span>({
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>  <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;comments&#39;</span>,
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>  <span style="color:#a6e22e">initialState</span>,
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>  <span style="color:#a6e22e">reducers</span><span style="color:#f92672">:</span> {},
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>  <span style="color:#a6e22e">extraReducers</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">builder</span>) <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>    <span style="color:#a6e22e">builder</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>      .<span style="color:#a6e22e">addCase</span>(<span style="color:#a6e22e">fetchComments</span>.<span style="color:#a6e22e">pending</span>, (<span style="color:#a6e22e">state</span>) <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>        <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">loading</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>        <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">error</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>      })
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>      .<span style="color:#a6e22e">addCase</span>(<span style="color:#a6e22e">fetchComments</span>.<span style="color:#a6e22e">fulfilled</span>, (<span style="color:#a6e22e">state</span>, <span style="color:#a6e22e">action</span>) <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>        <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">loading</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>        <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">items</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">action</span>.<span style="color:#a6e22e">payload</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>      })
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>      .<span style="color:#a6e22e">addCase</span>(<span style="color:#a6e22e">fetchComments</span>.<span style="color:#a6e22e">rejected</span>, (<span style="color:#a6e22e">state</span>, <span style="color:#a6e22e">action</span>) <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>        <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">loading</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span>        <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">error</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">action</span>.<span style="color:#a6e22e">payload</span> <span style="color:#f92672">??</span> <span style="color:#e6db74">&#39;请求失败&#39;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span>      })
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span>  },
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span>})
+</span></span></code></pre></div><p>整块状态在请求过程中的变化：</p>
+<table>
+	<thead>
+			<tr>
+					<th>阶段</th>
+					<th>items</th>
+					<th>loading</th>
+					<th>error</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>初始（initialState）</td>
+					<td><code>[]</code></td>
+					<td><code>false</code></td>
+					<td><code>null</code></td>
+			</tr>
+			<tr>
+					<td>pending</td>
+					<td><code>[]</code></td>
+					<td><code>true</code></td>
+					<td><code>null</code></td>
+			</tr>
+			<tr>
+					<td>fulfilled</td>
+					<td><code>[评论数据]</code></td>
+					<td><code>false</code></td>
+					<td><code>null</code></td>
+			</tr>
+			<tr>
+					<td>rejected</td>
+					<td><code>[]</code></td>
+					<td><code>false</code></td>
+					<td><code>&quot;错误信息&quot;</code></td>
+			</tr>
+	</tbody>
+</table>
+<p>组件 <code>useSelector(state =&gt; state.comments)</code> 拿到的，就是这张表里<strong>当前那一行</strong>。</p>
+<h3 id="55-组件里触发请求">5.5 组件里触发请求</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-tsx" data-lang="tsx"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#75715e">// src/components/CommentList.tsx
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span><span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">items</span>, <span style="color:#a6e22e">loading</span>, <span style="color:#a6e22e">error</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">useAppSelector</span>((<span style="color:#a6e22e">state</span>) <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">state</span>.<span style="color:#a6e22e">comments</span>)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dispatch</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">useAppDispatch</span>()
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span><span style="color:#a6e22e">useEffect</span>(() <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span>  <span style="color:#a6e22e">dispatch</span>(<span style="color:#a6e22e">fetchComments</span>())
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span>}, [<span style="color:#a6e22e">dispatch</span>])
+</span></span></code></pre></div><p><strong>为什么放 <code>useEffect</code> 里</strong>：</p>
+<ol>
+<li>React 渲染必须保持纯净，发请求是副作用，不能在渲染期做，要放进 effect。</li>
+<li>控制只请求一次——<code>dispatch</code> 引用在组件生命周期里稳定不变，所以 <code>[dispatch]</code> 等价于空依赖，effect 只在挂载时跑一次。</li>
+</ol>
+<blockquote>
+<p>注意：<code>extraReducers</code> 回调里的 <code>state</code> 参数，是<strong>这块分支本身</strong>（即 <code>state.comments</code>），不是整棵树。所以直接写 <code>state.items</code>，不用 <code>state.comments.items</code>——<code>combineReducers</code> 会把对应分支喂给子 reducer。</p>
+</blockquote>
+<hr>
+<h2 id="六网络请求fetch--axios">六、网络请求：fetch → axios</h2>
+<h3 id="61-两种写法对比">6.1 两种写法对比</h3>
+<table>
+	<thead>
+			<tr>
+					<th>维度</th>
+					<th>fetch</th>
+					<th>axios</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>状态码判断</td>
+					<td>手动 <code>if (!response.ok) throw</code></td>
+					<td>4xx/5xx <strong>自动抛错</strong>，直接进 catch</td>
+			</tr>
+			<tr>
+					<td>JSON 解析</td>
+					<td>手动 <code>await response.json()</code></td>
+					<td><strong>自动解析</strong>，数据在 <code>response.data</code></td>
+			</tr>
+			<tr>
+					<td>错误信息</td>
+					<td>普通 <code>Error</code></td>
+					<td>丰富（<code>error.response.status</code> / <code>.data</code> 等）</td>
+			</tr>
+			<tr>
+					<td>取消请求</td>
+					<td><code>AbortController</code></td>
+					<td><code>CancelToken</code> / <code>AbortController</code></td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="62-改造">6.2 改造</h3>
+<p>fetch 版要写两步样板：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-js" data-lang="js"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span><span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">ok</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">`请求失败：</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">json</span>()
+</span></span></code></pre></div><p>axios 版一步到位：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-js" data-lang="js"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">axios</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">url</span>)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span><span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>.<span style="color:#a6e22e">data</span>
+</span></span></code></pre></div><p>少写了「判断 ok」和「解析 json」两步，因为 axios 把它们内置了。</p>
+<blockquote>
+<p>一个小提醒：等下一步学了 <strong>RTK Query</strong>，它内置的 <code>fetchBaseQuery</code>（基于 fetch）又会把 axios 替代掉。不同层次的工具：axios 是「发请求的」，RTK Query 是「管缓存和状态的」，两者不冲突但层次不同。</p>
+</blockquote>
+<hr>
+<h2 id="七typescript-化">七、TypeScript 化</h2>
+<h3 id="71-为什么要-ts呼应-day02-的疑问">7.1 为什么要 TS（呼应 Day02 的疑问）</h3>
+<p>Day02 评论列表里 <code>items: []</code>，元素字段没声明，<code>item.auhtor</code>（拼错）不报错，运行时渲染成 <code>undefined</code>，页面空一块还查不到原因。TS 把字段写明白，<strong>拼错编译期就报红</strong>。</p>
+<h3 id="72-定义数据类型">7.2 定义数据类型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#75715e">// src/store/commentsSlice.ts
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Comment</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>  <span style="color:#a6e22e">id</span>: <span style="color:#66d9ef">number</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>  <span style="color:#a6e22e">author</span>: <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>  <span style="color:#a6e22e">content</span>: <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>  <span style="color:#a6e22e">date</span>: <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>  <span style="color:#a6e22e">likes</span>: <span style="color:#66d9ef">number</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">CommentsState</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>  <span style="color:#a6e22e">items</span>: <span style="color:#66d9ef">Comment</span>[]
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>  <span style="color:#a6e22e">loading</span>: <span style="color:#66d9ef">boolean</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>  <span style="color:#a6e22e">error</span>: <span style="color:#66d9ef">string</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>}
+</span></span></code></pre></div><p><code>Comment</code> 就是 Day02 里「代码没写、要从 db.json 反推」的那个结构，现在写明白了，全项目共享。</p>
+<h3 id="73-createasyncthunk-的泛型">7.3 createAsyncThunk 的泛型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#a6e22e">createAsyncThunk</span>&lt;<span style="color:#f92672">Comment</span><span style="color:#960050;background-color:#1e0010">[]</span>, <span style="color:#a6e22e">void</span>, { <span style="color:#a6e22e">rejectValue</span><span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#a6e22e">string</span> }&gt;(...)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span><span style="color:#75715e">//              ↑返回值    ↑参数  ↑rejectWithValue 的值类型
+</span></span></span></code></pre></div><p>三个泛型依次是：<strong>返回值类型、参数类型、rejectValue 类型</strong>。标了之后，<code>fulfilled</code> 的 <code>action.payload</code> 自动是 <code>Comment[]</code>，<code>rejected</code> 的 <code>action.payload</code> 自动是 <code>string</code>。</p>
+<p>axios 也标泛型：<code>axios.get&lt;Comment[]&gt;</code> 让 <code>response.data</code> 是 <code>Comment[]</code>。</p>
+<h3 id="74-rootstate--appdispatch--自动推导">7.4 RootState / AppDispatch —— 自动推导</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#75715e">// src/store/index.ts
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">RootState</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ReturnType</span>&lt;<span style="color:#f92672">typeof</span> <span style="color:#a6e22e">store.getState</span>&gt;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">AppDispatch</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">store</span>.<span style="color:#a6e22e">dispatch</span>
+</span></span></code></pre></div><p><strong>不手写 RootState 的结构</strong>，用 <code>ReturnType&lt;typeof store.getState&gt;</code> 从 store 自动推导：</p>
+<ul>
+<li><code>typeof store.getState</code>：取 <code>store.getState</code> 这个函数的类型。</li>
+<li><code>ReturnType&lt;...&gt;</code>：提取它的返回值类型，即整棵 state 树。</li>
+</ul>
+<p>好处：<code>store</code> 配置改了（加新 slice），<code>RootState</code> 自动跟着变，单一数据源、永不失同步。字段类型的源头是各 slice 的 <code>initialState</code>（<code>state.counter</code> 来自 counterSlice，<code>state.comments</code> 来自 commentsSlice 的 <code>CommentsState</code>）。</p>
+<h3 id="75-带类型的-hooks">7.5 带类型的 hooks</h3>
+<p>原生 <code>useSelector</code> 的 <code>state</code> 是 <code>any</code>，没补全。包装一层：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">useAppSelector</span>: <span style="color:#66d9ef">TypedUseSelectorHook</span>&lt;<span style="color:#f92672">RootState</span>&gt; <span style="color:#f92672">=</span> <span style="color:#a6e22e">useSelector</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">useAppDispatch</span><span style="color:#f92672">:</span> () <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">AppDispatch</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">useDispatch</span>
+</span></span></code></pre></div><p>组件里用 <code>useAppSelector</code> / <code>useAppDispatch</code> 替代原生 hooks，<code>state</code> 自动是 <code>RootState</code>，输入 <code>state.</code> 会提示 <code>counter</code> / <code>comments</code>。这是 RTK + TS 的标准写法。</p>
+<h3 id="76-tsconfig--渐进迁移">7.6 tsconfig + 渐进迁移</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>  <span style="color:#f92672">&#34;compilerOptions&#34;</span>: {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>    <span style="color:#f92672">&#34;strict&#34;</span>: <span style="color:#66d9ef">true</span>,        <span style="color:#75715e">// 严格模式
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>    <span style="color:#f92672">&#34;allowJs&#34;</span>: <span style="color:#66d9ef">true</span>,       <span style="color:#75715e">// 允许 .js/.jsx 共存
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>    <span style="color:#f92672">&#34;checkJs&#34;</span>: <span style="color:#66d9ef">false</span>,      <span style="color:#75715e">// 只检查 .ts/.tsx，不检查 .js/.jsx
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span>    <span style="color:#f92672">&#34;jsx&#34;</span>: <span style="color:#e6db74">&#34;react-jsx&#34;</span>,
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span>    <span style="color:#f92672">&#34;noEmit&#34;</span>: <span style="color:#66d9ef">true</span>         <span style="color:#75715e">// 只做类型检查，产出交给 vite/esbuild
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span><span>  }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span><span>}
+</span></span></code></pre></div><p><code>allowJs</code> + <code>checkJs: false</code> = <strong>渐进迁移</strong>：<code>.ts/.tsx</code> 有类型检查，<code>.js/.jsx</code> 照常运行不报错。所以不必一次全改，可以一个文件一个文件迁。本项目目前 <code>commentsSlice</code> / <code>store/index</code> / <code>CommentList</code> 是 TS，<code>counterSlice</code> / <code>App</code> / <code>main</code> 还是 JS，混合运行无问题。</p>
+<h3 id="77-ts-vs-tsx">7.7 .ts vs .tsx</h3>
+<table>
+	<thead>
+			<tr>
+					<th></th>
+					<th><code>.ts</code></th>
+					<th><code>.tsx</code></th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>含 JSX</td>
+					<td>❌</td>
+					<td>✅</td>
+			</tr>
+			<tr>
+					<td>用途</td>
+					<td>slice、store 配置、工具、hooks 逻辑</td>
+					<td>组件</td>
+			</tr>
+			<tr>
+					<td>泛型箭头 <code>&lt;T&gt;</code></td>
+					<td>正常</td>
+					<td>要写 <code>&lt;T,&gt;</code>（否则被误认为 JSX 标签）</td>
+			</tr>
+	</tbody>
+</table>
+<p><strong>规则：有 JSX → <code>.tsx</code>；没 JSX → <code>.ts</code>。</strong> 纯逻辑用 <code>.tsx</code> 也能跑，但约定用 <code>.ts</code>，文件名一眼能看出里面有没有组件。</p>
+<hr>
+<h2 id="八综合案例评论列表演进三连对比">八、综合案例：评论列表演进三连对比</h2>
+<p>同一个需求（请求评论列表 + 处理 loading/error），三种实现，体现心智演进：</p>
+<table>
+	<thead>
+			<tr>
+					<th>版本</th>
+					<th>项目</th>
+					<th>实现</th>
+					<th>状态管理</th>
+					<th>适用场景</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>v1</td>
+					<td><code>react-basic/comment3</code></td>
+					<td><code>useComments</code>（useEffect + fetch + cancelled）</td>
+					<td>组件内 <code>useState</code></td>
+					<td>数据只在局部用</td>
+			</tr>
+			<tr>
+					<td>v2</td>
+					<td><code>react-redux</code></td>
+					<td><code>commentsSlice</code>（createAsyncThunk + axios + extraReducers）</td>
+					<td>全局 Redux</td>
+					<td>数据多处共享、跨组件</td>
+			</tr>
+			<tr>
+					<td>v2+</td>
+					<td><code>react-redux</code>（TS）</td>
+					<td>同 v2 + <code>Comment</code> / <code>RootState</code> 类型</td>
+					<td>全局 Redux + 类型安全</td>
+					<td>同上，且有类型保障</td>
+			</tr>
+	</tbody>
+</table>
+<ul>
+<li><strong>v1 → v2</strong>：从「组件自己管状态」到「全局仓库管状态」，数据能跨组件共享。</li>
+<li><strong>v2 → v2+</strong>：从「运行时才发现拼错」到「编译期就报红」，代码里终于写明了数据结构。</li>
+<li><strong>下一步 v3</strong>：用 <strong>RTK Query</strong>，几行代码替代整套 <code>loading/error/items</code> + <code>extraReducers</code> 样板，还自带缓存/去重。</li>
+</ul>
+<blockquote>
+<p>三连对比是理解「数据获取演进」最深刻的方式：同一需求、不同解法，优劣一目了然。</p>
+</blockquote>
+<hr>
+<h2 id="九坑点与经验">九、坑点与经验</h2>
+<ol>
+<li><strong>删 <code>.js</code> 换 <code>.ts</code> 同名，触发 HMR 缓存错乱</strong>：vite 模块图还指向旧 <code>.js</code>，浏览器报 <code>Failed to load .../index.js</code> 404。代码本身没问题（<code>tsc</code> + <code>build</code> 都过）。解决：<strong>重启 dev server + 浏览器硬刷新</strong>（Ctrl+Shift+R 清缓存）。</li>
+<li><strong>strict 模式下 props 必须标类型</strong>：<code>.tsx</code> 里组件 props 不标会报 <code>implicitly has an 'any' type</code>。改 <code>.tsx</code> 不只是改后缀，要顺手补类型。</li>
+<li><strong><code>.tsx</code> 泛型箭头坑</strong>：<code>const f = &lt;T&gt;(x) =&gt; x</code> 里 <code>&lt;T&gt;</code> 被误认 JSX，要写成 <code>&lt;T,&gt;</code>。<code>.ts</code> 里没这问题。</li>
+<li><strong><code>dispatch</code> 引用稳定</strong>：<code>useDispatch()</code> 返回的 dispatch 不变，所以 <code>useEffect</code> 依赖 <code>[dispatch]</code> 等价空依赖，effect 只跑一次。</li>
+<li><strong>reducer 里 <code>state</code> 是分支不是整棵树</strong>：<code>commentsSlice</code> 的 <code>extraReducers</code> 里 <code>state</code> 就是 <code>state.comments</code> 本身，直接 <code>state.items</code>，不用 <code>state.comments.items</code>。</li>
+<li><strong>key 名决定 state 分支</strong>：<code>store/index</code> 的 <code>reducer</code> 配置里 key 是 <code>comments</code>，所以组件写 <code>state.comments</code>。它和 slice 的 <code>name: 'comments'</code> 没有绑定关系（虽然常同名），改 key 要跟着改组件。</li>
+<li><strong>引用路径带显式后缀要更新</strong>：文件从 <code>.js</code> 改成 <code>.ts</code> 后，引用它的地方若写死 <code>./store/index.js</code>，靠 vite 扩展名替换能跑但不规范，应改成 <code>./store</code>。</li>
+</ol>
+<hr>
+<h2 id="十总结">十、总结</h2>
+<p>今天学到的：</p>
+<ul>
+<li><strong>Redux 解决「跨组件共享状态」</strong>：单向数据流 <code>dispatch → reducer → state → UI</code>；三个原则（单一数据源、state 只读、纯函数改变）。</li>
+<li><strong>RTK 大幅减少样板</strong>：<code>configureStore</code> 建仓库，<code>createSlice</code> 定义切片；Immer 让你「直接改」state 实则不可变更新。</li>
+<li><strong>React-Redux 连接</strong>：<code>Provider</code> 注入 store，<code>useSelector</code> 读、<code>useDispatch</code> 写。</li>
+<li><strong>createAsyncThunk 处理异步</strong>：pending/fulfilled/rejected 三态 + loading/error/items 模式，<code>extraReducers</code> 消费。</li>
+<li><strong>fetch → axios</strong>：少写 ok 判断和 json 解析，错误自动抛。</li>
+<li><strong>TypeScript 化</strong>：<code>Comment</code> 类型写明字段、<code>createAsyncThunk</code> 泛型、<code>RootState</code> 自动推导、<code>useAppSelector</code>/<code>useAppDispatch</code> 带类型 hooks、<code>tsconfig</code> 渐进迁移。</li>
+<li><strong>综合案例</strong>：评论列表三连对比（<code>useComments</code> → <code>createAsyncThunk</code> → +TS）。</li>
+</ul>
+<hr>
+<h2 id="下一步">下一步</h2>
+<ul>
+<li><strong><code>useReducer</code></strong>：组件内的「迷你 Redux」，和今天的 Redux 呼应，理解了 Redux 再看它会秒懂。</li>
+<li><strong>性能优化</strong>：<code>useMemo</code> / <code>useCallback</code> / <code>React.memo</code>（什么时候用、什么时候别用）。</li>
+<li><strong>React Router</strong>：多页面路由。</li>
+<li><strong>RTK Query</strong>：评论列表 v3，几行替代整套 loading/error 样板，自带缓存/去重。</li>
+<li><strong>继续 TS 化</strong>：把 <code>counterSlice.js</code> / <code>App.jsx</code> / <code>main.jsx</code> 也迁成 TS。</li>
+</ul>
+<hr>
+<p><em>文章为 React 12 天学习计划第 3 天笔记，代码位于 <code>react-redux</code> 项目（<code>src/store/</code>、<code>src/components/</code>）。</em></p>
+
+          </article>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-12 col-lg-3">
+        <div id="stickySideBar" class="sticky-sidebar">
+          
+          <aside class="toc">
+              <h5>
+                目录
+              </h5>
+              <div class="toc-content">
+                <nav id="TableOfContents">
+  <ul>
+    <li><a href="#一为什么需要-redux">一、为什么需要 Redux</a></li>
+    <li><a href="#二redux-核心概念">二、Redux 核心概念</a></li>
+    <li><a href="#三redux-toolkitrtk">三、Redux Toolkit（RTK）</a>
+      <ul>
+        <li><a href="#31-configurestore--创建仓库">3.1 configureStore —— 创建仓库</a></li>
+        <li><a href="#32-createslice--切片">3.2 createSlice —— 切片</a></li>
+      </ul>
+    </li>
+    <li><a href="#四react-redux连接-react-和-redux">四、React-Redux：连接 React 和 Redux</a>
+      <ul>
+        <li><a href="#41-provider--注入仓库">4.1 Provider —— 注入仓库</a></li>
+        <li><a href="#42-useselector--usedispatch--读写仓库">4.2 useSelector / useDispatch —— 读写仓库</a></li>
+      </ul>
+    </li>
+    <li><a href="#五异步状态createasyncthunk">五、异步状态：createAsyncThunk</a>
+      <ul>
+        <li><a href="#51-同步-reducer-的局限">5.1 同步 reducer 的局限</a></li>
+        <li><a href="#52-createasyncthunk">5.2 createAsyncThunk</a></li>
+        <li><a href="#53-三态模式loading--error--items">5.3 三态模式：loading / error / items</a></li>
+        <li><a href="#54-extrareducers-处理三个生命周期">5.4 extraReducers 处理三个生命周期</a></li>
+        <li><a href="#55-组件里触发请求">5.5 组件里触发请求</a></li>
+      </ul>
+    </li>
+    <li><a href="#六网络请求fetch--axios">六、网络请求：fetch → axios</a>
+      <ul>
+        <li><a href="#61-两种写法对比">6.1 两种写法对比</a></li>
+        <li><a href="#62-改造">6.2 改造</a></li>
+      </ul>
+    </li>
+    <li><a href="#七typescript-化">七、TypeScript 化</a>
+      <ul>
+        <li><a href="#71-为什么要-ts呼应-day02-的疑问">7.1 为什么要 TS（呼应 Day02 的疑问）</a></li>
+        <li><a href="#72-定义数据类型">7.2 定义数据类型</a></li>
+        <li><a href="#73-createasyncthunk-的泛型">7.3 createAsyncThunk 的泛型</a></li>
+        <li><a href="#74-rootstate--appdispatch--自动推导">7.4 RootState / AppDispatch —— 自动推导</a></li>
+        <li><a href="#75-带类型的-hooks">7.5 带类型的 hooks</a></li>
+        <li><a href="#76-tsconfig--渐进迁移">7.6 tsconfig + 渐进迁移</a></li>
+        <li><a href="#77-ts-vs-tsx">7.7 .ts vs .tsx</a></li>
+      </ul>
+    </li>
+    <li><a href="#八综合案例评论列表演进三连对比">八、综合案例：评论列表演进三连对比</a></li>
+    <li><a href="#九坑点与经验">九、坑点与经验</a></li>
+    <li><a href="#十总结">十、总结</a></li>
+    <li><a href="#下一步">下一步</a></li>
+  </ul>
+</nav>
+              </div>
+          </aside>
+          
+
+          
+          <aside class="tags">
+            <h5></h5>
+            <ul class="tags-ul list-unstyled list-inline">
+              
+              
+              <li class="list-inline-item"><a href="/tags/react"
+                target="_blank"
+              >React</a></li>
+              
+              
+              <li class="list-inline-item"><a href="/tags/%E5%89%8D%E7%AB%AF"
+                target="_blank"
+              >前端</a></li>
+              
+              
+              <li class="list-inline-item"><a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0"
+                target="_blank"
+              >学习笔记</a></li>
+              
+              
+              <li class="list-inline-item"><a href="/tags/redux"
+                target="_blank"
+              >Redux</a></li>
+              
+              
+              <li class="list-inline-item"><a href="/tags/redux-toolkit"
+                target="_blank"
+              >Redux Toolkit</a></li>
+              
+              
+              <li class="list-inline-item"><a href="/tags/typescript"
+                target="_blank"
+              >TypeScript</a></li>
+              
+              
+              <li class="list-inline-item"><a href="/tags/%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86"
+                target="_blank"
+              >状态管理</a></li>
+              
+            </ul>
+          </aside>
+          
+
+          
+          <aside class="social">
+            <h5></h5>
+            <div class="social-content">
+              <ul class="list-inline">
+                <li class="list-inline-item text-center">
+                  <a target="_blank" href="https://www.linkedin.com/feed/?shareActive=true&text= http%3a%2f%2flocalhost%3a1313%2fposts%2freact-%25E5%25AD%25A6%25E4%25B9%25A0-day-03redux-toolkit%25E5%25BC%2582%25E6%25AD%25A5%25E7%258A%25B6%25E6%2580%2581%25E4%25B8%258E-typescript%2f">
+                    <i class="fab fa-linkedin"></i>
+                  </a>
+                </li>
+                <li class="list-inline-item text-center">
+                  <a target="_blank" href='https://twitter.com/share?text=React%20%e5%ad%a6%e4%b9%a0%20Day%2003%3aRedux%20Toolkit%e3%80%81%e5%bc%82%e6%ad%a5%e7%8a%b6%e6%80%81%e4%b8%8e%20TypeScript&url=http%3a%2f%2flocalhost%3a1313%2fposts%2freact-%25E5%25AD%25A6%25E4%25B9%25A0-day-03redux-toolkit%25E5%25BC%2582%25E6%25AD%25A5%25E7%258A%25B6%25E6%2580%2581%25E4%25B8%258E-typescript%2f&hashtags=React%2c%e5%89%8d%e7%ab%af%2c%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%2cRedux%2cRedux%20Toolkit%2cTypeScript%2c%e7%8a%b6%e6%80%81%e7%ae%a1%e7%90%86'>
+                    <i class="fab fa-twitter"></i>
+                  </a>
+                </li>
+                <li class="list-inline-item text-center">
+                  <a target="_blank" href="https://api.whatsapp.com/send?text=React%20%e5%ad%a6%e4%b9%a0%20Day%2003%3aRedux%20Toolkit%e3%80%81%e5%bc%82%e6%ad%a5%e7%8a%b6%e6%80%81%e4%b8%8e%20TypeScript: http%3a%2f%2flocalhost%3a1313%2fposts%2freact-%25E5%25AD%25A6%25E4%25B9%25A0-day-03redux-toolkit%25E5%25BC%2582%25E6%25AD%25A5%25E7%258A%25B6%25E6%2580%2581%25E4%25B8%258E-typescript%2f">
+                    <i class="fab fa-whatsapp"></i>
+                  </a>
+                </li>
+                <li class="list-inline-item text-center">
+                  <a target="_blank" href='mailto:?subject=React%20%e5%ad%a6%e4%b9%a0%20Day%2003%3aRedux%20Toolkit%e3%80%81%e5%bc%82%e6%ad%a5%e7%8a%b6%e6%80%81%e4%b8%8e%20TypeScript&amp;body=%e7%9c%8b%e7%9c%8b%e8%bf%99%e4%b8%aa%e7%ab%99%e7%82%b9 http%3a%2f%2flocalhost%3a1313%2fposts%2freact-%25E5%25AD%25A6%25E4%25B9%25A0-day-03redux-toolkit%25E5%25BC%2582%25E6%25AD%25A5%25E7%258A%25B6%25E6%2580%2581%25E4%25B8%258E-typescript%2f'>
+                    <i class="fa fa-envelope"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </aside>
+          
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-9 p-4">
+        
+      </div>
+    </div>
+  </div>
+  <button class="p-2 px-3" onclick="topFunction()" id="topScroll">
+    <i class="fas fa-angle-up"></i>
+  </button>
+</section>
+
+
+<div class="progress">
+  <div id="scroll-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+<Script src="/js/scrollProgressBar.js"></script>
+
+
+<script>
+  var topScroll = document.getElementById("topScroll");
+  window.onscroll = function() {scrollFunction()};
+
+  function scrollFunction() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+      topScroll.style.display = "block";
+    } else {
+      topScroll.style.display = "none";
+    }
+  }
+
+  function topFunction() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  }
+
+  
+  let stickySideBarElem = document.getElementById("stickySideBar");
+  let stickyNavBar =  true ;
+  if(stickyNavBar) {
+    let headerElem = document.getElementById("profileHeader");
+    let headerHeight = headerElem.offsetHeight + 15;
+    stickySideBarElem.style.top = headerHeight + "px";
+  } else {
+    stickySideBarElem.style.top = "50px";
+  }
+</script>
+
+
+<script src="/js/readingTime.js"></script>
+
+
+
+  </div><footer style="background-color: transparent;">
+    
+    
+
+
+  
+
+
+
+<div class="container py-3" id="recent-posts">
+    
+    
+    <div class="h3 text-center text-secondary py-3">
+        最近文章
+    </div>
+    <div class="row justify-content-center">
+        
+        <div class="col-lg-4 col-md-6 pt-2">
+            <div class="card h-100">
+                
+                <div class="card-body bg-transparent p-3 shadow-sm">
+                    <a href="/posts/react-%E5%AD%A6%E4%B9%A0-day-03redux-toolkit%E5%BC%82%E6%AD%A5%E7%8A%B6%E6%80%81%E4%B8%8E-typescript/" class="primary-font card-title">
+                        <h5 class="card-title bg-transparent" title="React 学习 Day 03:Redux Toolkit、异步状态与 TypeScript">React 学习 Day 03:Redux …</h5>
+                    </a>
+                    <div class="card-text secondary-font">
+                        <p> 延续 Day01/Day02（react-basic 项目），今天进入 react-redux 项目，学三块：① 全局状态管理 Redux Toolkit；② 异步数据流 createAsyncThunk + axios；③ 把项目 …</p>
+                    </div>
+                </div>
+                <div class="mt-auto card-footer">
+                    <span class="float-start">2026年7月8日</span>
+                    <a href="/posts/react-%E5%AD%A6%E4%B9%A0-day-03redux-toolkit%E5%BC%82%E6%AD%A5%E7%8A%B6%E6%80%81%E4%B8%8E-typescript/" class="float-end btn btn-outline-info btn-sm">阅读</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 pt-2">
+            <div class="card h-100">
+                
+                <div class="card-body bg-transparent p-3 shadow-sm">
+                    <a href="/posts/react-%E5%AD%A6%E4%B9%A0-day-02%E5%8F%97%E6%8E%A7%E8%A1%A8%E5%8D%95dom%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1%E4%B8%8E-hooks/" class="primary-font card-title">
+                        <h5 class="card-title bg-transparent" title="React 学习 Day 02：受控表单、DOM、组件通信与 Hooks">React 学习 Day 02：受控表单、DOM、 …</h5>
+                    </a>
+                    <div class="card-text secondary-font">
+                        <p> 延续 Day01，今天一口气覆盖「受控表单、受控 vs 非受控、useRef 获取 DOM、UUID/时间、组件通信、useEffect、自定义 Hook」，并用「请求接口的评论列表」综合案例收口。每个知识点都配项目里的真实案例代码。
+一 …</p>
+                    </div>
+                </div>
+                <div class="mt-auto card-footer">
+                    <span class="float-start">2026年7月5日</span>
+                    <a href="/posts/react-%E5%AD%A6%E4%B9%A0-day-02%E5%8F%97%E6%8E%A7%E8%A1%A8%E5%8D%95dom%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1%E4%B8%8E-hooks/" class="float-end btn btn-outline-info btn-sm">阅读</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 pt-2">
+            <div class="card h-100">
+                
+                <div class="card-body bg-transparent p-3 shadow-sm">
+                    <a href="/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="primary-font card-title">
+                        <h5 class="card-title bg-transparent" title="React 学习 Day 01：基础入门">React 学习 Day 01：基础入门</h5>
+                    </a>
+                    <div class="card-text secondary-font">
+                        <p> 从零开始，用一个 react-basic 项目串起 React 入门必备知识。
+一、项目搭建 使用 Vite 创建 React 项目：
+1npm create vite@latest react-basic -- --template …</p>
+                    </div>
+                </div>
+                <div class="mt-auto card-footer">
+                    <span class="float-start">2026年7月4日</span>
+                    <a href="/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="float-end btn btn-outline-info btn-sm">阅读</a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+
+    <div class="text-center pt-2">
+    
+    <span class="px-1">
+        <a href="http://localhost:1313/" title="东阳的个人站点">
+            <img alt="Footer logo" src="/images/avatar.jpg"
+                height="40px" width="40px" style="border-radius: 50%;">
+        </a>
+    </span>
+    
+
+    
+    <span class="px-1">
+        <a href="https://github.com/Samantha09" target="_blank" aria-label="github">
+            <svg xmlns="http://www.w3.org/2000/svg" width="2.7em" height="2.7em" viewBox="0 0 1792 1792">
+                <path id="footer-socialNetworks-github-svg-path"
+                    d="M522 1352q-8 9-20-3-13-11-4-19 8-9 20 3 12 11 4 19zm-42-61q9 12 0 19-8 6-17-7t0-18q9-7 17 6zm-61-60q-5 7-13 2-10-5-7-12 3-5 13-2 10 5 7 12zm31 34q-6 7-16-3-9-11-2-16 6-6 16 3 9 11 2 16zm129 112q-4 12-19 6-17-4-13-15t19-7q16 5 13 16zm63 5q0 11-16 11-17 2-17-11 0-11 16-11 17-2 17 11zm58-10q2 10-14 14t-18-8 14-15q16-2 18 9zm964-956v960q0 119-84.5 203.5t-203.5 84.5h-224q-16 0-24.5-1t-19.5-5-16-14.5-5-27.5v-239q0-97-52-142 57-6 102.5-18t94-39 81-66.5 53-105 20.5-150.5q0-121-79-206 37-91-8-204-28-9-81 11t-92 44l-38 24q-93-26-192-26t-192 26q-16-11-42.5-27t-83.5-38.5-86-13.5q-44 113-7 204-79 85-79 206 0 85 20.5 150t52.5 105 80.5 67 94 39 102.5 18q-40 36-49 103-21 10-45 15t-57 5-65.5-21.5-55.5-62.5q-19-32-48.5-52t-49.5-24l-20-3q-21 0-29 4.5t-5 11.5 9 14 13 12l7 5q22 10 43.5 38t31.5 51l10 23q13 38 44 61.5t67 30 69.5 7 55.5-3.5l23-4q0 38 .5 103t.5 68q0 22-11 33.5t-22 13-33 1.5h-224q-119 0-203.5-84.5t-84.5-203.5v-960q0-119 84.5-203.5t203.5-84.5h960q119 0 203.5 84.5t84.5 203.5z" />
+
+                <metadata>
+                    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+                        <rdf:Description about="https://iconscout.com/legal#licenses"
+                            dc:title="Github, Online, Project, Hosting, Square"
+                            dc:description="Github, Online, Project, Hosting, Square" dc:publisher="Iconscout"
+                            dc:date="2016-12-14" dc:format="image/svg+xml" dc:language="en">
+                            <dc:creator>
+                                <rdf:Bag>
+                                    <rdf:li>Font Awesome</rdf:li>
+                                </rdf:Bag>
+                            </dc:creator>
+                        </rdf:Description>
+                    </rdf:RDF>
+                </metadata>
+            </svg>
+        </a>
+    </span>
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-4 text-center">
+            &copy; 2026  保留所有权利
+            <div class="text-secondary">
+                Made with
+                <span class="text-danger">
+                    &#10084;
+                </span>
+                and
+                <a href="https://github.com/gurusabarish/hugo-profile" target="_blank"
+                    title="Designed and developed by gurusabarish">
+                    Hugo Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</footer>
+<script src="/bootstrap-5/js/bootstrap.bundle.min.js"></script>
+<script>
+    if (document.body.className.includes("dark")) {
+        document.body.classList.remove('dark');
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem("pref-theme", 'light');
+    }
+</script>
+
+
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            document.documentElement.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+</script>
+
+
+    <script>
+      
+      window.searchIndexURL = "/index.json";
+    </script>
+    <script src="/js/search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+  <section id="search-content" class="py-2">
+    <div class="container" id="search-results"></div>
+  </section>
+</body>
+
+</html>

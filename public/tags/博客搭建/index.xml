@@ -1,14 +1,24 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>博客搭建 on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</link><description>Recent content in 博客搭建 on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Fri, 30 May 2025 12:00:00 +0800</lastBuildDate><atom:link href="https://Samantha09.github.io/san-blog/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/index.xml" rel="self" type="application/rss+xml"/><item><title>Hello World</title><link>https://Samantha09.github.io/san-blog/posts/hello-world/</link><pubDate>Fri, 30 May 2025 12:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/hello-world/</guid><description>&lt;p&gt;这是我的第一篇博客文章！&lt;/p&gt;
-&lt;h2 id="为什么选择-hugo"&gt;为什么选择 Hugo&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;构建速度快&lt;/strong&gt;：Go 语言编写，毫秒级构建&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;主题丰富&lt;/strong&gt;：PaperMod 主题简洁美观&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;部署简单&lt;/strong&gt;：配合 GitHub Actions 自动部署&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="后续计划"&gt;后续计划&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;分享更多技术文章&lt;/li&gt;
-&lt;li&gt;记录学习笔记&lt;/li&gt;
-&lt;li&gt;探索更多有趣的技术&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;感谢阅读！&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>博客搭建 on 东阳的个人站点</title>
+		<link>http://localhost:1313/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</link>
+		<description>Recent content in 博客搭建 on 东阳的个人站点</description>
+		<generator>Hugo</generator>
+		<language>zh-cn</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 30 May 2025 12:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="http://localhost:1313/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Hello World</title>
+				<link>http://localhost:1313/posts/hello-world/</link>
+				<pubDate>Fri, 30 May 2025 12:00:00 +0800</pubDate>
+				<guid>http://localhost:1313/posts/hello-world/</guid>
+				<description>&lt;p&gt;这是我的第一篇博客文章！&lt;/p&gt;&#xA;&lt;h2 id=&#34;为什么选择-hugo&#34;&gt;为什么选择 Hugo&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;构建速度快&lt;/strong&gt;：Go 语言编写，毫秒级构建&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;主题丰富&lt;/strong&gt;：PaperMod 主题简洁美观&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;部署简单&lt;/strong&gt;：配合 GitHub Actions 自动部署&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;后续计划&#34;&gt;后续计划&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;分享更多技术文章&lt;/li&gt;&#xA;&lt;li&gt;记录学习笔记&lt;/li&gt;&#xA;&lt;li&gt;探索更多有趣的技术&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;感谢阅读！&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

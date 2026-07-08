@@ -1,57 +1,38 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>React on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/tags/react/</link><description>Recent content in React on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Sun, 05 Jul 2026 12:00:00 +0800</lastBuildDate><atom:link href="https://Samantha09.github.io/san-blog/tags/react/index.xml" rel="self" type="application/rss+xml"/><item><title>React 学习 Day 02：受控表单、DOM、组件通信与 Hooks</title><link>https://Samantha09.github.io/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-02%E5%8F%97%E6%8E%A7%E8%A1%A8%E5%8D%95dom%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1%E4%B8%8E-hooks/</link><pubDate>Sun, 05 Jul 2026 12:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-02%E5%8F%97%E6%8E%A7%E8%A1%A8%E5%8D%95dom%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1%E4%B8%8E-hooks/</guid><description>&lt;blockquote&gt;
-&lt;p&gt;延续 Day01，今天一口气覆盖「受控表单、受控 vs 非受控、useRef 获取 DOM、UUID/时间、组件通信、useEffect、自定义 Hook」，并用「请求接口的评论列表」综合案例收口。每个知识点都配项目里的真实案例代码。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;hr&gt;
-&lt;h2 id="一dom-是什么"&gt;一、DOM 是什么&lt;/h2&gt;
-&lt;p&gt;&lt;strong&gt;DOM = Document Object Model（文档对象模型）&lt;/strong&gt;。浏览器加载 HTML 后，把每个标签变成一个 JS 对象，按父子关系组成一棵树。JS 操作页面，本质就是操作这棵树上的节点。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;1&lt;/span&gt;&lt;span&gt;&amp;lt;html&amp;gt; ← 根节点
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;2&lt;/span&gt;&lt;span&gt; &amp;lt;body&amp;gt; ← 对象 { tagName: &amp;#39;BODY&amp;#39;, children: [...] }
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;3&lt;/span&gt;&lt;span&gt; &amp;lt;div&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;4&lt;/span&gt;&lt;span&gt; &amp;lt;input /&amp;gt; ← ref.current 拿到的就是这个对象
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;5&lt;/span&gt;&lt;span&gt; &amp;lt;/div&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;6&lt;/span&gt;&lt;span&gt; &amp;lt;/body&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;7&lt;/span&gt;&lt;span&gt;&amp;lt;/html&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;每个节点能用 DOM API 读写：&lt;/p&gt;</description></item><item><title>React 学习 Day 01：基础入门</title><link>https://Samantha09.github.io/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/</link><pubDate>Sat, 04 Jul 2026 12:00:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/</guid><description>&lt;blockquote&gt;
-&lt;p&gt;从零开始，用一个 &lt;code&gt;react-basic&lt;/code&gt; 项目串起 React 入门必备知识。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;hr&gt;
-&lt;h2 id="一项目搭建"&gt;一、项目搭建&lt;/h2&gt;
-&lt;p&gt;使用 Vite 创建 React 项目：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;1&lt;/span&gt;&lt;span&gt;npm create vite@latest react-basic -- --template react
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;2&lt;/span&gt;&lt;span&gt;cd react-basic
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;3&lt;/span&gt;&lt;span&gt;npm install
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;4&lt;/span&gt;&lt;span&gt;npm run dev
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;常用命令：&lt;/p&gt;
-&lt;table&gt;
-	&lt;thead&gt;
-			&lt;tr&gt;
-					&lt;th&gt;命令&lt;/th&gt;
-					&lt;th&gt;作用&lt;/th&gt;
-			&lt;/tr&gt;
-	&lt;/thead&gt;
-	&lt;tbody&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;npm run dev&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;启动开发服务器&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;npm run build&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;生产构建&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;npm run preview&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;预览生产构建&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;npm run lint&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;运行 Oxlint&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;npm test -- --run&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;运行测试&lt;/td&gt;
-			&lt;/tr&gt;
-	&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h2 id="二jsx-基础"&gt;二、JSX 基础&lt;/h2&gt;
-&lt;p&gt;JSX 允许在 JavaScript 中写 HTML 结构，并用 &lt;code&gt;{}&lt;/code&gt; 嵌入表达式。&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>React on 东阳的个人站点</title>
+		<link>http://localhost:1313/tags/react/</link>
+		<description>Recent content in React on 东阳的个人站点</description>
+		<generator>Hugo</generator>
+		<language>zh-cn</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 08 Jul 2026 12:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="http://localhost:1313/tags/react/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>React 学习 Day 03:Redux Toolkit、异步状态与 TypeScript</title>
+				<link>http://localhost:1313/posts/react-%E5%AD%A6%E4%B9%A0-day-03redux-toolkit%E5%BC%82%E6%AD%A5%E7%8A%B6%E6%80%81%E4%B8%8E-typescript/</link>
+				<pubDate>Wed, 08 Jul 2026 12:00:00 +0800</pubDate>
+				<guid>http://localhost:1313/posts/react-%E5%AD%A6%E4%B9%A0-day-03redux-toolkit%E5%BC%82%E6%AD%A5%E7%8A%B6%E6%80%81%E4%B8%8E-typescript/</guid>
+				<description>&lt;blockquote&gt;&#xA;&lt;p&gt;延续 Day01/Day02（&lt;code&gt;react-basic&lt;/code&gt; 项目），今天进入 &lt;code&gt;react-redux&lt;/code&gt; 项目，学三块：① 全局状态管理 &lt;strong&gt;Redux Toolkit&lt;/strong&gt;；② 异步数据流 &lt;strong&gt;createAsyncThunk + axios&lt;/strong&gt;；③ 把项目 &lt;strong&gt;TypeScript 化&lt;/strong&gt;。综合案例：用 RTK + axios + TS 重写「评论列表」，并与 Day02 的 &lt;code&gt;useComments&lt;/code&gt; 版本对比。代码位于 &lt;code&gt;react-redux&lt;/code&gt; 项目。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;一为什么需要-redux&#34;&gt;一、为什么需要 Redux&lt;/h2&gt;&#xA;&lt;p&gt;Day02 学过的状态管理方式，覆盖了大多数场景：&lt;/p&gt;&#xA;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;方式&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;适用&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;props（父→子）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;父把数据传给子&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;回调（子→父）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;子把数据传回父&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;状态提升（兄弟）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;兄弟组件共享，提到共同父&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Context（跨层级）&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;跨多层传值，省去层层转发&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;p&gt;但当应用变大，这些方式会力不从心：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&lt;strong&gt;props 钻取&lt;/strong&gt;：状态提升到很高层级后，中间组件被迫一层层转发它根本不关心的 props。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Context 的局限&lt;/strong&gt;：适合「低频变化的全局值」（主题、用户信息），不适合「高频更新、多处共享的复杂状态」（评论列表、购物车）——Context 值一变，所有消费组件全量重渲染，难做精细优化。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;&lt;strong&gt;Redux 的思路&lt;/strong&gt;：把共享状态从「组件内部」搬到「组件外部的一个仓库（store）」，任何组件直接读写，不用层层传递。&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;心智模型：组件只是仓库的「读写者」，仓库是唯一数据源。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;二redux-核心概念&#34;&gt;二、Redux 核心概念&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;单向数据流&lt;/strong&gt;：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1&lt;/span&gt;&lt;span&gt;UI 事件  →  dispatch(action)  →  reducer(state, action)  →  新 state  →  UI 更新&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;概念&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;是什么&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;例子&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;strong&gt;store&lt;/strong&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;仓库，存全局 state&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;configureStore({...})&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;strong&gt;state&lt;/strong&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;仓库里的当前数据&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;{ counter: {value:0}, comments:{...} }&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;strong&gt;action&lt;/strong&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;描述「发生了什么」的对象&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;{ type: &#39;counter/incremented&#39; }&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;strong&gt;reducer&lt;/strong&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;纯函数 &lt;code&gt;(state, action) =&amp;gt; newState&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;根据 action 算新 state&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;strong&gt;dispatch&lt;/strong&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;派发 action 触发更新&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;dispatch(incremented())&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;p&gt;&lt;strong&gt;三个原则&lt;/strong&gt;：&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>React 学习 Day 02：受控表单、DOM、组件通信与 Hooks</title>
+				<link>http://localhost:1313/posts/react-%E5%AD%A6%E4%B9%A0-day-02%E5%8F%97%E6%8E%A7%E8%A1%A8%E5%8D%95dom%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1%E4%B8%8E-hooks/</link>
+				<pubDate>Sun, 05 Jul 2026 12:00:00 +0800</pubDate>
+				<guid>http://localhost:1313/posts/react-%E5%AD%A6%E4%B9%A0-day-02%E5%8F%97%E6%8E%A7%E8%A1%A8%E5%8D%95dom%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1%E4%B8%8E-hooks/</guid>
+				<description>&lt;blockquote&gt;&#xA;&lt;p&gt;延续 Day01，今天一口气覆盖「受控表单、受控 vs 非受控、useRef 获取 DOM、UUID/时间、组件通信、useEffect、自定义 Hook」，并用「请求接口的评论列表」综合案例收口。每个知识点都配项目里的真实案例代码。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;一dom-是什么&#34;&gt;一、DOM 是什么&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;DOM = Document Object Model（文档对象模型）&lt;/strong&gt;。浏览器加载 HTML 后，把每个标签变成一个 JS 对象，按父子关系组成一棵树。JS 操作页面，本质就是操作这棵树上的节点。&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1&lt;/span&gt;&lt;span&gt;&amp;lt;html&amp;gt;               ← 根节点&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2&lt;/span&gt;&lt;span&gt;  &amp;lt;body&amp;gt;             ← 对象 { tagName: &amp;#39;BODY&amp;#39;, children: [...] }&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3&lt;/span&gt;&lt;span&gt;    &amp;lt;div&amp;gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4&lt;/span&gt;&lt;span&gt;      &amp;lt;input /&amp;gt;      ← ref.current 拿到的就是这个对象&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5&lt;/span&gt;&lt;span&gt;    &amp;lt;/div&amp;gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6&lt;/span&gt;&lt;span&gt;  &amp;lt;/body&amp;gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7&lt;/span&gt;&lt;span&gt;&amp;lt;/html&amp;gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;每个节点能用 DOM API 读写：&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>React 学习 Day 01：基础入门</title>
+				<link>http://localhost:1313/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/</link>
+				<pubDate>Sat, 04 Jul 2026 12:00:00 +0800</pubDate>
+				<guid>http://localhost:1313/posts/react-%E5%AD%A6%E4%B9%A0-day-01%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/</guid>
+				<description>&lt;blockquote&gt;&#xA;&lt;p&gt;从零开始，用一个 &lt;code&gt;react-basic&lt;/code&gt; 项目串起 React 入门必备知识。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;一项目搭建&#34;&gt;一、项目搭建&lt;/h2&gt;&#xA;&lt;p&gt;使用 Vite 创建 React 项目：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1&lt;/span&gt;&lt;span&gt;npm create vite@latest react-basic -- --template react&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2&lt;/span&gt;&lt;span&gt;cd react-basic&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3&lt;/span&gt;&lt;span&gt;npm install&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4&lt;/span&gt;&lt;span&gt;npm run dev&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;常用命令：&lt;/p&gt;&#xA;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;命令&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;作用&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;npm run dev&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;启动开发服务器&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;npm run build&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;生产构建&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;npm run preview&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;预览生产构建&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;npm run lint&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;运行 Oxlint&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;npm test -- --run&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;运行测试&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;二jsx-基础&#34;&gt;二、JSX 基础&lt;/h2&gt;&#xA;&lt;p&gt;JSX 允许在 JavaScript 中写 HTML 结构，并用 &lt;code&gt;{}&lt;/code&gt; 嵌入表达式。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

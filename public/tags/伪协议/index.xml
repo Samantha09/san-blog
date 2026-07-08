@@ -1,82 +1,24 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>伪协议 on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/tags/%E4%BC%AA%E5%8D%8F%E8%AE%AE/</link><description>Recent content in 伪协议 on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Fri, 05 Jun 2026 23:30:00 +0800</lastBuildDate><atom:link href="https://Samantha09.github.io/san-blog/tags/%E4%BC%AA%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml"/><item><title>php://filter 伪协议：在文件包含中读取源代码</title><link>https://Samantha09.github.io/san-blog/posts/php/filter-%E4%BC%AA%E5%8D%8F%E8%AE%AE%E5%9C%A8%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%BA%90%E4%BB%A3%E7%A0%81/</link><pubDate>Fri, 05 Jun 2026 23:30:00 +0800</pubDate><guid>https://Samantha09.github.io/san-blog/posts/php/filter-%E4%BC%AA%E5%8D%8F%E8%AE%AE%E5%9C%A8%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%BA%90%E4%BB%A3%E7%A0%81/</guid><description>&lt;h2 id="一phpfilter-是什么"&gt;一、php://filter 是什么&lt;/h2&gt;
-&lt;p&gt;&lt;code&gt;php://filter&lt;/code&gt; 是 PHP 提供的一种&lt;strong&gt;元封装协议（meta wrapper）&lt;/strong&gt;，用于在访问数据流时&lt;strong&gt;对数据进行过滤和转换&lt;/strong&gt;。&lt;/p&gt;
-&lt;p&gt;与 &lt;code&gt;php://input&lt;/code&gt; 不同，&lt;code&gt;php://filter&lt;/code&gt; 的核心价值不在于执行代码，而在于&lt;strong&gt;以安全的方式读取文件内容&lt;/strong&gt;——尤其是当目标文件是 PHP 源码时。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="二为什么需要-phpfilter-读取源码"&gt;二、为什么需要 php://filter 读取源码&lt;/h2&gt;
-&lt;p&gt;假设存在如下漏洞代码：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-php" data-lang="php"&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;1&lt;/span&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;&amp;lt;?&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;php&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;2&lt;/span&gt;&lt;span&gt;$file &lt;span style="color:#f92672"&gt;=&lt;/span&gt; $_GET[&lt;span style="color:#e6db74"&gt;&amp;#39;file&amp;#39;&lt;/span&gt;];
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;3&lt;/span&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;include&lt;/span&gt;($file); &lt;span style="color:#75715e"&gt;// 用户可控！
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;4&lt;/span&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;?&amp;gt;&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果我们直接传入 &lt;code&gt;?file=index.php&lt;/code&gt;，会发生什么？&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;1&lt;/span&gt;&lt;span&gt;GET /?file=index.php HTTP/1.1
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;include('index.php')&lt;/code&gt; 会&lt;strong&gt;执行&lt;/strong&gt; &lt;code&gt;index.php&lt;/code&gt; 中的 PHP 代码，而不是显示它的源码。页面上看到的仍然是渲染后的 HTML 输出。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;那如何看到源码呢？&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;答案就是 &lt;code&gt;php://filter&lt;/code&gt;。利用它的编码过滤器，可以在 PHP 代码被执行前，先将文件内容进行 Base64 编码：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;1&lt;/span&gt;&lt;span&gt;?file=php://filter/read=convert.base64-encode/resource=index.php
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这样返回的就是 Base64 编码后的源码字符串，而不是执行结果。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="三基本语法结构"&gt;三、基本语法结构&lt;/h2&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;1&lt;/span&gt;&lt;span&gt;php://filter/&amp;lt;action&amp;gt;=&amp;lt;filter_list&amp;gt;/resource=&amp;lt;target_file&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;table&gt;
-	&lt;thead&gt;
-			&lt;tr&gt;
-					&lt;th&gt;组成部分&lt;/th&gt;
-					&lt;th&gt;说明&lt;/th&gt;
-			&lt;/tr&gt;
-	&lt;/thead&gt;
-	&lt;tbody&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;read=&lt;/code&gt; / &lt;code&gt;write=&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;对读取/写入的数据应用过滤器&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;filter_list&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;过滤器名称，支持链式调用（用 `&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;resource=&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;指定目标文件路径&lt;/td&gt;
-			&lt;/tr&gt;
-	&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id="31-常用过滤器"&gt;3.1 常用过滤器&lt;/h3&gt;
-&lt;table&gt;
-	&lt;thead&gt;
-			&lt;tr&gt;
-					&lt;th&gt;过滤器&lt;/th&gt;
-					&lt;th&gt;功能&lt;/th&gt;
-			&lt;/tr&gt;
-	&lt;/thead&gt;
-	&lt;tbody&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;convert.base64-encode&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;Base64 编码&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;convert.base64-decode&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;Base64 解码&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;string.rot13&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;ROT13 编码&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;string.toupper&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;转大写&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;string.tolower&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;转小写&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;&lt;code&gt;convert.iconv.*&lt;/code&gt;&lt;/td&gt;
-					&lt;td&gt;字符集转换&lt;/td&gt;
-			&lt;/tr&gt;
-	&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h2 id="四实战案例ctfhub-文件包含读源码"&gt;四、实战案例：CTFHub 文件包含读源码&lt;/h2&gt;
-&lt;h3 id="41-题目环境"&gt;4.1 题目环境&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span style="display:flex;"&gt;&lt;span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"&gt;1&lt;/span&gt;&lt;span&gt;URL: http://&amp;lt;TARGET_IP&amp;gt;:&amp;lt;PORT&amp;gt;/
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;页面提示：&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>伪协议 on 东阳的个人站点</title>
+		<link>http://localhost:1313/tags/%E4%BC%AA%E5%8D%8F%E8%AE%AE/</link>
+		<description>Recent content in 伪协议 on 东阳的个人站点</description>
+		<generator>Hugo</generator>
+		<language>zh-cn</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 05 Jun 2026 23:30:00 +0800</lastBuildDate>
+		
+			<atom:link href="http://localhost:1313/tags/%E4%BC%AA%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>php://filter 伪协议：在文件包含中读取源代码</title>
+				<link>http://localhost:1313/posts/php/filter-%E4%BC%AA%E5%8D%8F%E8%AE%AE%E5%9C%A8%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%BA%90%E4%BB%A3%E7%A0%81/</link>
+				<pubDate>Fri, 05 Jun 2026 23:30:00 +0800</pubDate>
+				<guid>http://localhost:1313/posts/php/filter-%E4%BC%AA%E5%8D%8F%E8%AE%AE%E5%9C%A8%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%BA%90%E4%BB%A3%E7%A0%81/</guid>
+				<description>&lt;h2 id=&#34;一phpfilter-是什么&#34;&gt;一、php://filter 是什么&lt;/h2&gt;&#xA;&lt;p&gt;&lt;code&gt;php://filter&lt;/code&gt; 是 PHP 提供的一种&lt;strong&gt;元封装协议（meta wrapper）&lt;/strong&gt;，用于在访问数据流时&lt;strong&gt;对数据进行过滤和转换&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;p&gt;与 &lt;code&gt;php://input&lt;/code&gt; 不同，&lt;code&gt;php://filter&lt;/code&gt; 的核心价值不在于执行代码，而在于&lt;strong&gt;以安全的方式读取文件内容&lt;/strong&gt;——尤其是当目标文件是 PHP 源码时。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;二为什么需要-phpfilter-读取源码&#34;&gt;二、为什么需要 php://filter 读取源码&lt;/h2&gt;&#xA;&lt;p&gt;假设存在如下漏洞代码：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1&lt;/span&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;php&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2&lt;/span&gt;&lt;span&gt;$file &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; $_GET[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;file&amp;#39;&lt;/span&gt;];&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3&lt;/span&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;include&lt;/span&gt;($file);  &lt;span style=&#34;color:#75715e&#34;&gt;// 用户可控！&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4&lt;/span&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;?&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果我们直接传入 &lt;code&gt;?file=index.php&lt;/code&gt;，会发生什么？&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1&lt;/span&gt;&lt;span&gt;GET /?file=index.php HTTP/1.1&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;include(&#39;index.php&#39;)&lt;/code&gt; 会&lt;strong&gt;执行&lt;/strong&gt; &lt;code&gt;index.php&lt;/code&gt; 中的 PHP 代码，而不是显示它的源码。页面上看到的仍然是渲染后的 HTML 输出。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;那如何看到源码呢？&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;答案就是 &lt;code&gt;php://filter&lt;/code&gt;。利用它的编码过滤器，可以在 PHP 代码被执行前，先将文件内容进行 Base64 编码：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1&lt;/span&gt;&lt;span&gt;?file=php://filter/read=convert.base64-encode/resource=index.php&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这样返回的就是 Base64 编码后的源码字符串，而不是执行结果。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;三基本语法结构&#34;&gt;三、基本语法结构&lt;/h2&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1&lt;/span&gt;&lt;span&gt;php://filter/&amp;lt;action&amp;gt;=&amp;lt;filter_list&amp;gt;/resource=&amp;lt;target_file&amp;gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;组成部分&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;说明&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;read=&lt;/code&gt; / &lt;code&gt;write=&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;对读取/写入的数据应用过滤器&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;filter_list&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;过滤器名称，支持链式调用（用 `&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;resource=&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;指定目标文件路径&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;h3 id=&#34;31-常用过滤器&#34;&gt;3.1 常用过滤器&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;过滤器&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th&gt;功能&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;convert.base64-encode&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Base64 编码&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;convert.base64-decode&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;Base64 解码&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;string.rot13&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;ROT13 编码&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;string.toupper&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;转大写&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;string.tolower&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;转小写&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;&lt;code&gt;convert.iconv.*&lt;/code&gt;&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td&gt;字符集转换&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;四实战案例ctfhub-文件包含读源码&#34;&gt;四、实战案例：CTFHub 文件包含读源码&lt;/h2&gt;&#xA;&lt;h3 id=&#34;41-题目环境&#34;&gt;4.1 题目环境&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span style=&#34;white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1&lt;/span&gt;&lt;span&gt;URL: http://&amp;lt;TARGET_IP&amp;gt;:&amp;lt;PORT&amp;gt;/&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;页面提示：&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

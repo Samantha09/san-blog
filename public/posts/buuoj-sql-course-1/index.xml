@@ -1,1 +1,17 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>[BUUOJ] SQL COURSE 1 on 东阳的个人站点</title><link>https://Samantha09.github.io/san-blog/posts/buuoj-sql-course-1/</link><description>Recent content in [BUUOJ] SQL COURSE 1 on 东阳的个人站点</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate/><atom:link href="https://Samantha09.github.io/san-blog/posts/buuoj-sql-course-1/index.xml" rel="self" type="application/rss+xml"/></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>[BUUOJ] SQL COURSE 1 on 东阳的个人站点</title>
+		<link>http://localhost:1313/posts/buuoj-sql-course-1/</link>
+		<description>Recent content in [BUUOJ] SQL COURSE 1 on 东阳的个人站点</description>
+		<generator>Hugo</generator>
+		<language>zh-cn</language>
+		
+		
+		
+		
+			<lastBuildDate></lastBuildDate>
+		
+			<atom:link href="http://localhost:1313/posts/buuoj-sql-course-1/index.xml" rel="self" type="application/rss+xml" />
+	</channel>
+</rss>
